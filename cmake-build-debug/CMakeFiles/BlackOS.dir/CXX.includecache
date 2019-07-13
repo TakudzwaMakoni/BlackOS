@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/takudzwa/CLionProjects/BlackOS/header/BlackOSScripts.h
+ncurses.h
+-
+fstream
+-
+string
+-
+
+/Users/takudzwa/CLionProjects/BlackOS/source/BlackOSScripts.cpp
+../header/BlackOSScripts.h
+/Users/takudzwa/CLionProjects/BlackOS/header/BlackOSScripts.h
+
