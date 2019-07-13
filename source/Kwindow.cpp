@@ -102,7 +102,6 @@ Kwindow::Kwindow(std::vector<int> size,
 
     } else {
 
-        // BOSS_ANIMATION(m_start);
 
     }
 
