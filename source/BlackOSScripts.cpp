@@ -3,6 +3,7 @@
 //
 
 #include "../header/BlackOSScripts.h"
+#include "../header/Kmenu.h"
 
 void writeToFile(){
     std::string buf, fullPath;

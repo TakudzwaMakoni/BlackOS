@@ -43,7 +43,7 @@ int main(int argc, const char * argv[]) {
     // create main window
     std::vector<int> winsize = {WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE};
 
-    Kwindow window(winsize, &BOS_MAIN_MENU, 'c');
+    Kwindow window(winsize, &BOS_MAIN_MENU, 'x');
 
     endwin();
 

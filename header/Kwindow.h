@@ -20,7 +20,9 @@ public:
     WINDOW *window() const;
     void setAnimation(int start, int finish);
     Kmenu *menu() const;
-    void cursor(int code);
+    static void cursor(int code);
+
+    void loadMenu(WINDOW *window, const Kmenu *menu, const char &alignment);
 
     ~Kwindow();
 private:

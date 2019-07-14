@@ -10,6 +10,6 @@
 #include <string>
 
 typedef void (*directive)();
-
 void writeToFile();
+
 #endif //BLACKOS_BLACKOSSCRIPTS_H
