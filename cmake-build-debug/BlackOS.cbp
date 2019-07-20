@@ -80,28 +80,16 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/header/BlackOSObjects.h">
+			<Option target="BlackOS"/>
+		</Unit>
 		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/header/BlackOSScripts.h">
 			<Option target="BlackOS"/>
 		</Unit>
-		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/header/Kfield.h">
-			<Option target="BlackOS"/>
-		</Unit>
-		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/header/Kmenu.h">
-			<Option target="BlackOS"/>
-		</Unit>
-		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/header/Kwindow.h">
+		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/source/BlackOSObjects.cpp">
 			<Option target="BlackOS"/>
 		</Unit>
 		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/source/BlackOSScripts.cpp">
-			<Option target="BlackOS"/>
-		</Unit>
-		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/source/Kfield.cpp">
-			<Option target="BlackOS"/>
-		</Unit>
-		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/source/Kmenu.cpp">
-			<Option target="BlackOS"/>
-		</Unit>
-		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/source/Kwindow.cpp">
 			<Option target="BlackOS"/>
 		</Unit>
 		<Unit filename="/Users/takudzwa/CLionProjects/BlackOS/source/main.cpp">

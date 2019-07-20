@@ -123,6 +123,33 @@ BlackOS/fast:
 	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/build
 .PHONY : BlackOS/fast
 
+source/BlackOSObjects.o: source/BlackOSObjects.cpp.o
+
+.PHONY : source/BlackOSObjects.o
+
+# target to build an object file
+source/BlackOSObjects.cpp.o:
+	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.o
+.PHONY : source/BlackOSObjects.cpp.o
+
+source/BlackOSObjects.i: source/BlackOSObjects.cpp.i
+
+.PHONY : source/BlackOSObjects.i
+
+# target to preprocess a source file
+source/BlackOSObjects.cpp.i:
+	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.i
+.PHONY : source/BlackOSObjects.cpp.i
+
+source/BlackOSObjects.s: source/BlackOSObjects.cpp.s
+
+.PHONY : source/BlackOSObjects.s
+
+# target to generate assembly for a file
+source/BlackOSObjects.cpp.s:
+	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.s
+.PHONY : source/BlackOSObjects.cpp.s
+
 source/BlackOSScripts.o: source/BlackOSScripts.cpp.o
 
 .PHONY : source/BlackOSScripts.o
@@ -149,87 +176,6 @@ source/BlackOSScripts.s: source/BlackOSScripts.cpp.s
 source/BlackOSScripts.cpp.s:
 	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.s
 .PHONY : source/BlackOSScripts.cpp.s
-
-source/Kfield.o: source/Kfield.cpp.o
-
-.PHONY : source/Kfield.o
-
-# target to build an object file
-source/Kfield.cpp.o:
-	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/Kfield.cpp.o
-.PHONY : source/Kfield.cpp.o
-
-source/Kfield.i: source/Kfield.cpp.i
-
-.PHONY : source/Kfield.i
-
-# target to preprocess a source file
-source/Kfield.cpp.i:
-	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/Kfield.cpp.i
-.PHONY : source/Kfield.cpp.i
-
-source/Kfield.s: source/Kfield.cpp.s
-
-.PHONY : source/Kfield.s
-
-# target to generate assembly for a file
-source/Kfield.cpp.s:
-	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/Kfield.cpp.s
-.PHONY : source/Kfield.cpp.s
-
-source/Kmenu.o: source/Kmenu.cpp.o
-
-.PHONY : source/Kmenu.o
-
-# target to build an object file
-source/Kmenu.cpp.o:
-	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/Kmenu.cpp.o
-.PHONY : source/Kmenu.cpp.o
-
-source/Kmenu.i: source/Kmenu.cpp.i
-
-.PHONY : source/Kmenu.i
-
-# target to preprocess a source file
-source/Kmenu.cpp.i:
-	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/Kmenu.cpp.i
-.PHONY : source/Kmenu.cpp.i
-
-source/Kmenu.s: source/Kmenu.cpp.s
-
-.PHONY : source/Kmenu.s
-
-# target to generate assembly for a file
-source/Kmenu.cpp.s:
-	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/Kmenu.cpp.s
-.PHONY : source/Kmenu.cpp.s
-
-source/Kwindow.o: source/Kwindow.cpp.o
-
-.PHONY : source/Kwindow.o
-
-# target to build an object file
-source/Kwindow.cpp.o:
-	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/Kwindow.cpp.o
-.PHONY : source/Kwindow.cpp.o
-
-source/Kwindow.i: source/Kwindow.cpp.i
-
-.PHONY : source/Kwindow.i
-
-# target to preprocess a source file
-source/Kwindow.cpp.i:
-	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/Kwindow.cpp.i
-.PHONY : source/Kwindow.cpp.i
-
-source/Kwindow.s: source/Kwindow.cpp.s
-
-.PHONY : source/Kwindow.s
-
-# target to generate assembly for a file
-source/Kwindow.cpp.s:
-	$(MAKE) -f CMakeFiles/BlackOS.dir/build.make CMakeFiles/BlackOS.dir/source/Kwindow.cpp.s
-.PHONY : source/Kwindow.cpp.s
 
 source/main.o: source/main.cpp.o
 
@@ -267,18 +213,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... BlackOS"
+	@echo "... source/BlackOSObjects.o"
+	@echo "... source/BlackOSObjects.i"
+	@echo "... source/BlackOSObjects.s"
 	@echo "... source/BlackOSScripts.o"
 	@echo "... source/BlackOSScripts.i"
 	@echo "... source/BlackOSScripts.s"
-	@echo "... source/Kfield.o"
-	@echo "... source/Kfield.i"
-	@echo "... source/Kfield.s"
-	@echo "... source/Kmenu.o"
-	@echo "... source/Kmenu.i"
-	@echo "... source/Kmenu.s"
-	@echo "... source/Kwindow.o"
-	@echo "... source/Kwindow.i"
-	@echo "... source/Kwindow.s"
 	@echo "... source/main.o"
 	@echo "... source/main.i"
 	@echo "... source/main.s"

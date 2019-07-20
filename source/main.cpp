@@ -1,10 +1,12 @@
+
+#include "../header/BlackOSObjects.h"
 #include "../header/BlackOSScripts.h"
-#include "../header/Kfield.h"
-#include "../header/Kwindow.h"
+
 
 #include <string>
 #include <vector>
 #include <ncurses.h>
+#include <memory>
 
 #define WORLD_WIDTH (COLS - 10)
 #define WORLD_HEIGHT (LINES - 10)
@@ -22,30 +24,28 @@ int main(int argc, const char * argv[]) {
 
     std::vector<int> framex(50,50);
 
-    directive testScript = script;
-
+    BlackOSObjects::directive testScript = script;
 
     std::string fname1 = "* HOME *";
     std::string fname2 = "* SETTINGS *";
     std::string fname3 = "* PROFILES *";
     std::string fname4 = "* QUIT *";
 
-    Kfield field1(fname1, writeToFile);
-    Kfield field2(fname2, writeToFile);
-    Kfield field3(fname3, testScript);
-    Kfield field4(fname4, testScript);
+    BlackOSObjects::Kfield field1(fname1, BlackOSScripts::writeToFile);
+    BlackOSObjects::Kfield field2(fname2, BlackOSScripts::writeToFile);
+    BlackOSObjects::Kfield field3(fname3, testScript);
+    BlackOSObjects::Kfield field4(fname4, testScript);
 
-    fieldVector mainFields = {field1,field2,field3,field4};
+    std::vector<BlackOSObjects::Kfield> mainFields = {field1,field2,field3,field4};
     std::string mainMenuName = "BlackOS version 1.0";
 
-    Kmenu BOS_MAIN_MENU(mainMenuName , mainFields, framex);
-
+    BlackOSObjects::Kmenu BOS_MAIN_MENU(mainMenuName , mainFields, framex);
+    std::unique_ptr<BlackOSObjects::Kmenu> holder = std::make_unique<BlackOSObjects::Kmenu>(BOS_MAIN_MENU);
     // create main window
     std::vector<int> winsize = {WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE};
 
-    Kwindow window(winsize, &BOS_MAIN_MENU, 'x');
+    BlackOSObjects::Kwindow window(winsize, holder, 'l');
 
     endwin();
-
     return 0;
 }

@@ -70,48 +70,9 @@ CMakeFiles/BlackOS.dir/source/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/BlackOS.dir/source/main.cpp.s"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/takudzwa/CLionProjects/BlackOS/source/main.cpp -o CMakeFiles/BlackOS.dir/source/main.cpp.s
 
-CMakeFiles/BlackOS.dir/source/Kfield.cpp.o: CMakeFiles/BlackOS.dir/flags.make
-CMakeFiles/BlackOS.dir/source/Kfield.cpp.o: ../source/Kfield.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/BlackOS.dir/source/Kfield.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/BlackOS.dir/source/Kfield.cpp.o -c /Users/takudzwa/CLionProjects/BlackOS/source/Kfield.cpp
-
-CMakeFiles/BlackOS.dir/source/Kfield.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/BlackOS.dir/source/Kfield.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/takudzwa/CLionProjects/BlackOS/source/Kfield.cpp > CMakeFiles/BlackOS.dir/source/Kfield.cpp.i
-
-CMakeFiles/BlackOS.dir/source/Kfield.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/BlackOS.dir/source/Kfield.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/takudzwa/CLionProjects/BlackOS/source/Kfield.cpp -o CMakeFiles/BlackOS.dir/source/Kfield.cpp.s
-
-CMakeFiles/BlackOS.dir/source/Kmenu.cpp.o: CMakeFiles/BlackOS.dir/flags.make
-CMakeFiles/BlackOS.dir/source/Kmenu.cpp.o: ../source/Kmenu.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/BlackOS.dir/source/Kmenu.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/BlackOS.dir/source/Kmenu.cpp.o -c /Users/takudzwa/CLionProjects/BlackOS/source/Kmenu.cpp
-
-CMakeFiles/BlackOS.dir/source/Kmenu.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/BlackOS.dir/source/Kmenu.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/takudzwa/CLionProjects/BlackOS/source/Kmenu.cpp > CMakeFiles/BlackOS.dir/source/Kmenu.cpp.i
-
-CMakeFiles/BlackOS.dir/source/Kmenu.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/BlackOS.dir/source/Kmenu.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/takudzwa/CLionProjects/BlackOS/source/Kmenu.cpp -o CMakeFiles/BlackOS.dir/source/Kmenu.cpp.s
-
-CMakeFiles/BlackOS.dir/source/Kwindow.cpp.o: CMakeFiles/BlackOS.dir/flags.make
-CMakeFiles/BlackOS.dir/source/Kwindow.cpp.o: ../source/Kwindow.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/BlackOS.dir/source/Kwindow.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/BlackOS.dir/source/Kwindow.cpp.o -c /Users/takudzwa/CLionProjects/BlackOS/source/Kwindow.cpp
-
-CMakeFiles/BlackOS.dir/source/Kwindow.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/BlackOS.dir/source/Kwindow.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/takudzwa/CLionProjects/BlackOS/source/Kwindow.cpp > CMakeFiles/BlackOS.dir/source/Kwindow.cpp.i
-
-CMakeFiles/BlackOS.dir/source/Kwindow.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/BlackOS.dir/source/Kwindow.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/takudzwa/CLionProjects/BlackOS/source/Kwindow.cpp -o CMakeFiles/BlackOS.dir/source/Kwindow.cpp.s
-
 CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.o: CMakeFiles/BlackOS.dir/flags.make
 CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.o: ../source/BlackOSScripts.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.o -c /Users/takudzwa/CLionProjects/BlackOS/source/BlackOSScripts.cpp
 
 CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.i: cmake_force
@@ -122,25 +83,34 @@ CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.s"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/takudzwa/CLionProjects/BlackOS/source/BlackOSScripts.cpp -o CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.s
 
+CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.o: CMakeFiles/BlackOS.dir/flags.make
+CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.o: ../source/BlackOSObjects.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.o -c /Users/takudzwa/CLionProjects/BlackOS/source/BlackOSObjects.cpp
+
+CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.i"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/takudzwa/CLionProjects/BlackOS/source/BlackOSObjects.cpp > CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.i
+
+CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.s"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/takudzwa/CLionProjects/BlackOS/source/BlackOSObjects.cpp -o CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.s
+
 # Object files for target BlackOS
 BlackOS_OBJECTS = \
 "CMakeFiles/BlackOS.dir/source/main.cpp.o" \
-"CMakeFiles/BlackOS.dir/source/Kfield.cpp.o" \
-"CMakeFiles/BlackOS.dir/source/Kmenu.cpp.o" \
-"CMakeFiles/BlackOS.dir/source/Kwindow.cpp.o" \
-"CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.o"
+"CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.o" \
+"CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.o"
 
 # External object files for target BlackOS
 BlackOS_EXTERNAL_OBJECTS =
 
 BlackOS: CMakeFiles/BlackOS.dir/source/main.cpp.o
-BlackOS: CMakeFiles/BlackOS.dir/source/Kfield.cpp.o
-BlackOS: CMakeFiles/BlackOS.dir/source/Kmenu.cpp.o
-BlackOS: CMakeFiles/BlackOS.dir/source/Kwindow.cpp.o
 BlackOS: CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.o
+BlackOS: CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.o
 BlackOS: CMakeFiles/BlackOS.dir/build.make
 BlackOS: CMakeFiles/BlackOS.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable BlackOS"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable BlackOS"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/BlackOS.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

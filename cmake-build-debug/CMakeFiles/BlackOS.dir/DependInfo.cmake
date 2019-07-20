@@ -4,10 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/Users/takudzwa/CLionProjects/BlackOS/source/BlackOSObjects.cpp" "/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.o"
   "/Users/takudzwa/CLionProjects/BlackOS/source/BlackOSScripts.cpp" "/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.o"
-  "/Users/takudzwa/CLionProjects/BlackOS/source/Kfield.cpp" "/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles/BlackOS.dir/source/Kfield.cpp.o"
-  "/Users/takudzwa/CLionProjects/BlackOS/source/Kmenu.cpp" "/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles/BlackOS.dir/source/Kmenu.cpp.o"
-  "/Users/takudzwa/CLionProjects/BlackOS/source/Kwindow.cpp" "/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles/BlackOS.dir/source/Kwindow.cpp.o"
   "/Users/takudzwa/CLionProjects/BlackOS/source/main.cpp" "/Users/takudzwa/CLionProjects/BlackOS/cmake-build-debug/CMakeFiles/BlackOS.dir/source/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")

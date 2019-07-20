@@ -9,7 +9,10 @@
 #include <fstream>
 #include <string>
 
-typedef void (*directive)();
+namespace BlackOSScripts{
+
 void writeToFile();
+
+}
 
 #endif //BLACKOS_BLACKOSSCRIPTS_H
