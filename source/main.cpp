@@ -44,7 +44,10 @@ int main(int argc, const char * argv[]) {
     // create main window
     std::vector<int> winsize = {WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE};
 
-    BlackOSObjects::Kwindow window(winsize, holder, 'l');
+    int xOffset = 0;
+    int yOffset = 0;
+    auto windowPair = std::make_pair(xOffset, yOffset);
+    BlackOSObjects::Kwindow window(winsize, holder, windowPair );
 
     endwin();
     return 0;

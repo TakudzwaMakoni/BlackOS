@@ -17,7 +17,7 @@ namespace BlackOSObjects{
     std::string Kmenu::name() const { return m_name; }
 
     Kwindow::Kwindow(std::vector<int> &size, std::unique_ptr<Kmenu> &menu,
-                     char alignment){
+                    const std::pair<int,int> &alignment){
 
          m_menu = std::move(menu);
         curs_set(0);
@@ -55,20 +55,49 @@ namespace BlackOSObjects{
             for (int i = 0; i < fields.size(); i++) {
               if (i == highlighted)
                 wattron(m_window, A_REVERSE);
+
               int yAlign, xAlign;
-              switch (alignment) {
-              case 'c':
-                yAlign = i + (yMax / 2) - numOfFields;
-                xAlign = (xMax - fields[i].name().length()) / 2;
-                break;
-              case 'l':
-                yAlign = i + (yMax / 2) - numOfFields;
-                xAlign = 1;
-                break;
-              default:
-                yAlign = i + (yMax / 2) - numOfFields;
-                xAlign = (xMax - fields[i].name().length()) / 2;
-              }
+              int left, right, top, bottom, v_centre, h_centre;
+
+              // left align
+              left = 1;
+
+              // right align
+              int longest_string_len = 0;
+              std::for_each(fields.begin(), fields.end(), [&longest_string_len](const Kfield &field){
+
+                std::string str = field.name();
+
+                int len = str.length();
+                if (len > longest_string_len)
+                  longest_string_len = len;
+
+              });
+              right = xMax - longest_string_len -
+                  1;
+
+              // centre align
+              v_centre = i + (yMax / 2) - numOfFields;
+              h_centre = (xMax - fields[i].name().length()) / 2;
+
+              // top align
+              top =  i + 1;
+              bottom = yMax - 2  - numOfFields + i;
+
+              if(alignment.first == 1 )
+                xAlign = right;
+              else if(alignment.first == 0)
+                xAlign = h_centre;
+              else if(alignment.first == -1)
+                  xAlign = left;
+
+              if(alignment.second == 1)
+                  yAlign = top;
+              else if(alignment.second == 0)
+                  yAlign = v_centre;
+              else if (alignment.second == -1)
+                yAlign = bottom;
+
               mvwprintw(m_window, yAlign, xAlign, fields[i].name().c_str());
               wattroff(m_window, A_REVERSE);
             }

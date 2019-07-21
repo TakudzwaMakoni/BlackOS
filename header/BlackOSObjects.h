@@ -50,13 +50,11 @@ namespace BlackOSObjects{
 
     public:
         explicit Kwindow(std::vector<int> &size, std::unique_ptr<Kmenu> &menu,
-                         char alignment = 'c');
+                         const std::pair<int,int> &alignment);
 
         WINDOW *window() const;
         void setAnimation(int start, int finish);
         static void cursor(int code);
-      static void loadMenu(WINDOW *window, const std::unique_ptr<Kmenu> menu,
-                             const char &alignment);
 
         ~Kwindow();
 
