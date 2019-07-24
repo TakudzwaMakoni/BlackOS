@@ -1,0 +1,3 @@
+/Users/takudzwa/CLionProjects/BlackOS/CMakeFiles/rebuild_cache.dir
+/Users/takudzwa/CLionProjects/BlackOS/CMakeFiles/edit_cache.dir
+/Users/takudzwa/CLionProjects/BlackOS/CMakeFiles/BlackOS.dir

@@ -13,7 +13,7 @@
 #define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
 #define X_CENTRE (COLS - WORLD_WIDTH) / 2
 
-void script(){};
+
 
 int main(int argc, const char * argv[]) {
 
@@ -24,17 +24,25 @@ int main(int argc, const char * argv[]) {
 
     std::vector<int> framex(50,50);
 
-    BlackOSObjects::directive testScript = script;
+
 
     std::string fname1 = "* HOME *";
-    std::string fname2 = "* SETTINGS *";
-    std::string fname3 = "* PROFILES *";
-    std::string fname4 = "* QUIT *";
+    std::string fmessage1 = "you selected 'home'.";
 
-    BlackOSObjects::Kfield field1(fname1, BlackOSScripts::writeToFile);
-    BlackOSObjects::Kfield field2(fname2, BlackOSScripts::writeToFile);
-    BlackOSObjects::Kfield field3(fname3, testScript);
-    BlackOSObjects::Kfield field4(fname4, testScript);
+
+    std::string fname2 = "* SETTINGS *";
+    std::string fmessage2 = "you selected 'settings'.";
+
+    std::string fname3 = "* PROFILES *";
+    std::string fmessage3 = "you selected 'profiles'.";
+
+    std::string fname4 = "* QUIT *";
+    std::string fmessage4 = "you selected 'quit'.";
+
+    BlackOSObjects::Kfield field1(fname1, fmessage1, BlackOSScripts::writeToFile);
+    BlackOSObjects::Kfield field2(fname2, fmessage2, BlackOSScripts::writeToFile);
+    BlackOSObjects::Kfield field3(fname3, fmessage3, BlackOSScripts::writeToFile);
+    BlackOSObjects::Kfield field4(fname4, fmessage4, BlackOSScripts::writeToFile);
 
     std::vector<BlackOSObjects::Kfield> mainFields = {field1,field2,field3,field4};
     std::string mainMenuName = "BlackOS version 1.0";
@@ -46,8 +54,18 @@ int main(int argc, const char * argv[]) {
 
     int xOffset = 0;
     int yOffset = 0;
-    auto windowPair = std::make_pair(xOffset, yOffset);
-    BlackOSObjects::Kwindow window(winsize, holder, windowPair );
+
+    std::string name = "testdata";
+    Eigen::Matrix3d testData;
+    testData << 1,2,3,4,5,6,7,8,9;
+
+   BlackOSObjects::Kgrid<double,3,3> grid(name,testData);
+
+    Eigen::Matrix3d matr2 = grid.matrix();
+   // k_grid.read(&matr2);
+
+    BlackOSObjects::Kwindow k_window(winsize, holder, xOffset,yOffset );
+    k_window.display();
 
     endwin();
     return 0;

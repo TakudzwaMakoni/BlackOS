@@ -5,6 +5,7 @@
 #ifndef BLACKOS_BLACKOSOBJECTS_H
 #define BLACKOS_BLACKOSOBJECTS_H
 
+#include "Eigen/dense"
 #include "ncurses.h"
 #include "BlackOSScripts.h"
 
@@ -19,14 +20,16 @@ namespace BlackOSObjects{
     class Kfield {
 
     public:
-        Kfield(std::string &name, directive script);
+        Kfield(std::string &name,  std::string &message, directive script);
 
         std::string name() const;
         directive script() const;
+        std::string message() const;
 
     private:
         const std::string m_name;
         const directive m_script;
+        const std::string m_message;
     };
 
 
@@ -45,16 +48,18 @@ namespace BlackOSObjects{
         const std::string m_name;
     };
 
-
     class Kwindow {
 
     public:
-        explicit Kwindow(std::vector<int> &size, std::unique_ptr<Kmenu> &menu,
-                         const std::pair<int,int> &alignment);
+        explicit Kwindow( const std::vector<int> &size, std::unique_ptr<Kmenu> &menu,
+                          int &xAlignment , int &yAlignment);
 
         WINDOW *window() const;
         void setAnimation(int start, int finish);
         static void cursor(int code);
+
+        void display();
+
 
         ~Kwindow();
 
@@ -62,9 +67,37 @@ namespace BlackOSObjects{
         WINDOW *m_window;
         int m_start, m_end;
       std::unique_ptr<Kmenu>  m_menu;
+      const std::vector<int> &m_size;
+      const int m_xAlignment;
+      const int m_yAlignment;
 
     };
 
-} // BlackOSObjects
+template <typename T , int rows ,int cols>
+class Kgrid{
+private:
+
+  const std::string m_name;
+  Eigen::Matrix<T, rows, cols> m_matrix;
+
+public:
+  Kgrid(std::string &name, Eigen::Matrix<T, rows, cols> matrix ) : m_name(name), m_matrix(matrix){}
+  Eigen::Matrix<T, rows, cols> matrix() const{
+    return m_matrix;
+  }
+  void write(std::vector<T> &data){
+    int expectedSize = rows * cols;
+    if(data.size()!= expectedSize){
+      throw std::exception("invalid size for matrix " + m_name);
+    }
+    Eigen::Map<Eigen::Matrix<T, rows, cols>> matrix(&data);
+    m_matrix = matrix;
+  }
+  void display(){
+
+  }
+};
+
+} // Namespace BlackOSObjects
 
 #endif //BLACKOS_BLACKOSOBJECTS_H
