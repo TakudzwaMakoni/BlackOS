@@ -1,0 +1,39 @@
+#blackosdipslay
+
+cmake_minimum_required( VERSION 3.14 FATAL_ERROR)
+
+project (BlackOSDisplay LANGUAGES CXX)
+
+set(SRC_FILES
+    src/Display.cpp
+    src/Directives.cpp
+    src/Kfield.cpp
+    src/Kmenu.cpp)
+
+set(INC_FILES
+    inc/Directives.h
+    inc/Kfield.h
+    inc/Kgrid.h
+    inc/Kmenu.h
+    inc/Kwindow.h)
+
+add_library(Display 
+    STATIC
+    ${SRC_FILES}
+    ${INC_FILES})
+
+add_executable(BlackOSDisplay "src/Display.cpp")
+
+
+set(CMAKE_CXX_FLAGS "-lncurses")
+
+add_subdirectory(inc)
+add_subdirectory(src)
+
+# list(APPEND CMAKE_MODULE_PATH "/usr/local/Cellar/eigen/3.3.7/share/cmake/Modules")
+
+
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+
+target_link_libraries (BlackOSDisplay Eigen3::Eigen)
+target_link_libraries (BlackOSDisplay Display)

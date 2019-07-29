@@ -1,1 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/c++  -lncurses -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/BlackOS.dir/source/main.cpp.o CMakeFiles/BlackOS.dir/source/BlackOSScripts.cpp.o CMakeFiles/BlackOS.dir/source/BlackOSObjects.cpp.o  -o BlackOS 

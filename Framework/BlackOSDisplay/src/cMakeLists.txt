@@ -1,0 +1,9 @@
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+target_link_libraries (BlackOSDisplay Eigen3::Eigen)
+target_link_libraries (BlackOSDisplay Display)
+set(ENV{TERM} "iterm2")

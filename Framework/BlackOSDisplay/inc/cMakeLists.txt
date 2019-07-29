@@ -1,0 +1,4 @@
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+
+target_link_libraries (BlackOSDisplay Eigen3::Eigen)
+target_link_libraries (BlackOSDisplay Display)
