@@ -30,12 +30,19 @@ Kmenu::Kmenu(const size_t &id, std::string &name, int sizeY, int sizeX ,int posY
 
 /// return Window Object
 WINDOW * Kmenu::window() const {
-  return m_privateWin;
+  return _win;
 }
 /// return fields in Kmenu instance
 std::vector<Kfield> Kmenu::fields() const { return m_fields; }
 /// return window size of instance
 std::vector<int> Kmenu::size() const { return m_size; }
+/// return window centre x position
+int Kmenu::centreX() const {
+    return m_size[1]/2;
+}
+int Kmenu::centreY() const {
+    return m_size[0]/2;
+}
 /// return type of Kwindow instance
 std::string Kmenu::winType() const { return "Kmenu"; }
 /// return name of Kwindow instance
@@ -43,28 +50,36 @@ std::string Kmenu::name() const { return m_name; }
 /// switch for cursor blinking
 void Kmenu::cursor(const int &code) const { curs_set(code); }
 /// set style of corners of BlackOS Window
-void Kmenu::setCornerStyle(const char &ch) {
-    wborder(m_privateWin, 0, 0, 0, 0, (int)ch, (int)ch, (int)ch, (int)ch);
+void Kmenu::setCornerStyle(const int &ch) {
+    wborder(_win, 0, 0, 0, 0, (int)ch, (int)ch, (int)ch, (int)ch);
 }
 /// set style for each corner of BlackOS Window
-void Kmenu::setCornerStyle(const char &ch1, const char &ch2,
-                           const char &ch3, const char &ch4) {
-    wborder(m_privateWin, 0, 0, 0, 0, (int)ch1, (int)ch2, (int)ch3, (int)ch4);
+void Kmenu::setCornerStyle(const int &ch1, const int &ch2,
+                           const int &ch3, const int &ch4) {
+    wborder(_win, 0, 0, 0, 0, ch1, ch2, ch3, ch4);
+    wrefresh(_win);
 }
 ///set border style
-void Kmenu::setBorderStyle(const char &ch){
-    box(m_privateWin, ch, ch);
+void Kmenu::setBorderStyle(const int &ch){
+    box(_win, ch, ch);
 }
+void Kmenu::setFields(const std::vector<Kfield> &fields){
+    this->m_fields = fields;
+}
+/// get selected field
+Kfield Kmenu::getSelectedField() const {
+    return this->m_fields[_highlighted];}
 /// set corner label of BlackOS Window
 void Kmenu::setLabel(const std::string &label) const {
     int labellocy = m_size[0] - 1;
     int labellocx = m_size[1] - (3 + (int)label.length());
-    mvwaddstr(m_privateWin, labellocy, labellocx, label.c_str());
+    mvwaddstr(_win, labellocy, labellocx, label.c_str());
 }
+size_t Kmenu::getID() const {return this->m_id;}
 /// return the maximum size of the local window
 std::vector<int> Kmenu::maxSize() const {
     int yMax, xMax;
-    getmaxyx(m_privateWin, yMax, xMax);
+    getmaxyx(_win, yMax, xMax);
     std::vector<int> size{yMax, xMax};
     return size;
 }
@@ -81,7 +96,7 @@ void Kmenu::setAnimation(const int &start, const int &finish) const {
 Eigen::Vector2i Kmenu::position() const { return m_position;}
 /// set the private window to a window
 void Kmenu::setWin() {
-  m_privateWin = newwin(m_size[0], m_size[1], m_size[2], m_size[3]);
+  _win = newwin(m_size[0], m_size[1], m_size[2], m_size[3]);
 }
 /// add child display object to this instances private window
 void Kmenu::addDisplayObj(BlackOSDisplay::Kwindow obj) const {
@@ -90,18 +105,18 @@ void Kmenu::addDisplayObj(BlackOSDisplay::Kwindow obj) const {
   //WINDOW * win = subwin(m_privateWin, childSize[0],childSize[1],childSize[2],childSize[3]);
 }
 /// display the menu onto private window
-void Kmenu::display() const {
+void Kmenu::display(){
 setAnimation(0,0);
   cursor(0);
 
    setLabel(m_name);
 
     int yMax, xMax;
-    getmaxyx(m_privateWin, yMax, xMax);
+    getmaxyx(_win, yMax, xMax);
     move(yMax / 2, xMax / 2);
 
-    keypad(m_privateWin, true);
-    box(m_privateWin, 0, 0);
+    keypad(_win, true);
+    box(_win, 0, 0);
 
     int selection;
     int highlighted = 0;
@@ -110,7 +125,7 @@ setAnimation(0,0);
     while (true) {
         for (int i = 0; i < numOfFields; i++) {
             if (i == highlighted)
-                wattron(m_privateWin, A_REVERSE);
+                wattron(_win, A_REVERSE);
 
             int yAlign = 0;
             int xAlign = 0;
@@ -154,10 +169,10 @@ setAnimation(0,0);
             else if (m_yAlignment == -1)
                 yAlign = bottom;
 
-            mvwprintw(m_privateWin, yAlign, xAlign, m_fields[i].name().c_str());
-            wattroff(m_privateWin, A_REVERSE);
+            mvwprintw(_win, yAlign, xAlign, m_fields[i].name().c_str());
+            wattroff(_win, A_REVERSE);
         }
-        selection = wgetch(m_privateWin);
+        selection = wgetch(_win);
 
         switch (selection) {
             case KEY_UP:
@@ -177,19 +192,17 @@ setAnimation(0,0);
         if (selection == 10) {
             break;
         }
-        clear();
-
-        mvprintw((yMax / 2), (xMax - m_fields[highlighted].message().length())/2, m_fields[highlighted].message().c_str());
-        auto fieldScript = m_fields[highlighted].script();
-        fieldScript(); // performs the script.
+        
     }
-    wrefresh(m_privateWin);
-    getch();
+    _highlighted = highlighted;
+    clear();
+    wrefresh(_win);
+
 }
 
 Kmenu::~Kmenu(){
     
-    delwin(m_privateWin);
+    delwin(_win);
 }
 
 

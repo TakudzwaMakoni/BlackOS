@@ -12,15 +12,15 @@ namespace BlackOSDisplay {
 /// BlackOS Field Object
     class Kfield {
     public:
-        Kfield(std::string &name, std::string &message, directive script);
+        Kfield(const std::string name = "", const std::string message = "", const directive script = nullptr);
         std::string name() const;
         directive script() const;
         std::string message() const;
 
     private:
-        const std::string m_name;
-        const directive m_script;
-        const std::string m_message;
+         std::string m_name;
+         directive m_script;
+         std::string m_message;
     };
 } // namespace BlackOSDisplay
 

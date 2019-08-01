@@ -19,9 +19,10 @@
 #define X_CENTRE (COLS - WORLD_WIDTH) / 2
 
 int main(int argc, const char * argv[]) {
-    
     initscr();
     cbreak();
+    while(true){
+    
     
     // create main menu
     
@@ -57,7 +58,20 @@ int main(int argc, const char * argv[]) {
     Eigen::Matrix3d testData;
     testData << 1,2,3,4,5,6,7,8,9;
     
+    main_menu.setFields(mainFields);
     main_menu.display();
+    auto selectedField = main_menu.getSelectedField();
+    if (selectedField.name() == fname4)
+        break;
+    
+    WINDOW * main_win = main_menu.window();
+        std::string msg = selectedField.message();
+        int msgLen = msg.length();
+        
+        wclear(main_win);
+        mvwprintw(main_win, main_menu.centreY(), main_menu.centreX()-msgLen, selectedField.message().c_str());
+        wgetch(main_win);
+    } // while true
     
     endwin();
     return 0;

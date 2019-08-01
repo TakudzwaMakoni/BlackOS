@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="BlackOS"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\..\;CMake Files\..\..\..\..\..\usr\;CMake Files\..\..\..\..\..\usr\local\;CMake Files\..\..\..\..\..\usr\local\share\;CMake Files\..\..\..\..\..\usr\local\share\eigen3\;CMake Files\..\..\..\..\..\usr\local\share\eigen3\cmake\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="BlackOS">
+				<Option output="/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/BlackOS" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/inc"/>
+					<Add directory="/usr/local/include/eigen3"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 BlackOS"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="BlackOS/fast">
+				<Option output="/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/BlackOS" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/inc"/>
+					<Add directory="/usr/local/include/eigen3"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 BlackOS/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/takudzwa/prg/cpp/BlackOS/BlackOSDev/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/inc/Directives.h">
+			<Option target="BlackOS"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/inc/Kfield.h">
+			<Option target="BlackOS"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/inc/Kgrid.h">
+			<Option target="BlackOS"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/inc/Kmenu.h">
+			<Option target="BlackOS"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/inc/Kwindow.h">
+			<Option target="BlackOS"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/src/Directives.cpp">
+			<Option target="BlackOS"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/src/Display.cpp">
+			<Option target="BlackOS"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/src/Kfield.cpp">
+			<Option target="BlackOS"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/Framework/BlackOSDisplay/src/Kmenu.cpp">
+			<Option target="BlackOS"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/../../../../../usr/local/share/eigen3/cmake/Eigen3Config.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\share\eigen3\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/../../../../../usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\share\eigen3\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/takudzwa/prg/cpp/BlackOS/../../../../../usr/local/share/eigen3/cmake/Eigen3Targets.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\..\usr\local\share\eigen3\cmake\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
