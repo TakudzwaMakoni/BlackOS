@@ -96,7 +96,7 @@ void Kmenu::setAnimation(const int &start, const int &finish) const {
 Eigen::Vector2i Kmenu::position() const { return _position;}
 /// set the private window to a window
 void Kmenu::setWin() {
-  _win = newwin(_size[0], _size[1], _size[2], _size[3]);
+  _win = newwin(_size[0], _size[1], _position[0], _position[1]);
 }
 /// TODO : Not in use
 void Kmenu::addDisplayObj(BlackOSDisplay::Kwindow obj) const {
@@ -125,13 +125,12 @@ void Kmenu::display(){
 
             // left align
             left = 1;
-
             // right align
             int longest_string_len = 0;
             std::for_each(_fields.begin(), _fields.end(), [&longest_string_len](const Kfield &field){
 
                 std::string str = field.name();
-
+                
                 int len = str.length();
                 if (len > longest_string_len)
                     longest_string_len = len;
@@ -184,13 +183,11 @@ void Kmenu::display(){
         if (selection == 10) {
             break;
         }
-        
     }
     _highlighted = highlighted;
     clear();
     wrefresh(_win);
 }
-
 Kmenu::~Kmenu(){
     delwin(_win);
 }

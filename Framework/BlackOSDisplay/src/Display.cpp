@@ -11,7 +11,10 @@
 #include <memory>
 #include <ncurses.h>
 
-
+#define WORLD_WIDTH (COLS - 20)
+#define WORLD_HEIGHT (LINES - 20)
+#define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
+#define X_CENTRE (COLS - WORLD_WIDTH) / 2
 
 
 int main(int argc, const char * argv[]) {
@@ -43,14 +46,13 @@ int main(int argc, const char * argv[]) {
     std::vector<BlackOSDisplay::Kfield> mainFields = {field1,field2,field3,field4};
     std::string mainMenuName = "BlackOS version 1.0";
     
-    BlackOSDisplay::Kmenu main_menu(1, mainMenuName, 50, 70, 20, 10);
+    BlackOSDisplay::Kmenu main_menu(1, mainMenuName, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
     // create main window
         
     std::string name = "testdata";
     Eigen::Matrix3d testData;
     testData << 1,2,3,4,5,6,7,8,9;
     
-        
     main_menu.setFieldAlign(0, 0);
     main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');
     main_menu.setLabel("BlackOS test menu");
@@ -59,16 +61,13 @@ int main(int argc, const char * argv[]) {
     auto selectedField = main_menu.getSelectedField();
     if (selectedField.name() == fname4)
         break;
-    
     WINDOW * main_win = main_menu.window();
-        std::string msg = selectedField.message();
+    std::string msg = selectedField.message();
         int msgLen = msg.length();
-        
         wclear(main_win);
-        mvwprintw(main_win, main_menu.centreY(), main_menu.centreX()-msgLen, selectedField.message().c_str());
+        mvwprintw(main_win, main_menu.centreY(), main_menu.centreX() - msgLen, selectedField.message().c_str());
         wgetch(main_win);
     } // while true
-    
     endwin();
     return 0;
 }
