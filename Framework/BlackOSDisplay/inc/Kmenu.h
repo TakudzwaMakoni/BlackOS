@@ -32,16 +32,12 @@ public:
     virtual WINDOW * window() const override;
 /// set animation on start and finish
     virtual void setAnimation(const int &start, const int &finish) const override;
-    /// switch for cursor blinking
-    virtual void cursor(const int &code) const override;
-    /// set style of corners of BlackOS Window
-    virtual void setCornerStyle(const int &ch) override;
-    /// set style for each corner of BlackOS Window
-    virtual void setCornerStyle(const int &ch1, const int &ch2,
-                                const int &ch3, const int &ch4) override ;
-    /// set border style
-    virtual void setBorderStyle(const int &ch) override;
-    /// set corner label of BlackOS Window
+    /// set style of BlackOS Window border
+    virtual void setBorderStyle(const int &ch = 0) override;
+    /// set style of BlackOS Window border
+    virtual void setBorderStyle(const int &L, const int &R,
+                           const int &T, const int &B,const int &TL, const int &TR,
+                           const int &BL, const int &BR) override ;
     virtual void setLabel(const std::string &label) const override;
     virtual std::vector<int> maxSize() const override ;
     virtual std::string winType() const override;
@@ -53,7 +49,8 @@ public:
     virtual Kfield getSelectedField() const;
     
     size_t getID() const;
-    void setPos(Eigen::Vector2i &v);
+    void setWinPos(int x, int y);
+    void setFieldAlign(int x, int y);
     int centreX() const;
     int centreY() const;
     std::vector<Kfield> fields() const;
@@ -66,14 +63,14 @@ public:
 private:
     virtual void setWin() override;
     WINDOW * _win;
-    std::vector<int> m_size;
-    std::vector<Kfield> m_fields;
-    int m_xAlignment = 0;
-    int m_yAlignment = 0;
-    Eigen::Vector2i m_position;
+    std::vector<int> _size;
+    std::vector<Kfield> _fields;
+    int _xAlign = 0;
+    int _yAlign = 0;
+    Eigen::Vector2i _position;
     std::string m_name;
     int _highlighted{-1};
-    const size_t m_id; // TODO: need a NODE MAP TO NAVIGATE BETWEEN MENUS
+    const size_t _id; // TODO: need a NODE MAP TO NAVIGATE BETWEEN MENUS
     mutable int m_startAnim, m_finishAnim;
 };
 

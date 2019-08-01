@@ -13,22 +13,16 @@
 
 
 
-#define WORLD_WIDTH (COLS - 3)
-#define WORLD_HEIGHT (LINES - 3)
-#define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
-#define X_CENTRE (COLS - WORLD_WIDTH) / 2
 
 int main(int argc, const char * argv[]) {
     initscr();
     cbreak();
+    cursor(0);
     while(true){
     
     
     // create main menu
-    
-    std::vector<int> framex(10,10);
-    
-    
+
     std::string fname1 = "* HOME *";
     std::string fmessage1 = "you selected 'home'.";
     
@@ -49,15 +43,17 @@ int main(int argc, const char * argv[]) {
     std::vector<BlackOSDisplay::Kfield> mainFields = {field1,field2,field3,field4};
     std::string mainMenuName = "BlackOS version 1.0";
     
-    BlackOSDisplay::Kmenu main_menu(1, mainMenuName, WORLD_HEIGHT, WORLD_WIDTH, (int)Y_CENTRE, (int)X_CENTRE);
+    BlackOSDisplay::Kmenu main_menu(1, mainMenuName, 50, 70, 20, 10);
     // create main window
-    std::vector<int> winsize = {WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE};
-    
-    
+        
     std::string name = "testdata";
     Eigen::Matrix3d testData;
     testData << 1,2,3,4,5,6,7,8,9;
     
+        
+    main_menu.setFieldAlign(0, 0);
+    main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');
+    main_menu.setLabel("BlackOS test menu");
     main_menu.setFields(mainFields);
     main_menu.display();
     auto selectedField = main_menu.getSelectedField();
@@ -77,38 +73,3 @@ int main(int argc, const char * argv[]) {
     return 0;
 }
 
-
-
-
-/*
- 
- 
- int main(int argc, char** argv)
- {
- initscr();
- 
- printw("UNIVERSE");
- 
- WINDOW* WORLD = newwin(50,100,5,15);
- 
- refresh();
- 
- box(WORLD,0,0);
- mvwprintw(WORLD, 1, 1, "WORLD");
- 
- WINDOW * sub = subwin(WORLD,40,90,5,15 );
- box(sub,0,0);
- mvwprintw(sub,1,1,"SUB1111");
- 
- refresh();
- wrefresh(WORLD);
- 
- getch();
- delwin(WORLD);
- 
- endwin();
- return 0;
- }
- 
- 
- */

@@ -9,6 +9,8 @@
 #include <vector>
 #include <memory>
 
+#define cursor(x) curs_set(x)
+
 namespace  BlackOSDisplay{
 
 typedef WINDOW *cwin;
@@ -22,14 +24,12 @@ typedef WINDOW *cwin;
         virtual WINDOW * window() const = 0;
         virtual void setAnimation(const int &start, const int &finish) const = 0;
         /// switch for cursor blinking
-        virtual void cursor(const int &code) const = 0;
         /// set style of corners of BlackOS Window
-        virtual void setCornerStyle(const int &ch) = 0;
-        /// set style for each corner of BlackOS Window
-        virtual void setCornerStyle(const int &ch1 , const int &ch2,
-                            const int &ch3, const int &ch4) = 0;
-        /// set border style of BlackOS window
         virtual void setBorderStyle(const int &ch) = 0;
+        /// set style for each corner of BlackOS Window
+     virtual void setBorderStyle(const int &L, const int &R,
+                                 const int &T, const int &B,const int &TL, const int &TR,
+                                 const int &BL, const int &BR) = 0;
         /// set corner label of BlackOS Window
         virtual void setLabel(const std::string &label) const = 0;
         virtual std::vector<int> maxSize() const = 0;
