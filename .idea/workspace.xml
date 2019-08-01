@@ -11,16 +11,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c7f6ef6e-416e-4193-a880-44e36b6f99d8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kfield.h" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kfield.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kmenu.h" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kmenu.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kwindow.h" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kwindow.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Display.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Display.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Kfield.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Kfield.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Kmenu.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Kmenu.cpp" afterDir="false" />
-    </list>
+    <list default="true" id="c7f6ef6e-416e-4193-a880-44e36b6f99d8" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/BlackOSDev/" />
     <ignored path="$PROJECT_DIR$/CMakeFiles/" />
@@ -222,7 +213,7 @@
       <workItem from="1563734473714" duration="15042000" />
       <workItem from="1563907863370" duration="11830000" />
       <workItem from="1564653075747" duration="225000" />
-      <workItem from="1564653314045" duration="1086000" />
+      <workItem from="1564653314045" duration="1243000" />
     </task>
     <task id="LOCAL-00001" summary="classes to BlackOSObjects.h">
       <created>1563614756240</created>
@@ -242,7 +233,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="83885000" />
+    <option name="totallyTimeSpent" value="84042000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="6" />
