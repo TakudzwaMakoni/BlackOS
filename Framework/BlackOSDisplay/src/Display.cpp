@@ -11,8 +11,8 @@
 #include <memory>
 #include <ncurses.h>
 
-#define WORLD_WIDTH (COLS - 20)
-#define WORLD_HEIGHT (LINES - 20)
+#define WORLD_WIDTH (COLS - 1)
+#define WORLD_HEIGHT (LINES - 1)
 #define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
 #define X_CENTRE (COLS - WORLD_WIDTH) / 2
 
@@ -43,19 +43,24 @@ int main(int argc, const char * argv[]) {
     BlackOSDisplay::Kfield field3(fname3, fmessage3, Directives::writeToFile);
     BlackOSDisplay::Kfield field4(fname4, fmessage4, Directives::writeToFile);
     
-    std::vector<BlackOSDisplay::Kfield> mainFields = {field1,field2,field3,field4};
-    std::string mainMenuName = "BlackOS version 1.0";
+    //  std::vector<BlackOSDisplay::Kfield> mainFields = {field1,field2,field3,field4};
+    //  std::string mainMenuName = "BlackOS version 1.0";
     
-    BlackOSDisplay::Kmenu main_menu(1, mainMenuName, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
-    // create main window
+   //  BlackOSDisplay::Kmenu main_menu(1, mainMenuName, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
+   //  create main window
         
-    std::string name = "testdata";
-    Eigen::Matrix3d testData;
-    testData << 1,2,3,4,5,6,7,8,9;
-    
+        std::vector<int> size  = {WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE};
+        std::string name = "testdata";
+        Eigen::Matrix<double, 3, 3> testData;
+        testData << 1.089,2.436,3.5268,4.721346,5.8654,6.345,7.1743,8.13673,9.4564;
+        BlackOSDisplay::Kgrid<double, 3, 3> grid(name, testData, size);
+        grid.setPrecision(0);
+        grid.display();
+        
+    /*
     main_menu.setFieldAlign(0, 0);
-    main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');
-    main_menu.setLabel("BlackOS test menu");
+        main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');
+    main_menu.setLabel("BlackOS NUmber 2");
     main_menu.setFields(mainFields);
     main_menu.display();
     auto selectedField = main_menu.getSelectedField();
@@ -67,6 +72,7 @@ int main(int argc, const char * argv[]) {
         wclear(main_win);
         mvwprintw(main_win, main_menu.centreY(), main_menu.centreX() - msgLen, selectedField.message().c_str());
         wgetch(main_win);
+     */
     } // while true
     endwin();
     return 0;

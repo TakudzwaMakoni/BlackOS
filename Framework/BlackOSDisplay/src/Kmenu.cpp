@@ -44,7 +44,7 @@ int Kmenu::centreY() const {
 /// return type of Kwindow instance
 std::string Kmenu::winType() const { return "Kmenu"; }
 /// return name of Kwindow instance
-std::string Kmenu::name() const { return m_name; }
+std::string Kmenu::name() const { return _name; }
 /// set style of corners of BlackOS Window
 void Kmenu::setBorderStyle(const int &ch) {
     wborder(_win, ch, ch, ch, ch, ch, ch, ch, ch);
@@ -105,7 +105,6 @@ void Kmenu::addDisplayObj(BlackOSDisplay::Kwindow obj) const {
 }
 /// display the menu onto private window
 void Kmenu::display(){
-    
     
     setAnimation(0,0);// TODO: not in use
     

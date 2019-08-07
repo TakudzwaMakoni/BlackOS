@@ -13,18 +13,11 @@ namespace Directives{
         fullPath = "testexample.txt";
         buf = "this is a test!";
         std::ofstream file;
-
         file.open(fullPath);
         file << buf;
         file.close();
     }
-
     void animate(int aniCode){
-
-
     }
-
-
-
 }
 

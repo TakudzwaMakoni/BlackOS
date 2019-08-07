@@ -48,6 +48,7 @@ public:
     virtual void addDisplayObj(Kwindow obj) const;
     virtual Kfield getSelectedField() const;
     
+    
     size_t getID() const;
     void setWinPos(int x, int y);
     void setFieldAlign(int x, int y);
@@ -68,7 +69,7 @@ private:
     int _xAlign = 0;
     int _yAlign = 0;
     Eigen::Vector2i _position;
-    std::string m_name;
+    std::string _name;
     int _highlighted{-1};
     const size_t _id; // TODO: need a NODE MAP TO NAVIGATE BETWEEN MENUS
     mutable int m_startAnim, m_finishAnim;
