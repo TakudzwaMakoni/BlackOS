@@ -49,14 +49,21 @@ int main(int argc, const char * argv[]) {
    //  BlackOSDisplay::Kmenu main_menu(1, mainMenuName, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
    //  create main window
         
-        std::vector<int> size  = {WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE};
+        
         std::string name = "testdata";
         Eigen::Matrix<double, 3, 3> testData;
         testData << 1.089,2.436,3.5268,4.721346,5.8654,6.345,7.1743,8.13673,9.4564;
-        BlackOSDisplay::Kgrid<double, 3, 3> grid(name, testData, size);
-        grid.setPrecision(0);
+        BlackOSDisplay::Kgrid<double, 3, 3> grid(name, testData, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
+        grid.setPrecision(5);
+        grid.setBorderStyle();
+        grid.setGrid(false);
+        grid.setGridAlign(0, 0);
         grid.display();
-        
+        auto selectedElement = grid.getSelectedElement();
+        WINDOW * grid_window = grid.window();
+        wclear(grid_window);
+        mvwprintw(grid_window, grid.centreY(), grid.centreX(), std::to_string(selectedElement).c_str());
+        wgetch(grid_window);
     /*
     main_menu.setFieldAlign(0, 0);
         main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');

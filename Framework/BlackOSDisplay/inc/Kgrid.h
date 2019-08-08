@@ -29,7 +29,7 @@ namespace BlackOSDisplay{
         Eigen::Vector2i _position;
         int _precision;
         int _vPadding{2};
-        bool _showGrid = true;
+        bool _showGrid{false};
 
         int _highlightedRow{-1};
         int _highlightedCol{-1};
@@ -70,12 +70,52 @@ namespace BlackOSDisplay{
                     std::stringstream stream;
                         stream << std::setprecision(_precision)<< std::fixed <<_matrix.coeff(i, j);
                     stream.precision(_precision);
-                    auto str = stream.str();
+                   
+                        
+                        int yAlign = 0;
+                        int xAlign = 0;
+                        int left, right, top, bottom, v_centre, h_centre;
+                        
+                        // left align
+                        left = 1;
+                        
+                        
+                        
+                        int hPadding{3};
+                        auto str{stream.str()};
                         if(_showGrid){
-                            mvwprintw(_win, i*_vPadding, (_precision+5)*j, ("|" + str + "|").c_str());
-                        } else {
-                    mvwprintw(_win, i*_vPadding, (_precision+3)*j, str.c_str());
+                            hPadding = _showGrid? 5 : 3;
+                            str = "|" + str + "|";
                         }
+                        int gridWidth = cols * (_precision + hPadding);
+                        int gridHeight =  rows * _vPadding;
+                        
+                        // right align
+                        right = _size[1] - gridWidth - 1;
+                        
+                        // centre align
+                        v_centre = i + (_size[0] / 2) - gridHeight;
+                        h_centre = (_size[1] - gridWidth) / 2;
+                        
+                        // top align
+                        top =  i + 1;
+                        bottom = _size[0] - 2  - gridHeight + i;
+                        
+                        if(_xAlign == 1 )
+                            xAlign = right;
+                        else if(_xAlign == 0)
+                            xAlign = h_centre;
+                        else if(_xAlign == -1)
+                            xAlign = left;
+                        
+                        if(_yAlign == 1)
+                            yAlign = top;
+                        else if(_yAlign == 0)
+                            yAlign = v_centre;
+                        else if (_yAlign == -1)
+                            yAlign = bottom;
+                        
+                            mvwprintw(_win, yAlign + i*_vPadding, xAlign + (_precision+hPadding)*j, (str).c_str());
                         wattroff(_win, A_REVERSE);
                     }
                 }
@@ -154,10 +194,11 @@ namespace BlackOSDisplay{
         virtual std::string winType() const override{ return "Kgrid";}
         virtual std::string name() const override{return this->_name;}
         ///
-        Kgrid(std::string &name,Eigen::Matrix<dataType, rows, cols> &data, std::vector<int> size)
+        Kgrid(std::string &name,Eigen::Matrix<dataType, rows, cols> &data, int sizeY, int sizeX ,int posY, int posX)
                 : _name(name), _id(0){
                     this->write(data);
-                    _size = size;
+                    _size = {sizeY,sizeX};
+                    _position = {posY,posX};
                     setWin();
                 }
         ///
@@ -179,6 +220,11 @@ namespace BlackOSDisplay{
         void setGrid(bool show){
             _showGrid = show;
         }
+        void setGridAlign(int x, int y){
+            _xAlign = x; _yAlign = y;
+        }
+        dataType getSelectedElement() const {
+            return this->_matrix(_highlightedRow,_highlightedCol);}
     };
 } // namespace BlackOSDisplay
 
