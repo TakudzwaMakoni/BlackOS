@@ -11,10 +11,6 @@
 #include <iomanip>
 #include <sstream>
 
-
-double pi = 3.14159265359;
-
-
 namespace BlackOSDisplay{
 
     /// BlackOS Grid Object
@@ -55,31 +51,32 @@ namespace BlackOSDisplay{
             
             setAnimation(0,0);// TODO: not in use
             
+            auto entryViewer = newwin(3, _size[1]-1, _size[0]-4, 2);
+
+            
             keypad(_win, true);
             int selection;
             int highlightedRow = 0;
             int highlightedCol = 0;
 
             while (true) {
-                
+                //wclear(entryViewer);
                 for (int i = 0; i < rows; ++i) {
                     for (int j = 0; j < cols; ++j){
                         if (j == highlightedCol && i == highlightedRow){
                             wattron(_win, A_REVERSE);
                             }
+                        auto element = _matrix(highlightedRow,highlightedCol);
                     std::stringstream stream;
-                        stream << std::setprecision(_precision)<< std::fixed <<_matrix.coeff(i, j);
+                        stream << std::setprecision(_precision)<< std::fixed << _matrix.coeff(i, j);
                     stream.precision(_precision);
                    
-                        
                         int yAlign = 0;
                         int xAlign = 0;
                         int left, right, top, bottom, v_centre, h_centre;
                         
                         // left align
                         left = 1;
-                        
-                        
                         
                         int hPadding{3};
                         auto str{stream.str()};
@@ -117,6 +114,8 @@ namespace BlackOSDisplay{
                         
                             mvwprintw(_win, yAlign + i*_vPadding, xAlign + (_precision+hPadding)*j, (str).c_str());
                         wattroff(_win, A_REVERSE);
+                        mvwprintw(entryViewer, 1, 1, std::to_string(element).c_str());
+                        wrefresh(entryViewer);
                     }
                 }
                 selection = wgetch(_win);
@@ -155,6 +154,7 @@ namespace BlackOSDisplay{
             _highlightedRow = highlightedRow;
             _highlightedCol = highlightedCol;
             clear();
+            wrefresh(entryViewer);
             wrefresh(_win);
         }
         /// return Window Object

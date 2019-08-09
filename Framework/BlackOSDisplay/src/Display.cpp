@@ -54,7 +54,7 @@ int main(int argc, const char * argv[]) {
         Eigen::Matrix<double, 3, 3> testData;
         testData << 1.089,2.436,3.5268,4.721346,5.8654,6.345,7.1743,8.13673,9.4564;
         BlackOSDisplay::Kgrid<double, 3, 3> grid(name, testData, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
-        grid.setPrecision(5);
+        grid.setPrecision(2);
         grid.setBorderStyle();
         grid.setGrid(false);
         grid.setGridAlign(0, 0);
