@@ -14,51 +14,88 @@
 namespace BlackOSDisplay{
 
     /// BlackOS Grid Object
-    template <typename dataType, int rows, int cols> class Kgrid : public Kwindow  {
+    template <typename dataType, size_t rows, size_t cols> class Kgrid : public Kwindow  {
     private:
         const std::string _name;
         Eigen::Matrix<dataType, rows, cols> _matrix;
         WINDOW * _win;
+        std::vector<WINDOW *> _subwins;
         std::vector<int> _size;
         int _xAlign = 0;
         int _yAlign = 0;
         Eigen::Vector2i _position;
         int _precision;
-        int _vPadding{2};
-        bool _showGrid{false};
-
-        int _highlightedRow{-1};
-        int _highlightedCol{-1};
+        int _vPadding{1};
+        std::string _title;
+        bool _setGrid{false};
+        bool _showTitle{false};
+        size_t _highlightedRow{0};
+        size_t _highlightedCol{0};
+        // degrees, precision,
+        std::vector<std::string> _attributes;
         const size_t _id; // TODO: need a NODE MAP TO NAVIGATE BETWEEN MENUS
         mutable int m_startAnim, m_finishAnim;
         virtual void setWin() override{
             _win = newwin(_size[0], _size[1], _position[0], _position[1]);
         }
+        std::string attributeString(){
+            std::string str;
+            for (std::vector<std::string>::iterator it = _attributes.begin(); it != _attributes.end(); ++it){
+                str += " " + *it;
+            }
+            return str;
+        }
+        // delete any additionally added windows. TODO: possibility for implementation of externally adding windows?
+        void delWith(std::vector<WINDOW *> windows){
+            if(!windows.empty())
+                for(std::vector<WINDOW *>::iterator it = windows.begin(); it != windows.end(); ++it){
+                    delwin(*it);
+                }
+        };
         ///
         void write(Eigen::Matrix<dataType, rows, cols> &data) {
-            int expectedSize = rows * cols;
-            if (data.size() != expectedSize) {
-                throw std::exception();
-            }
             _matrix = data;
         }
-        
+        void write(std::vector<dataType> &data){
+            if (data.size()!= rows * cols){
+                std::string message  = "expected vector size: " + std::to_string(rows) + " x " + std::to_string(cols);
+                throw std::invalid_argument(message);
+                }
+            for (int i = 0; i < rows; ++i) {
+                for (int j = 0; j < cols; ++j) {
+                    _matrix(i,j) = data[(i*rows) + j]; // testing output
+                }
+            }
+            }
+            
     public:
+        
         
         /// display Kgrid
         virtual void display() override {
             /// TODO MAKE GRID
-            
-            setAnimation(0,0);// TODO: not in use
-            
-            auto entryViewer = newwin(3, _size[1]-1, _size[0]-4, 2);
 
-            
+            setAnimation(0,0);// TODO: not in use
             keypad(_win, true);
             int selection;
-            int highlightedRow = 0;
-            int highlightedCol = 0;
-
+            size_t highlightedRow = 0;
+            size_t highlightedCol = 0;
+            int topPad = 1;
+            if(_showTitle){
+            auto titleBar = newwin(2, _size[1], _position[0], _position[1]);
+                // an extra space below for system / window messages.
+                wattron(titleBar, A_REVERSE);
+                std::string tPadding(_size[1] - _title.length(), ' ');
+                mvwprintw(titleBar, 0, 0, (tPadding +_title).c_str());
+                _attributes = {"RAD", "PREC: " + std::to_string(_precision)};
+                // default / test attributes
+                mvwprintw(titleBar, 0, 0, attributeString().c_str());
+                wattroff(titleBar, A_REVERSE);
+                wrefresh(titleBar);
+                topPad = 3;
+                _subwins.push_back(titleBar);
+            }
+            int displayPrecision;
             while (true) {
                 //wclear(entryViewer);
                 for (int i = 0; i < rows; ++i) {
@@ -68,38 +105,50 @@ namespace BlackOSDisplay{
                             }
                         auto element = _matrix(highlightedRow,highlightedCol);
                     std::stringstream stream;
-                        stream << std::setprecision(_precision)<< std::fixed << _matrix.coeff(i, j);
-                    stream.precision(_precision);
-                   
+                        // if number is greater than two digits, express in scientific format, which requires 4 spaces for exponent, two for front digit and decimal point, allowing two d.p for total width 8.
+                        if(_matrix.coeff(i,j) > 99.99){
+                            stream << std::scientific << std::setprecision(2)<<std::setw(8) << std::setfill(' ') << _matrix.coeff(i, j);
+                        }
+                        else {
+                            // three spaces reserved for decimal and front digits, max width is 8.
+                            displayPrecision  = _precision > 5? 5: _precision;
+                            stream << std::setprecision(displayPrecision)<< std::fixed << std::setfill(' ')<< std::setw(8)<< _matrix.coeff(i, j);
+                        }
+                        
                         int yAlign = 0;
                         int xAlign = 0;
                         int left, right, top, bottom, v_centre, h_centre;
                         
                         // left align
-                        left = 1;
+                        left = 2;
                         
-                        int hPadding{3};
+                        int hPadding{4};
                         auto str{stream.str()};
-                        if(_showGrid){
-                            hPadding = _showGrid? 5 : 3;
+                        if(_setGrid){
+                            hPadding = 6;
                             str = "|" + str + "|";
                         }
-                        int gridWidth = cols * (_precision + hPadding);
-                        int gridHeight =  rows * _vPadding;
+                        int gridWidth = (cols * 8) + (cols - 2);
+                        int gridHeight =  rows * _vPadding; // avoid collision with status bar
+                        
+                        int bottomPad = - gridHeight + i;
+                        int rightPad = gridWidth - 1;
+                        int hCentrePad = gridWidth;
+                        int vCentrPad = gridHeight;
                         
                         // right align
-                        right = _size[1] - gridWidth - 1;
+                        right = _size[1] ;
                         
                         // centre align
-                        v_centre = i + (_size[0] / 2) - gridHeight;
-                        h_centre = (_size[1] - gridWidth) / 2;
+                        v_centre = i + (_size[0] / 2) - vCentrPad;
+                        h_centre = (_size[1] - hCentrePad) / 2;
                         
                         // top align
-                        top =  i + 1;
-                        bottom = _size[0] - 2  - gridHeight + i;
+                        top =  i + topPad;
+                        bottom = _size[0] - 2;
                         
                         if(_xAlign == 1 )
-                            xAlign = right;
+                            xAlign = right + rightPad;
                         else if(_xAlign == 0)
                             xAlign = h_centre;
                         else if(_xAlign == -1)
@@ -110,12 +159,11 @@ namespace BlackOSDisplay{
                         else if(_yAlign == 0)
                             yAlign = v_centre;
                         else if (_yAlign == -1)
-                            yAlign = bottom;
-                        
-                            mvwprintw(_win, yAlign + i*_vPadding, xAlign + (_precision+hPadding)*j, (str).c_str());
+                            yAlign = bottom + bottomPad;
+                            mvwprintw(_win, yAlign + i*_vPadding, xAlign + (displayPrecision+hPadding)*j, (str).c_str());
                         wattroff(_win, A_REVERSE);
-                        mvwprintw(entryViewer, 1, 1, std::to_string(element).c_str());
-                        wrefresh(entryViewer);
+                        mvwprintw(_win, bottom, left, std::to_string(element).c_str());
+                        wrefresh(_win);
                     }
                 }
                 selection = wgetch(_win);
@@ -154,7 +202,6 @@ namespace BlackOSDisplay{
             _highlightedRow = highlightedRow;
             _highlightedCol = highlightedCol;
             clear();
-            wrefresh(entryViewer);
             wrefresh(_win);
         }
         /// return Window Object
@@ -167,7 +214,7 @@ namespace BlackOSDisplay{
             m_finishAnim = finish;
         }
         /// set style of BlackOS Window border
-        virtual void setBorderStyle(const int &ch = 0) override{
+        virtual void borderStyle(const int &ch = 0) override{
             wborder(_win, ch, ch, ch, ch, ch, ch, ch, ch);
             wrefresh(_win);
         }
@@ -179,7 +226,7 @@ namespace BlackOSDisplay{
             wrefresh(_win);
         }
         ///
-        virtual void setLabel(const std::string &label) const override{
+        virtual void label(const std::string &label) const override{
             int labellocy = _size[0] - 1;
             int labellocx = _size[1] - (3 + (int)label.length());
             mvwaddstr(_win, labellocy, labellocx, label.c_str());
@@ -202,6 +249,14 @@ namespace BlackOSDisplay{
                     setWin();
                 }
         ///
+        Kgrid(std::string &name,std::vector<dataType> &data, int sizeY, int sizeX ,int posY, int posX)
+        : _name(name), _id(0){
+            this->write(data);
+            _size = {sizeY,sizeX};
+            _position = {posY,posX};
+            setWin();
+        }
+        ///
         Eigen::Matrix<dataType, rows, cols> matrix() const { return _matrix; }
         ///
         size_t getID() const {
@@ -217,14 +272,31 @@ namespace BlackOSDisplay{
         void setPrecision(int precision){
             _precision  = precision;
         }
-        void setGrid(bool show){
-            _showGrid = show;
+        void gridLines(bool show){
+            _setGrid = show;
         }
-        void setGridAlign(int x, int y){
+        void showTitle(bool show){
+            _showTitle = show;
+        }
+        void align(int x, int y){
             _xAlign = x; _yAlign = y;
         }
-        dataType getSelectedElement() const {
+        // get the raw element selected from matrix
+        dataType selectedRaw() const {
             return this->_matrix(_highlightedRow,_highlightedCol);}
+        // get the i and j indices of the t element selected in the matrix
+        std::vector<size_t> selectedIndices() const {
+            return std::vector<size_t>{_highlightedRow, _highlightedCol};
+        }
+        void setTitle(std::string title){
+            _title = title;
+        }
+        
+        ~Kgrid(){
+            delWith(_subwins);
+            delwin(_win);
+        }
+        
     };
 } // namespace BlackOSDisplay
 

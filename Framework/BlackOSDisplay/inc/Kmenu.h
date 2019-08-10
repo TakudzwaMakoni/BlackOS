@@ -33,12 +33,12 @@ public:
 /// set animation on start and finish
     virtual void setAnimation(const int &start, const int &finish) const override;
     /// set style of BlackOS Window border
-    virtual void setBorderStyle(const int &ch = 0) override;
+    virtual void borderStyle(const int &ch = 0) override;
     /// set style of BlackOS Window border
     virtual void setBorderStyle(const int &L, const int &R,
                            const int &T, const int &B,const int &TL, const int &TR,
                            const int &BL, const int &BR) override ;
-    virtual void setLabel(const std::string &label) const override;
+    virtual void label(const std::string &label) const override;
     virtual std::vector<int> maxSize() const override ;
     virtual std::string winType() const override;
     virtual std::string name() const override;

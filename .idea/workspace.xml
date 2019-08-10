@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
-    <generated />
+    <generated>
+      <config projectName="BlackOS" targetName="BlackOS" />
+    </generated>
   </component>
   <component name="CMakeSettings">
     <configurations>
@@ -10,7 +12,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c7f6ef6e-416e-4193-a880-44e36b6f99d8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kgrid.h" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kgrid.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kmenu.h" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kmenu.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kwindow.h" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kwindow.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Display.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Display.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Kmenu.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Kmenu.cpp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/BlackOSDev/" />
@@ -22,52 +30,29 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FavoritesManager">
     <favorites_list name="BlackOS" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/cMakeLists.txt">
+        <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kgrid.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="21" selection-start-line="21" selection-end-line="21" />
+            <state relative-caret-position="204">
+              <caret line="58" column="18" selection-start-line="58" selection-start-column="13" selection-end-line="58" selection-end-column="18" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Framework/cMakeLists.txt">
+        <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/src/Display.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="5" column="28" lean-forward="true" selection-start-line="5" selection-start-column="28" selection-end-line="5" selection-end-column="28" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/src/Kmenu.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="14" column="18" selection-start-line="14" selection-start-column="18" selection-end-line="14" selection-end-column="18" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kmenu.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="54" column="11" selection-start-line="54" selection-start-column="11" selection-end-line="54" selection-end-column="11" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kwindow.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="456">
-              <caret line="38" column="3" selection-start-line="38" selection-start-column="3" selection-end-line="38" selection-end-column="3" />
+            <state relative-caret-position="271">
+              <caret line="68" column="36" lean-forward="true" selection-start-line="68" selection-start-column="36" selection-end-line="68" selection-end-column="36" />
+              <folding>
+                <element signature="e#0#26#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -82,12 +67,18 @@
     </option>
   </component>
   <component name="FindInProjectRecents">
+    <findStrings>
+      <find>write</find>
+    </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/BlackOSDev</dir>
     </dirStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/src/Display.cpp" root0="SKIP_INSPECTION" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -120,6 +111,8 @@
         <option value="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kwindow.h" />
         <option value="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kmenu.h" />
         <option value="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Kmenu.cpp" />
+        <option value="$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kgrid.h" />
+        <option value="$PROJECT_DIR$/Framework/BlackOSDisplay/src/Display.cpp" />
       </list>
     </option>
   </component>
@@ -136,7 +129,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -144,41 +136,18 @@
               <item name="BlackOS" type="b2602c69:ProjectViewProjectNode" />
               <item name="BlackOS" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="BlackOS" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BlackOS" type="462c0819:PsiDirectoryNode" />
-              <item name="Framework" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="BlackOS" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BlackOS" type="462c0819:PsiDirectoryNode" />
-              <item name="Framework" type="462c0819:PsiDirectoryNode" />
-              <item name="BlackOSDisplay" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="BlackOS" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BlackOS" type="462c0819:PsiDirectoryNode" />
-              <item name="Framework" type="462c0819:PsiDirectoryNode" />
-              <item name="BlackOSDisplay" type="462c0819:PsiDirectoryNode" />
-              <item name="inc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="BlackOS" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BlackOS" type="462c0819:PsiDirectoryNode" />
-              <item name="Framework" type="462c0819:PsiDirectoryNode" />
-              <item name="BlackOSDisplay" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.advertisement.text.overridden" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../BlackOSCLion" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
@@ -233,6 +202,7 @@
       <workItem from="1564653075747" duration="225000" />
       <workItem from="1564653314045" duration="1784000" />
       <workItem from="1564657745225" duration="376000" />
+      <workItem from="1565430188973" duration="3123000" />
     </task>
     <task id="LOCAL-00001" summary="classes to BlackOSObjects.h">
       <created>1563614756240</created>
@@ -252,28 +222,28 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="84959000" />
+    <option name="totallyTimeSpent" value="88082000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8181818" visible="true" weight="0.1941392" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8181818" visible="true" weight="0.1965812" />
       <window_info id="Structure" order="1" sideWeight="0.18181819" side_tool="true" weight="0.3270202" />
       <window_info id="Favorites" order="2" sideWeight="0.50166667" side_tool="true" weight="0.15079366" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32908705" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4993895" weight="0.31632653" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4993895" weight="0.32857144" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.493895" weight="0.31632653" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39915073" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
-      <window_info anchor="bottom" id="Messages" order="8" weight="0.30306122" />
+      <window_info anchor="bottom" id="Messages" order="8" sideWeight="0.4945055" weight="0.30306122" />
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.30497926" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.501221" side_tool="true" visible="true" weight="0.32959184" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.506105" side_tool="true" visible="true" weight="0.30306122" />
       <window_info anchor="bottom" id="Version Control" order="11" weight="0.32987553" />
-      <window_info active="true" anchor="bottom" id="CMake" order="12" sideWeight="0.498779" visible="true" weight="0.32959184" />
+      <window_info anchor="bottom" id="CMake" order="12" sideWeight="0.4981685" weight="0.32959184" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -326,6 +296,17 @@
     <MESSAGE value="alignment of menu in Kwindow" />
     <option name="LAST_COMMIT_MESSAGE" value="alignment of menu in Kwindow" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kgrid.h</url>
+          <line>58</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="editorHistoryManager">
     <entry file="file:///Library/Developer/CommandLineTools/usr/include/c++/v1/iosfwd">
       <provider selected="true" editor-type-id="text-editor">
@@ -360,20 +341,6 @@
     <entry file="file://$PROJECT_DIR$/header/BlackOSScripts.h" />
     <entry file="file://$PROJECT_DIR$/source/BlackOSObjects.cpp" />
     <entry file="file://$PROJECT_DIR$/header/BlackOSObjects.h" />
-    <entry file="file://$PROJECT_DIR$/cMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="21" selection-start-line="21" selection-end-line="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/src/Kmenu.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="14" column="18" selection-start-line="14" selection-start-column="18" selection-end-line="14" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kmenu.h">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -383,7 +350,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kwindow.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="456">
+        <state>
           <caret line="38" column="3" selection-start-line="38" selection-start-column="3" selection-end-line="38" selection-end-column="3" />
         </state>
       </provider>
@@ -391,7 +358,38 @@
     <entry file="file://$PROJECT_DIR$/Framework/cMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
-          <caret line="5" column="28" lean-forward="true" selection-start-line="5" selection-start-column="28" selection-end-line="5" selection-end-column="28" />
+          <caret line="5" column="28" selection-start-line="5" selection-start-column="28" selection-end-line="5" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/src/Kmenu.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-204">
+          <caret line="14" column="18" selection-start-line="14" selection-start-column="18" selection-end-line="14" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/inc/Kgrid.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="58" column="18" selection-start-line="58" selection-start-column="13" selection-end-line="58" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Framework/BlackOSDisplay/src/Display.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="271">
+          <caret line="68" column="36" lean-forward="true" selection-start-line="68" selection-start-column="36" selection-end-line="68" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

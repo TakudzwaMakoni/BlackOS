@@ -46,7 +46,7 @@ std::string Kmenu::winType() const { return "Kmenu"; }
 /// return name of Kwindow instance
 std::string Kmenu::name() const { return _name; }
 /// set style of corners of BlackOS Window
-void Kmenu::setBorderStyle(const int &ch) {
+void Kmenu::borderStyle(const int &ch) {
     wborder(_win, ch, ch, ch, ch, ch, ch, ch, ch);
     wrefresh(_win);
 }
@@ -66,7 +66,7 @@ void Kmenu::setFields(const std::vector<Kfield> &fields){
 Kfield Kmenu::getSelectedField() const {
     return this->_fields[_highlighted];}
 /// set corner label of BlackOS Window
-void Kmenu::setLabel(const std::string &label) const {
+void Kmenu::label(const std::string &label) const {
     int labellocy = _size[0] - 1;
     int labellocx = _size[1] - (3 + (int)label.length());
     mvwaddstr(_win, labellocy, labellocx, label.c_str());
