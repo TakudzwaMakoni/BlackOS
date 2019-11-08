@@ -45,7 +45,7 @@ public:
     
     
     virtual void setFields(const std::vector<Kfield> &fields);
-    virtual void addDisplayObj(Kwindow obj) const;
+    virtual void addDisplayObj(Kwindow &obj) const;
     virtual Kfield getSelectedField() const;
     
     
