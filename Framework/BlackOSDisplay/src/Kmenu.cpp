@@ -12,6 +12,15 @@
 namespace {
 const int PADDING = 1;
 // WINDOW * DEFAULT_WINDOW = newwin(0,0,0,0);
+std::string paddedStr(const std::string &str, const int len) {
+  std::string newstr = str;
+  const int oldStrLen = str.size();
+  int correction = len - oldStrLen;
+  std::string padding(" ", correction);
+  newstr.insert(0, padding);
+  newstr.insert(oldStrLen, padding);
+  return newstr;
+}
 
 } // namespace
 
@@ -50,7 +59,6 @@ void Kmenu::setBorderStyle(const int &L, const int &R, const int &T,
   wborder(_win, L, R, T, B, TL, TR, BL, BR);
   wrefresh(_win);
 }
-/// set border style
 
 void Kmenu::setFields(const std::vector<Kfield> &fields) {
   this->_fields = fields;
@@ -78,10 +86,25 @@ void Kmenu::setFieldAlign(int x, int y) {
   _xAlign = x;
   _yAlign = y;
 }
+
+void Kmenu::fieldPadding(bool paddingOn) {
+  if (paddingOn) {
+    // establish length of longest field name
+    int longest_field_name_len = 0;
+    for (const Kfield field : _fields) {
+      int len = field.name().size();
+      if (len > longest_field_name_len)
+        longest_field_name_len = len;
+    }
+    std::for_each(_fields.begin(), _fields.end(), [&](Kfield f) {
+      f.setName(paddedStr(f.name(), longest_field_name_len));
+    });
+  }
+}
 /// set animation codes for window start and finish
 void Kmenu::setAnimation(const int &start, const int &finish) const {
-  m_startAnim = start;
-  m_finishAnim = finish;
+  _startAnim = start;
+  _finishAnim = finish;
 }
 /// get position of window top left corner
 Eigen::Vector2i Kmenu::position() const { return _position; }

@@ -52,6 +52,7 @@ int main(int argc, const char *argv[]) {
     main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');
     main_menu.label("main menu");
     main_menu.setFields(mainFields);
+    main_menu.fieldPadding(true);
     main_menu.display();
     auto selectedField = main_menu.getSelectedField();
 

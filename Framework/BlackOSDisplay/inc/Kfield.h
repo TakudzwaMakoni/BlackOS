@@ -18,11 +18,12 @@ public:
   std::string name() const;
   directive script() const;
   std::string message() const;
+  void setName(const std::string &name);
 
 private:
-  std::string m_name;
-  directive m_script;
-  std::string m_message;
+  std::string _name;
+  directive _script;
+  std::string _message;
 };
 } // namespace BlackOSDisplay
 
