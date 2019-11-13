@@ -5,7 +5,8 @@ cmake_minimum_required( VERSION 3.14 FATAL_ERROR)
 project (BlackOSDisplay LANGUAGES CXX)
 
 set(SRC_FILES
-    src/Display.cpp
+    src/DisplayMenu.cpp
+    src/DisplayGrid.cpp
     src/Directives.cpp
     src/Kfield.cpp
     src/Kmenu.cpp)
@@ -17,13 +18,18 @@ set(INC_FILES
     inc/Kmenu.h
     inc/Kwindow.h)
 
-add_library(Display 
+add_library(DisplayMenu
     STATIC
     ${SRC_FILES}
     ${INC_FILES})
 
-add_executable(BlackOSDisplay "src/Display.cpp")
+add_library(DisplayGrid
+    STATIC
+    ${SRC_FILES}
+    ${INC_FILES})
 
+add_executable(BlackOSDisplay "src/DisplayMenu.cpp")
+add_executable(BlackOSDisplay "src/DisplayGrid.cpp")
 
 set(CMAKE_CXX_FLAGS "-lncurses")
 
@@ -36,4 +42,5 @@ add_subdirectory(src)
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 target_link_libraries (BlackOSDisplay Eigen3::Eigen)
-target_link_libraries (BlackOSDisplay Display)
+target_link_libraries (BlackOSDisplay DisplayMenu)
+target_link_libraries (BlackOSDisplay DisplayGrid)

@@ -5,14 +5,16 @@
 #ifndef BLACKOS_DIRECTIVES_H
 #define BLACKOS_DIRECTIVES_H
 
-#include <ncurses.h>
 #include <fstream>
+#include <ncurses.h>
 #include <string>
 
-namespace Directives{
-
+namespace Directives {
+void doNothing();
 void writeToFile();
+void animate();
+void exitProgram();
 
-}
+} // namespace Directives
 
-#endif //BLACKOS_DIRECTIVES_H
+#endif // BLACKOS_DIRECTIVES_H

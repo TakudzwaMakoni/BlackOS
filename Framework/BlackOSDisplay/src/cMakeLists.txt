@@ -5,5 +5,5 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 target_link_libraries (BlackOSDisplay Eigen3::Eigen)
-target_link_libraries (BlackOSDisplay Display)
-set(ENV{TERM} "iterm2")
+target_link_libraries (BlackOSDisplay DisplayMenu)
+target_link_libraries (BlackOSDisplay DisplayGrid)

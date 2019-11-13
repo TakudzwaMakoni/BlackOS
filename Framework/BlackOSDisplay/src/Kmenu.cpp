@@ -116,8 +116,7 @@ void Kmenu::display() {
 
       // left align
       left = 1;
-      // right
-      // align/home/takudzwa/dev/BlackOS/Framework/BlackOSDisplay/src/Kmenu.cpp
+      // right align
       int longest_string_len = 0;
       std::for_each(_fields.begin(), _fields.end(),
                     [&longest_string_len](const Kfield &field) {
@@ -153,8 +152,8 @@ void Kmenu::display() {
       mvwprintw(_win, yAlign, xAlign, _fields[i].name().c_str());
       wattroff(_win, A_REVERSE);
     }
-    selection = wgetch(_win);
 
+    selection = wgetch(_win);
     switch (selection) {
     case KEY_UP:
       highlighted--;
