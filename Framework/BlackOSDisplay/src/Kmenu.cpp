@@ -12,15 +12,6 @@
 namespace {
 const int PADDING = 1;
 // WINDOW * DEFAULT_WINDOW = newwin(0,0,0,0);
-std::string paddedStr(const std::string &str, const int len) {
-  std::string newstr = str;
-  const int oldStrLen = str.size();
-  int correction = len - oldStrLen;
-  std::string padding(" ", correction);
-  newstr.insert(0, padding);
-  newstr.insert(oldStrLen, padding);
-  return newstr;
-}
 
 } // namespace
 
@@ -86,19 +77,33 @@ void Kmenu::setFieldAlign(int x, int y) {
   _xAlign = x;
   _yAlign = y;
 }
+void Kmenu::setFieldStyle(std::string style) { this->_fieldStyle = style; }
 
-void Kmenu::fieldPadding(bool paddingOn) {
-  if (paddingOn) {
-    // establish length of longest field name
-    int longest_field_name_len = 0;
-    for (const Kfield field : _fields) {
-      int len = field.name().size();
-      if (len > longest_field_name_len)
-        longest_field_name_len = len;
-    }
-    std::for_each(_fields.begin(), _fields.end(), [&](Kfield f) {
-      f.setName(paddedStr(f.name(), longest_field_name_len));
-    });
+void Kmenu::addFieldPadding() {
+  // establish length of longest field name
+  int maxLen = 1;
+  for (const Kfield field : _fields) {
+    int len = field.name().size();
+    if (len > maxLen)
+      maxLen = len;
+  }
+  for (std::vector<Kfield>::iterator it = _fields.begin(); it != _fields.end();
+       ++it) {
+
+    std::string str = it->name(); // retrieve field name
+    const int newStrLen = maxLen % 2 == 0 ? maxLen : maxLen + 1;
+    // set new field length to even number.
+    const int oldStrLen = str.size();   // retrieve size of field name
+    std::string newStr(newStrLen, ' '); // make empty new field
+    int correction = (newStrLen - oldStrLen) / 2;
+    // calculate correction size
+    newStr.replace(correction, oldStrLen, str);
+    // insert field name into new field at centre
+    std::string front = _fieldStyle + " ";
+    std::string back = " " + _fieldStyle;
+    newStr.insert(0, front);
+    newStr.append(back);
+    it->setName(newStr); // assign padded name to field
   }
 }
 /// set animation codes for window start and finish

@@ -25,34 +25,45 @@ int main(int argc, const char *argv[]) {
 
     // create main menu
 
-    std::string fname1 = "* HOME *";
+    std::string fname0 = "SOMETHING";
+    std::string fmessage0 = "you selected 'something'.";
+
+    std::string fname1 = "HOME";
     std::string fmessage1 = "you selected 'home'.";
 
-    std::string fname2 = "* SETTINGS *";
+    std::string fname2 = "SETTINGS";
     std::string fmessage2 = "you selected 'settings'.";
 
-    std::string fname3 = "* PROFILES *";
+    std::string fname3 = "PROFILE";
     std::string fmessage3 = "you selected 'profiles'.";
 
-    std::string fname4 = "* QUIT *";
+    std::string fname4 = "QUIT";
     std::string fmessage4 = "you selected 'quit'.";
 
+    std::string fname5 = "SOMETHING ELSE";
+    std::string fmessage5 = "you selected 'something else'.";
+
+    BlackOSDisplay::Kfield field0(fname0, fmessage0);
     BlackOSDisplay::Kfield field1(fname1, fmessage1);
     BlackOSDisplay::Kfield field2(fname2, fmessage2);
     BlackOSDisplay::Kfield field3(fname3, fmessage3);
     BlackOSDisplay::Kfield field4(fname4, fmessage4, Directives::exitProgram);
+    BlackOSDisplay::Kfield field5(fname5, fmessage5);
 
-    std::vector<BlackOSDisplay::Kfield> mainFields = {field1, field2, field3,
-                                                      field4};
+    std::vector<BlackOSDisplay::Kfield> mainFields = {
+        field0, field1, field2, field3, field5, field4,
+    };
     std::string mainMenuName = "BlackOS version 1.0 ";
     BlackOSDisplay::Kmenu main_menu(1, mainMenuName, WORLD_HEIGHT, WORLD_WIDTH,
                                     Y_CENTRE, X_CENTRE);
 
     main_menu.setFieldAlign(0, 0);
     main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');
+
     main_menu.label("main menu");
     main_menu.setFields(mainFields);
-    main_menu.fieldPadding(true);
+    // main_menu.setFieldStyle("X"); // must do this before padding
+    main_menu.addFieldPadding(); // must do this before displaying
     main_menu.display();
     auto selectedField = main_menu.getSelectedField();
 

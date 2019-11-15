@@ -48,7 +48,8 @@ public:
   size_t getID() const;
   void setWinPos(int x, int y);
   void setFieldAlign(int x, int y);
-  void fieldPadding(bool paddingOn = true);
+  void addFieldPadding();
+  void setFieldStyle(std::string style);
   int centreX() const;
   int centreY() const;
   std::vector<Kfield> fields() const;
@@ -64,6 +65,7 @@ private:
   std::vector<Kfield> _fields;
   int _xAlign = 0;
   int _yAlign = 0;
+  std::string _fieldStyle = "";
   Eigen::Vector2i _position;
   std::string _name;
   int _highlighted{-1};
