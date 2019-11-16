@@ -82,13 +82,15 @@ public:
     size_t highlightedRow = 0;
     size_t highlightedCol = 0;
     int topPad = 1;
+
+    // title bar
     if (_showTitle) {
       auto titleBar = newwin(2, _size[1], _position[0], _position[1]);
       // an extra space below for system / window messages.
       wattron(titleBar, A_REVERSE);
       std::string tPadding(_size[1] - _title.length(), ' ');
       mvwprintw(titleBar, 0, 0, (tPadding + _title).c_str());
-      _attributes = {"RAD", "DISP-PREC: " + std::to_string(_precision)};
+      _attributes = {"RAD", "PREC: " + std::to_string(_precision)};
       // default / test attributes
       mvwprintw(titleBar, 0, 0, attributeString().c_str());
       wattroff(titleBar, A_REVERSE);
@@ -96,29 +98,53 @@ public:
       topPad = 3;
       _subwins.push_back(titleBar);
     }
-    int displayPrecision;
+
+    // precision of entries shown in matrix
+    int displayPrecision = 5;
+
     while (true) {
-      // wclear(entryViewer);
+
+      // navigate through elements in matrix.
       for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
           if (j == highlightedCol && i == highlightedRow) {
             wattron(_win, A_REVERSE);
           }
+
           auto element = _matrix(highlightedRow, highlightedCol);
-          std::stringstream stream;
+          std::stringstream elementStream;
+          elementStream << std::setprecision(_precision) << element;
+          const std::string elementStr = elementStream.str();
+          const int elementStrSize = elementStr.size();
+          std::string elementDisplay(_size[1] / 2, ' ');
+          elementDisplay.replace(0, elementStrSize, elementStr);
+
+          std::stringstream numStream;
+
+          // length of matrix cells set to 8.
+          std::string str(8, ' ');
+          int strSize = str.size();
+
           // if number is greater than two digits, express in scientific format,
           // which requires 4 spaces for exponent, two for front digit and
           // decimal point, allowing two d.p for total width 8.
+
           if (_matrix.coeff(i, j) > 99.99) {
-            stream << std::scientific << std::setprecision(2) << std::setw(8)
-                   << std::setfill(' ') << _matrix.coeff(i, j);
+            numStream << std::scientific << std::setprecision(2)
+                      << _matrix.coeff(i, j);
           } else {
             // three spaces reserved for decimal and front digits, max width
             // is 8.
-            displayPrecision = _precision > 5 ? 5 : _precision;
-            stream << std::setprecision(displayPrecision) << std::fixed
-                   << std::setfill(' ') << std::setw(8) << _matrix.coeff(i, j);
+            // displayPrecision = _precision > 5 ? 5 : _precision;
+            numStream << std::setprecision(displayPrecision) << std::fixed
+                      << _matrix.coeff(i, j);
           }
+
+          std::string numStr = numStream.str();
+          int numStrSize = numStr.size();
+
+          int correction = strSize - numStrSize;
+          str.replace(correction, numStrSize, numStr);
 
           int yAlign = 0;
           int xAlign = 0;
@@ -128,7 +154,7 @@ public:
           left = 2;
 
           int hPadding{4};
-          auto str{stream.str()};
+          // auto str{stream.str()};
           if (_setGrid) {
             hPadding = 6;
             str = "|" + str + "|";
@@ -168,7 +194,9 @@ public:
           mvwprintw(_win, yAlign + i * _vPadding,
                     xAlign + (displayPrecision + hPadding) * j, (str).c_str());
           wattroff(_win, A_REVERSE);
-          mvwprintw(_win, bottom, left, std::to_string(element).c_str());
+
+          // display the element highlighted to full user precision.
+          mvwprintw(_win, bottom, left, elementDisplay.c_str());
           wrefresh(_win);
         }
       }

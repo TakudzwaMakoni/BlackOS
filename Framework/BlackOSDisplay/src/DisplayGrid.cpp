@@ -22,26 +22,27 @@ int main(int argc, const char *argv[]) {
   cbreak();
   cursor(0);
 
-  std::string name = "test";
+  std::string name = "Matrix A";
 
   Eigen::Matrix<double, 3, 3> testData;
   testData << 11.089, 2.436, 3.5268, 4.721346, 5.8654, 6.345, 7.1743, 8.13673,
       9100.4564;
-  std::vector<double> testData2{34.2,   21.25, 37.2,    54.2, 5.2,
-                                6546.2, 7.2,   75358.2, 9.2};
+  std::vector<double> testData2{34.2763,     21.25021, 37.243,  54.2343, 5.0243,
+                                6546.218856, 7.774276, 75358.2, 9.2};
   BlackOSDisplay::Kgrid<double, 3, 3> grid(name, testData2, WORLD_HEIGHT,
                                            WORLD_WIDTH, Y_CENTRE, X_CENTRE);
-  grid.setPrecision(2);
-  grid.borderStyle();
-  grid.gridLines(false);
-  grid.label(grid.name());
-  grid.setTitle("Matrix Editor Program");
-  grid.showTitle(true);
-  grid.align(0, 0);
+
   auto mat = grid.matrix();
 
   while (true) {
-    //  create main window
+
+    grid.setPrecision(8);
+    grid.borderStyle();
+    grid.gridLines(false);
+    grid.label(grid.name());
+    grid.setTitle("Matrix Editor Program");
+    grid.showTitle(true);
+    grid.align(0, 0);
 
     printw(std::to_string(mat.coeff(0, 0)).c_str());
 
