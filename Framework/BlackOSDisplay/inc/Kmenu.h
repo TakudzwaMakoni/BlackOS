@@ -50,6 +50,7 @@ public:
   void setFieldAlign(int x, int y);
   void addFieldPadding();
   void setFieldStyle(std::string style);
+  void paginate(int divisor);
   int centreX() const;
   int centreY() const;
   std::vector<Kfield> fields() const;
@@ -69,6 +70,7 @@ private:
   Eigen::Vector2i _position;
   std::string _name;
   int _highlighted{-1};
+  int _pagination = -1;
   const size_t _id; // TODO: need a NODE MAP TO NAVIGATE BETWEEN MENUS
   mutable int _startAnim, _finishAnim;
 };

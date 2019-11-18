@@ -64,6 +64,7 @@ int main(int argc, const char *argv[]) {
 
     main_menu.setFieldAlign(0, 0);
     main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');
+    main_menu.paginate(2);
 
     main_menu.label("main menu");
     main_menu.setFields(mainFields);

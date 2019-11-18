@@ -44,8 +44,6 @@ int main(int argc, const char *argv[]) {
     grid.showTitle(true);
     grid.align(0, 0);
 
-    printw(std::to_string(mat.coeff(0, 0)).c_str());
-
     grid.display();
     auto selectedElement = grid.selectedRaw();
     WINDOW *grid_window = grid.window();

@@ -106,6 +106,8 @@ void Kmenu::addFieldPadding() {
     it->setName(newStr); // assign padded name to field
   }
 }
+/// show multiple fields in paginated groups
+void Kmenu::paginate(int divisor) { _pagination = divisor; }
 /// set animation codes for window start and finish
 void Kmenu::setAnimation(const int &start, const int &finish) const {
   _startAnim = start;
@@ -127,14 +129,37 @@ void Kmenu::addDisplayObj(BlackOSDisplay::Kwindow &obj) const {
 void Kmenu::display() {
 
   setAnimation(0, 0); // TODO: not in use
-
   keypad(_win, true);
   int selection;
   int highlighted = 0;
   int numOfFields = _fields.size();
+  _pagination = _pagination == -1 ? _fields.size() : _pagination;
+
+  // number of pages and leftover
+  int pages = numOfFields / _pagination;
+  int residue = numOfFields % _pagination;
+  // correction for total number of pages
+  int totalPages = residue == 0 ? pages : pages + 1;
+  std::vector<std::vector<Kfield>> paginatedFields;
+  for (int page = 0; page < pages; ++page) {
+    std::vector<Kfield> sub(_fields.begin() + (page * _pagination),
+                            _fields.begin() + ((page + 1) * _pagination));
+    paginatedFields.push_back(sub);
+  }
+  if (residue != 0) {
+    std::vector<Kfield> residualSub(_fields.begin() + (_pagination * pages),
+                                    _fields.end());
+    paginatedFields.push_back(residualSub);
+  }
+
+  int displayPage = 0;
 
   while (true) {
-    for (int i = 0; i < numOfFields; i++) {
+
+    std::vector<Kfield> displayFields = paginatedFields[displayPage];
+    int numOfDisplayFields = displayFields.size();
+    for (int i = 0; i < numOfDisplayFields; ++i) {
+
       if (i == highlighted)
         wattron(_win, A_REVERSE);
 
@@ -146,7 +171,7 @@ void Kmenu::display() {
       left = 1;
       // right align
       int longest_string_len = 0;
-      std::for_each(_fields.begin(), _fields.end(),
+      std::for_each(displayFields.begin(), displayFields.end(),
                     [&longest_string_len](const Kfield &field) {
                       std::string str = field.name();
                       int len = str.length();
@@ -156,12 +181,12 @@ void Kmenu::display() {
       right = _size[1] - longest_string_len - 1;
 
       // centre align
-      v_centre = i + (_size[0] / 2) - numOfFields;
-      h_centre = (_size[1] - _fields[i].name().length()) / 2;
+      v_centre = i + (_size[0] / 2) - numOfDisplayFields;
+      h_centre = (_size[1] - displayFields[i].name().length()) / 2;
 
       // top align
       top = i + 1;
-      bottom = _size[0] - 2 - numOfFields + i;
+      bottom = _size[0] - 2 - numOfDisplayFields + i;
 
       if (_xAlign == 1)
         xAlign = right;
@@ -177,23 +202,36 @@ void Kmenu::display() {
       else if (_yAlign == -1)
         yAlign = bottom;
 
-      mvwprintw(_win, yAlign, xAlign, _fields[i].name().c_str());
+      mvwprintw(_win, yAlign, xAlign, displayFields[i].name().c_str());
       wattroff(_win, A_REVERSE);
     }
 
     selection = wgetch(_win);
     switch (selection) {
+    case KEY_LEFT:
+      displayPage--;
+      if (displayPage == -1) {
+        displayPage = 0;
+      }
+      break;
+    case KEY_RIGHT:
+      displayPage++;
+      if (displayPage == paginatedFields.size()) {
+        displayPage--;
+      }
+      break;
     case KEY_UP:
       highlighted--;
       if (highlighted == -1) {
-        highlighted = 0;
+        highlighted++;
       }
       break;
     case KEY_DOWN:
       highlighted++;
-      if (highlighted == _fields.size()) {
-        highlighted = (int)_fields.size() - 1;
+      if (highlighted == displayFields.size()) {
+        highlighted--;
       }
+      break;
     default:
       break;
     }
@@ -201,7 +239,7 @@ void Kmenu::display() {
       break;
     }
   }
-  _highlighted = highlighted;
+  _highlighted = highlighted + (_pagination * displayPage);
   clear();
   wrefresh(_win);
 }
