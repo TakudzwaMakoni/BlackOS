@@ -85,18 +85,17 @@ public:
 
     // title bar
     if (_showTitle) {
-      auto titleBar = newwin(2, _size[1], _position[0], _position[1]);
-      // an extra space below for system / window messages.
-      wattron(titleBar, A_REVERSE);
-      std::string tPadding(_size[1] - _title.length(), ' ');
-      mvwprintw(titleBar, 0, 0, (tPadding + _title).c_str());
       _attributes = {"RAD", "PREC: " + std::to_string(_precision)};
-      // default / test attributes
-      mvwprintw(titleBar, 0, 0, attributeString().c_str());
-      wattroff(titleBar, A_REVERSE);
-      wrefresh(titleBar);
-      topPad = 3;
-      _subwins.push_back(titleBar);
+      // an extra space below for system / window messages.
+      wattron(_win, A_REVERSE);
+      std::string tPadding(_size[1], ' ');
+      int correction = _size[1] - _title.length() - 3;
+      std::string titleString = attributeString();
+      int titleStrLength = titleString.size();
+      tPadding.replace(0, titleStrLength, titleString);
+      tPadding.replace(correction, _size[1], _title + " ");
+      mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
+      wattroff(_win, A_REVERSE);
     }
 
     // precision of entries shown in matrix
