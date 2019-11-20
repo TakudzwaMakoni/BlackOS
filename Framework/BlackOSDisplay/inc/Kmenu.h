@@ -56,14 +56,20 @@ public:
   std::vector<Kfield> fields() const;
   std::vector<int> size() const;
   Eigen::Vector2i position() const;
+  void showTitle(bool show);
+  void setTitle(std::string title);
+  void delWith(std::vector<WINDOW *> windows);
+  std::string attributeString();
 
   ~Kmenu();
 
 private:
   virtual void setWin() override;
   WINDOW *_win;
+  std::vector<WINDOW *> _subwins;
   std::vector<int> _size;
   std::vector<Kfield> _fields;
+  std::vector<std::string> _attributes;
   int _xAlign = 0;
   int _yAlign = 0;
   std::string _fieldStyle = "";
@@ -73,6 +79,8 @@ private:
   int _pagination = -1;
   const size_t _id; // TODO: need a NODE MAP TO NAVIGATE BETWEEN MENUS
   mutable int _startAnim, _finishAnim;
+  bool _showTitle{false};
+  std::string _title;
 };
 
 } // namespace BlackOSDisplay

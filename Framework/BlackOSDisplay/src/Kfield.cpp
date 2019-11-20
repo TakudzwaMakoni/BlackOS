@@ -5,8 +5,8 @@
 
 using namespace BlackOSDisplay;
 
-Kfield::Kfield(const std::string name, const std::string message,
-               const directive script)
+Kfield::Kfield(const std::string &name, const directive script,
+               const std::string &message)
     : _name(name), _script(script), _message(message) {}
 std::string Kfield::name() const { return this->_name; }
 directive Kfield::script() const { return this->_script; }

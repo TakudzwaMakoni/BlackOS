@@ -313,6 +313,7 @@ public:
   std::vector<size_t> selectedIndices() const {
     return std::vector<size_t>{_highlightedRow, _highlightedCol};
   }
+  /// set the title
   void setTitle(std::string title) { _title = title; }
 
   ~Kgrid() {

@@ -13,8 +13,9 @@ typedef void (*directive)();
 /// BlackOS Field Object
 class Kfield {
 public:
-  Kfield(const std::string name = "", const std::string message = "",
-         const directive script = Directives::doNothing);
+  Kfield(const std::string &name, const directive script,
+         const std::string &message = "");
+  Kfield();
   std::string name() const;
   directive script() const;
   std::string message() const;
@@ -22,7 +23,7 @@ public:
 
 private:
   std::string _name;
-  directive _script;
+  directive _script = Directives::doNothing;
   std::string _message;
 };
 } // namespace BlackOSDisplay

@@ -24,12 +24,12 @@ int main(int argc, const char *argv[]) {
 
   std::string name = "Matrix A";
 
-  Eigen::Matrix<double, 3, 3> testData;
+  Eigen::Matrix<double, 4, 4> testData;
   testData << 11.089, 2.436, 3.5268, 4.721346, 5.8654, 6.345, 7.1743, 8.13673,
-      9100.4564;
+      9100.4564, 12, 231, 3453, 1231, 453, 13, 11;
   std::vector<double> testData2{34.2763,     21.25021, 37.243,  54.2343, 5.0243,
                                 6546.218856, 7.774276, 75358.2, 9.2};
-  BlackOSDisplay::Kgrid<double, 3, 3> grid(name, testData2, WORLD_HEIGHT,
+  BlackOSDisplay::Kgrid<double, 4, 4> grid(name, testData, WORLD_HEIGHT,
                                            WORLD_WIDTH, Y_CENTRE, X_CENTRE);
 
   auto mat = grid.matrix();

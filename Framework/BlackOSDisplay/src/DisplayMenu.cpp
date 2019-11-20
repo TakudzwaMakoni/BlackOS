@@ -40,19 +40,17 @@ int main(int argc, const char *argv[]) {
   std::string fname5 = "SOMETHING ELSE";
   std::string fmessage5 = "you selected 'something else'.";
 
-  BlackOSDisplay::Kfield field0(fname0, fmessage0);
-  BlackOSDisplay::Kfield field1(fname1, fmessage1);
-  BlackOSDisplay::Kfield field2(fname2, fmessage2);
-  BlackOSDisplay::Kfield field3(fname3, fmessage3);
-  BlackOSDisplay::Kfield field4(fname4, fmessage4, Directives::exitProgram);
-  BlackOSDisplay::Kfield field5(fname5, fmessage5);
+  BlackOSDisplay::Kfield field0(fname0, Directives::doNothing, fmessage0);
+  BlackOSDisplay::Kfield field1(fname1, Directives::doNothing, fmessage1);
+  BlackOSDisplay::Kfield field2(fname2, Directives::doNothing, fmessage2);
+  BlackOSDisplay::Kfield field3(fname3, Directives::doNothing, fmessage3);
+  BlackOSDisplay::Kfield field4(fname4, Directives::exitProgram);
+  BlackOSDisplay::Kfield field5(fname5, Directives::doNothing, fmessage5);
 
   std::vector<BlackOSDisplay::Kfield> mainFields = {
-      field1,
-      field2,
-      field3,
-      field4,
-  };
+      field1, field2, field3, field4, field5, field0, field0,
+      field0, field0, field0, field5, field0, field0, field0};
+
   std::string mainMenuName = "BlackOS version 1.0 ";
 
   while (true) {
@@ -64,10 +62,12 @@ int main(int argc, const char *argv[]) {
 
     main_menu.setFieldAlign(0, 0);
     main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');
-    main_menu.paginate(2);
+    main_menu.paginate(4);
 
     main_menu.label("main menu");
     main_menu.setFields(mainFields);
+    main_menu.setTitle("BlackOS Menu");
+    main_menu.showTitle(true);
     main_menu.setFieldStyle("="); // must do this before padding
     main_menu.addFieldPadding();  // must do this before displaying
     main_menu.display();

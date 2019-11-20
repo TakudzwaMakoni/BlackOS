@@ -119,11 +119,33 @@ Eigen::Vector2i Kmenu::position() const { return _position; }
 void Kmenu::setWin() {
   _win = newwin(_size[0], _size[1], _position[0], _position[1]);
 }
-/// TODO : Not in use
+// delete any additionally added windows. TODO: possibility for implementation
+// of externally adding windows?
+void Kmenu::delWith(std::vector<WINDOW *> windows) {
+  if (!windows.empty())
+    for (std::vector<WINDOW *>::iterator it = windows.begin();
+         it != windows.end(); ++it) {
+      delwin(*it);
+    }
+};
+///  show the title bar.
+void Kmenu::showTitle(bool show) { _showTitle = show; }
+/// set the title.
+void Kmenu::setTitle(std::string title) { _title = title; }
+/// TODO : Not in use.
 void Kmenu::addDisplayObj(BlackOSDisplay::Kwindow &obj) const {
   std::vector<int> childSize = _size;
   std::for_each(childSize.begin(), childSize.end(),
                 [](const int &i) { return i - PADDING; });
+}
+/// return attribute string.
+std::string Kmenu::attributeString() {
+  std::string str;
+  for (std::vector<std::string>::iterator it = _attributes.begin();
+       it != _attributes.end(); ++it) {
+    str += " " + *it;
+  }
+  return str;
 }
 /// display the menu onto private window
 void Kmenu::display() {
@@ -155,6 +177,23 @@ void Kmenu::display() {
   int displayPage = 0;
 
   while (true) {
+    wclear(_win);
+    // title bar
+    if (_showTitle) {
+
+      _attributes = {"page: ", std::to_string(displayPage + 1), " of ",
+                     std::to_string(totalPages)};
+
+      wattron(_win, A_REVERSE);
+      std::string tPadding(_size[1], ' ');
+      int correction = _size[1] - _title.length() - 3;
+      std::string titleString = attributeString();
+      int titleStrLength = titleString.size();
+      tPadding.replace(0, titleStrLength, titleString);
+      tPadding.replace(correction, _size[1], _title + " ");
+      mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
+      wattroff(_win, A_REVERSE);
+    }
 
     std::vector<Kfield> displayFields = paginatedFields[displayPage];
     int numOfDisplayFields = displayFields.size();
@@ -240,7 +279,9 @@ void Kmenu::display() {
     }
   }
   _highlighted = highlighted + (_pagination * displayPage);
-  clear();
   wrefresh(_win);
 }
-Kmenu::~Kmenu() { delwin(_win); }
+Kmenu::~Kmenu() {
+  delWith(_subwins);
+  delwin(_win);
+}
