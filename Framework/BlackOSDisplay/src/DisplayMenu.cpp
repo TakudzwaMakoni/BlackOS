@@ -22,6 +22,8 @@ int main(int argc, const char *argv[]) {
   cbreak();
   cursor(0);
 
+  WINDOW *world = newwin(WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
+
   std::string fname0 = "SOMETHING";
   std::string fmessage0 = "you selected 'something'.";
 
@@ -57,9 +59,10 @@ int main(int argc, const char *argv[]) {
 
     // create main menu
 
-    BlackOSDisplay::Kmenu main_menu(1, mainMenuName, WORLD_HEIGHT, WORLD_WIDTH,
+    BlackOSDisplay::Kmenu main_menu(mainMenuName, WORLD_HEIGHT, WORLD_WIDTH,
                                     Y_CENTRE, X_CENTRE);
 
+    main_menu.setWin(world); // must set the window!
     main_menu.setFieldAlign(0, 0);
     main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');
     main_menu.paginate(4);
@@ -85,6 +88,7 @@ int main(int argc, const char *argv[]) {
     wgetch(main_win);
 
   } // while true
+  delwin(world);
   endwin();
   return 0;
 }

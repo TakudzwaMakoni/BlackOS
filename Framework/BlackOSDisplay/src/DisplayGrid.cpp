@@ -22,6 +22,8 @@ int main(int argc, const char *argv[]) {
   cbreak();
   cursor(0);
 
+  WINDOW *world = newwin(WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
+
   std::string name = "Matrix A";
 
   Eigen::Matrix<double, 4, 4> testData;
@@ -36,8 +38,9 @@ int main(int argc, const char *argv[]) {
 
   while (true) {
 
+    grid.setWin(world); // must set the window!
     grid.setPrecision(8);
-    grid.borderStyle();
+    grid.setBorderStyle();
     grid.gridLines(false);
     grid.label(grid.name());
     grid.setTitle("Matrix Editor Program");
@@ -54,6 +57,7 @@ int main(int argc, const char *argv[]) {
 
     wclear(grid_window);
   } // while true
+  delwin(world);
   endwin();
   return 0;
 }

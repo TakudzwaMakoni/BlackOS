@@ -22,16 +22,13 @@ std::string emptyField;
 /// BlackOS Menu Object
 class Kmenu : public Kwindow {
 public:
-  Kmenu(const size_t &id, std::string &name, int sizeY, int sizeX, int posY,
-        int posX);
+  Kmenu(std::string &name, int sizeY, int sizeX, int posY, int posX);
 
   virtual void display() override;
   /// return Window Object
   virtual WINDOW *window() const override;
-  /// set animation on start and finish
-  virtual void setAnimation(const int &start, const int &finish) const override;
   /// set style of BlackOS Window border
-  virtual void borderStyle(const int &ch = 0) override;
+  virtual void setBorderStyle(const int &ch) override;
   /// set style of BlackOS Window border
   virtual void setBorderStyle(const int &L, const int &R, const int &T,
                               const int &B, const int &TL, const int &TR,
@@ -40,12 +37,12 @@ public:
   virtual std::vector<int> maxSize() const override;
   virtual std::string winType() const override;
   virtual std::string name() const override;
+  virtual void setWin(WINDOW *window) override;
 
   virtual void setFields(const std::vector<Kfield> &fields);
   virtual void addDisplayObj(Kwindow &obj) const;
   virtual Kfield getSelectedField() const;
 
-  size_t getID() const;
   void setWinPos(int x, int y);
   void setFieldAlign(int x, int y);
   void addFieldPadding();
@@ -64,7 +61,6 @@ public:
   ~Kmenu();
 
 private:
-  virtual void setWin() override;
   WINDOW *_win;
   std::vector<WINDOW *> _subwins;
   std::vector<int> _size;
@@ -77,10 +73,9 @@ private:
   std::string _name;
   int _highlighted{-1};
   int _pagination = -1;
-  const size_t _id; // TODO: need a NODE MAP TO NAVIGATE BETWEEN MENUS
-  mutable int _startAnim, _finishAnim;
   bool _showTitle{false};
   std::string _title;
+  std::vector<int> _borderStyle{0, 0, 0, 0, 0, 0, 0, 0}; // size = 8.
 };
 
 } // namespace BlackOSDisplay

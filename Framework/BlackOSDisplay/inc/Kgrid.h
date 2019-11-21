@@ -8,15 +8,19 @@
 #include "Eigen/Dense"
 #include "Kwindow.h"
 #include <iomanip>
+#include <memory>
+#include <ncurses.h>
 #include <sstream>
 #include <string>
 
 namespace BlackOSDisplay {
 
-/// BlackOS Grid Object
+/// BlackOS Grid class Kwindow
 template <typename dataType, size_t rows, size_t cols>
 class Kgrid : public Kwindow {
+
 private:
+  /// private member variables
   const std::string _name;
   Eigen::Matrix<dataType, rows, cols> _matrix;
   WINDOW *_win;
@@ -32,13 +36,12 @@ private:
   bool _showTitle{false};
   size_t _highlightedRow{0};
   size_t _highlightedCol{0};
-  // degrees, precision,
+  std::vector<int> _borderStyle{0, 0, 0, 0, 0, 0, 0, 0}; // size = 8.
   std::vector<std::string> _attributes;
   const size_t _id; // TODO: need a NODE MAP TO NAVIGATE BETWEEN MENUS
   mutable int m_startAnim, m_finishAnim;
-  virtual void setWin() override {
-    _win = newwin(_size[0], _size[1], _position[0], _position[1]);
-  }
+
+  /// private member functions
   std::string attributeString() {
     std::string str;
     for (std::vector<std::string>::iterator it = _attributes.begin();
@@ -47,8 +50,7 @@ private:
     }
     return str;
   }
-  // delete any additionally added windows. TODO: possibility for implementation
-  // of externally adding windows?
+  /// delete any additionally added windows.
   void delWith(std::vector<WINDOW *> windows) {
     if (!windows.empty())
       for (std::vector<WINDOW *>::iterator it = windows.begin();
@@ -56,8 +58,9 @@ private:
         delwin(*it);
       }
   };
-  ///
+  /// write eigen matrix data to class matrix
   void write(Eigen::Matrix<dataType, rows, cols> &data) { _matrix = data; }
+  /// (overload) write data from vector into matrix
   void write(std::vector<dataType> &data) {
     if (data.size() != rows * cols) {
       std::string message = "expected vector size: " + std::to_string(rows) +
@@ -66,24 +69,63 @@ private:
     }
     for (int i = 0; i < rows; ++i) {
       for (int j = 0; j < cols; ++j) {
-        _matrix(i, j) = data[(i * rows) + j]; // testing output
+        _matrix(i, j) = data[(i * rows) + j];
       }
     }
   }
 
+  /// public member functions
+
 public:
+  /// constructor for Kgrid
+  Kgrid(std::string &name, Eigen::Matrix<dataType, rows, cols> &data, int sizeY,
+        int sizeX, int posY, int posX)
+      : _name(name), _id(0) {
+    this->write(data);
+    _size = {sizeY, sizeX};
+    _position = {posY, posX};
+  }
+  /// (overload) constructor for Kgrid
+  Kgrid(std::string &name, std::vector<dataType> &data, int sizeY, int sizeX,
+        int posY, int posX)
+      : _name(name), _id(0) {
+    this->write(data);
+    _size = {sizeY, sizeX};
+    _position = {posY, posX};
+  }
+  ///
+
+  // assign a window Object
+  virtual void setWin(WINDOW *window) override {
+    _win = window;
+    wresize(_win, _size[0], _size[1]);
+    mvwin(_win, _position[0], _position[1]);
+    wrefresh(_win);
+  }
   /// display Kgrid
   virtual void display() override {
-    /// TODO MAKE GRID
 
-    setAnimation(0, 0); // TODO: not in use
     keypad(_win, true);
     int selection;
     size_t highlightedRow = 0;
     size_t highlightedCol = 0;
     int topPad = 1;
 
-    // title bar
+    // border styles
+    int L, R, T, B, TL, TR, BL, BR;
+    L = _borderStyle[0];
+    R = _borderStyle[1];
+    T = _borderStyle[2];
+    B = _borderStyle[3];
+    TL = _borderStyle[4];
+    TR = _borderStyle[5];
+    BL = _borderStyle[6];
+    BR = _borderStyle[7];
+
+    // set border
+    wborder(_win, L, R, T, B, TL, TR, BL, BR);
+
+    // title bar TODO: MODULARISE
     if (_showTitle) {
       _attributes = {"RAD", "PREC: " + std::to_string(_precision)};
       // an extra space below for system / window messages.
@@ -102,7 +144,6 @@ public:
     int displayPrecision = 5;
 
     while (true) {
-
       // navigate through elements in matrix.
       for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
@@ -153,7 +194,8 @@ public:
           left = 2;
 
           int hPadding{4};
-          // auto str{stream.str()};
+
+          // TODO: MODULARISE
           if (_setGrid) {
             hPadding = 6;
             str = "|" + str + "|";
@@ -238,24 +280,19 @@ public:
     wrefresh(_win);
   }
   /// return Window Object
-  virtual WINDOW *window() const override { return this->_win; }
-  /// set animation on start and finish
-  virtual void setAnimation(const int &start,
-                            const int &finish) const override {
-    m_startAnim = start;
-    m_finishAnim = finish;
+  virtual WINDOW *
+  window(/*TODO: option to return cleared / uncleared*/) const override {
+    return this->_win;
   }
   /// set style of BlackOS Window border
-  virtual void borderStyle(const int &ch = 0) override {
-    wborder(_win, ch, ch, ch, ch, ch, ch, ch, ch);
-    wrefresh(_win);
+  virtual void setBorderStyle(const int &ch = 0) override {
+    _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
   }
   /// set style of BlackOS Window border
   virtual void setBorderStyle(const int &L, const int &R, const int &T,
                               const int &B, const int &TL, const int &TR,
                               const int &BL, const int &BR) override {
-    wborder(_win, L, R, T, B, TL, TR, BL, BR);
-    wrefresh(_win);
+    _borderStyle = {L, R, T, B, TL, TR, BL, BR};
   }
   ///
   virtual void label(const std::string &label) const override {
@@ -272,28 +309,8 @@ public:
   }
   virtual std::string winType() const override { return "Kgrid"; }
   virtual std::string name() const override { return this->_name; }
-  ///
-  Kgrid(std::string &name, Eigen::Matrix<dataType, rows, cols> &data, int sizeY,
-        int sizeX, int posY, int posX)
-      : _name(name), _id(0) {
-    this->write(data);
-    _size = {sizeY, sizeX};
-    _position = {posY, posX};
-    setWin();
-  }
-  ///
-  Kgrid(std::string &name, std::vector<dataType> &data, int sizeY, int sizeX,
-        int posY, int posX)
-      : _name(name), _id(0) {
-    this->write(data);
-    _size = {sizeY, sizeX};
-    _position = {posY, posX};
-    setWin();
-  }
-  ///
+
   Eigen::Matrix<dataType, rows, cols> matrix() const { return _matrix; }
-  ///
-  size_t getID() const { return this->_id; }
   ///
   int centreX() const { return _size[1] / 2; }
   int centreY() const { return _size[0] / 2; }
@@ -317,7 +334,8 @@ public:
 
   ~Kgrid() {
     delWith(_subwins);
-    delwin(_win);
+    wclear(_win);
+    // delwin(_win); TODO: delete window at end of program
   }
 };
 } // namespace BlackOSDisplay

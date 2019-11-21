@@ -17,12 +17,9 @@ const int PADDING = 1;
 
 using namespace BlackOSDisplay;
 
-Kmenu::Kmenu(const size_t &id, std::string &name, int sizeY, int sizeX,
-             int posY, int posX)
-    : _id(id) {
+Kmenu::Kmenu(std::string &name, int sizeY, int sizeX, int posY, int posX) {
   _size = {sizeY, sizeX};
   _position = {posY, posX};
-  setWin();
 }
 
 /// return Window Object
@@ -39,16 +36,14 @@ std::string Kmenu::winType() const { return "Kmenu"; }
 /// return name of Kwindow instance
 std::string Kmenu::name() const { return _name; }
 /// set style of corners of BlackOS Window
-void Kmenu::borderStyle(const int &ch) {
-  wborder(_win, ch, ch, ch, ch, ch, ch, ch, ch);
-  wrefresh(_win);
+void Kmenu::setBorderStyle(const int &ch) {
+  _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
 }
 /// set style for each corner of BlackOS Window
 void Kmenu::setBorderStyle(const int &L, const int &R, const int &T,
                            const int &B, const int &TL, const int &TR,
                            const int &BL, const int &BR) {
-  wborder(_win, L, R, T, B, TL, TR, BL, BR);
-  wrefresh(_win);
+  _borderStyle = {L, R, T, B, TL, TR, BL, BR};
 }
 
 void Kmenu::setFields(const std::vector<Kfield> &fields) {
@@ -62,7 +57,6 @@ void Kmenu::label(const std::string &label) const {
   int labellocx = _size[1] - (3 + (int)label.length());
   mvwaddstr(_win, labellocy, labellocx, label.c_str());
 }
-size_t Kmenu::getID() const { return this->_id; }
 /// return the maximum size of the local window
 std::vector<int> Kmenu::maxSize() const {
   int yMax, xMax;
@@ -108,16 +102,14 @@ void Kmenu::addFieldPadding() {
 }
 /// show multiple fields in paginated groups
 void Kmenu::paginate(int divisor) { _pagination = divisor; }
-/// set animation codes for window start and finish
-void Kmenu::setAnimation(const int &start, const int &finish) const {
-  _startAnim = start;
-  _finishAnim = finish;
-}
 /// get position of window top left corner
 Eigen::Vector2i Kmenu::position() const { return _position; }
 /// set the private window to a window
-void Kmenu::setWin() {
-  _win = newwin(_size[0], _size[1], _position[0], _position[1]);
+void Kmenu::setWin(WINDOW *window) {
+  _win = window;
+  wresize(_win, _size[0], _size[1]);
+  mvwin(_win, _position[0], _position[1]);
+  wrefresh(_win);
 }
 // delete any additionally added windows. TODO: possibility for implementation
 // of externally adding windows?
@@ -150,7 +142,6 @@ std::string Kmenu::attributeString() {
 /// display the menu onto private window
 void Kmenu::display() {
 
-  setAnimation(0, 0); // TODO: not in use
   keypad(_win, true);
   int selection;
   int highlighted = 0;
