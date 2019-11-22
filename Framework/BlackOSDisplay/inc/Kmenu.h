@@ -24,8 +24,9 @@ class Kmenu : public Kwindow {
 public:
   Kmenu(std::string &name, int sizeY, int sizeX, int posY, int posX);
 
+  // override member functions
   virtual void display() override;
-  /// return Window Object
+  /// return window
   virtual WINDOW *window() const override;
   /// set style of BlackOS Window border
   virtual void setBorderStyle(const int &ch) override;
@@ -38,6 +39,10 @@ public:
   virtual std::string winType() const override;
   virtual std::string name() const override;
   virtual void setWin(WINDOW *window) override;
+  /*  virtual void Kerase(int y1, int x1, int y2, int x2) override;
+    virtual void KeraseExcept(int y1, int x1, int y2, int x2) override;
+    virtual void Kerase(std::vector<int> &elements) override;
+    virtual void KeraseExcept(std::vector<int> &elements) override; */
 
   virtual void setFields(const std::vector<Kfield> &fields);
   virtual void addDisplayObj(Kwindow &obj) const;

@@ -21,13 +21,12 @@ Kmenu::Kmenu(std::string &name, int sizeY, int sizeX, int posY, int posX) {
   _size = {sizeY, sizeX};
   _position = {posY, posX};
 }
-
-/// return Window Object
-WINDOW *Kmenu::window() const { return _win; }
 /// return fields in Kmenu instance
 std::vector<Kfield> Kmenu::fields() const { return _fields; }
 /// return window size of instance
 std::vector<int> Kmenu::size() const { return _size; }
+/// reutrn window
+WINDOW *Kmenu::window() const { return this->_win; };
 /// return window centre x position
 int Kmenu::centreX() const { return _size[1] / 2; }
 int Kmenu::centreY() const { return _size[0] / 2; }
@@ -168,7 +167,7 @@ void Kmenu::display() {
   int displayPage = 0;
 
   while (true) {
-    wclear(_win);
+    werase(_win);
     // title bar
     if (_showTitle) {
 
@@ -274,5 +273,5 @@ void Kmenu::display() {
 }
 Kmenu::~Kmenu() {
   delWith(_subwins);
-  delwin(_win);
+  // delwin(_win);
 }

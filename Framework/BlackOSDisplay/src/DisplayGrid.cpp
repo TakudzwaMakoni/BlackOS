@@ -31,14 +31,15 @@ int main(int argc, const char *argv[]) {
       9100.4564, 12, 231, 3453, 1231, 453, 13, 11;
   std::vector<double> testData2{34.2763,     21.25021, 37.243,  54.2343, 5.0243,
                                 6546.218856, 7.774276, 75358.2, 9.2};
-  BlackOSDisplay::Kgrid<double, 4, 4> grid(name, testData, WORLD_HEIGHT,
-                                           WORLD_WIDTH, Y_CENTRE, X_CENTRE);
+  BlackOSDisplay::Kgrid<double, 4, 4> grid(name, WORLD_HEIGHT, WORLD_WIDTH,
+                                           Y_CENTRE, X_CENTRE);
 
   auto mat = grid.matrix();
 
   while (true) {
 
-    grid.setWin(world); // must set the window!
+    grid.setWin(world);   // must set the window!
+    grid.write(testData); // must write the data!
     grid.setPrecision(8);
     grid.setBorderStyle();
     grid.gridLines(false);

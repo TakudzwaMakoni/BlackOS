@@ -20,8 +20,8 @@ class Kwindow {
 
 public:
   virtual void display() = 0;
+  /// return window
   virtual WINDOW *window() const = 0;
-  /// switch for cursor blinking
   /// set style of corners of BlackOS Window
   virtual void setBorderStyle(const int &ch) = 0;
   /// set style for each corner of BlackOS Window
@@ -34,6 +34,10 @@ public:
   virtual std::string winType() const = 0;
   virtual std::string name() const = 0;
   virtual void setWin(WINDOW *window) = 0;
+  /*  virtual void Kerase(int y1, int x1, int y2, int x2) = 0;
+    virtual void KeraseExcept(int y1, int x1, int y2, int x2) = 0;
+    virtual void Kerase(std::vector<int> &elements) = 0;
+    virtual void KeraseExcept(std::vector<int> &elements) = 0; */
 };
 } // namespace BlackOSDisplay
 

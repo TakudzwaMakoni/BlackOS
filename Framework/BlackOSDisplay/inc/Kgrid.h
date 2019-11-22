@@ -19,89 +19,18 @@ namespace BlackOSDisplay {
 template <typename dataType, size_t rows, size_t cols>
 class Kgrid : public Kwindow {
 
-private:
-  /// private member variables
-  const std::string _name;
-  Eigen::Matrix<dataType, rows, cols> _matrix;
-  WINDOW *_win;
-  std::vector<WINDOW *> _subwins;
-  std::vector<int> _size;
-  int _xAlign = 0;
-  int _yAlign = 0;
-  Eigen::Vector2i _position;
-  int _precision;
-  int _vPadding{1};
-  std::string _title;
-  bool _setGrid{false};
-  bool _showTitle{false};
-  size_t _highlightedRow{0};
-  size_t _highlightedCol{0};
-  std::vector<int> _borderStyle{0, 0, 0, 0, 0, 0, 0, 0}; // size = 8.
-  std::vector<std::string> _attributes;
-  const size_t _id; // TODO: need a NODE MAP TO NAVIGATE BETWEEN MENUS
-  mutable int m_startAnim, m_finishAnim;
-
-  /// private member functions
-  std::string attributeString() {
-    std::string str;
-    for (std::vector<std::string>::iterator it = _attributes.begin();
-         it != _attributes.end(); ++it) {
-      str += " " + *it;
-    }
-    return str;
-  }
-  /// delete any additionally added windows.
-  void delWith(std::vector<WINDOW *> windows) {
-    if (!windows.empty())
-      for (std::vector<WINDOW *>::iterator it = windows.begin();
-           it != windows.end(); ++it) {
-        delwin(*it);
-      }
-  };
-  /// write eigen matrix data to class matrix
-  void write(Eigen::Matrix<dataType, rows, cols> &data) { _matrix = data; }
-  /// (overload) write data from vector into matrix
-  void write(std::vector<dataType> &data) {
-    if (data.size() != rows * cols) {
-      std::string message = "expected vector size: " + std::to_string(rows) +
-                            " x " + std::to_string(cols);
-      throw std::invalid_argument(message);
-    }
-    for (int i = 0; i < rows; ++i) {
-      for (int j = 0; j < cols; ++j) {
-        _matrix(i, j) = data[(i * rows) + j];
-      }
-    }
-  }
-
-  /// public member functions
-
 public:
   /// constructor for Kgrid
-  Kgrid(std::string &name, Eigen::Matrix<dataType, rows, cols> &data, int sizeY,
-        int sizeX, int posY, int posX)
-      : _name(name), _id(0) {
-    this->write(data);
-    _size = {sizeY, sizeX};
-    _position = {posY, posX};
-  }
-  /// (overload) constructor for Kgrid
-  Kgrid(std::string &name, std::vector<dataType> &data, int sizeY, int sizeX,
-        int posY, int posX)
-      : _name(name), _id(0) {
-    this->write(data);
-    _size = {sizeY, sizeX};
-    _position = {posY, posX};
-  }
-  ///
+  Kgrid(std::string &name, int sizeY, int sizeX, int posY, int posX);
+  /// write eigen matrix data to class matrix
+  void write(Eigen::Matrix<dataType, rows, cols> &data);
+  /// (overload) write data from vector into matrix
+  void write(std::vector<dataType> &data);
+
+  // overrides
 
   // assign a window Object
-  virtual void setWin(WINDOW *window) override {
-    _win = window;
-    wresize(_win, _size[0], _size[1]);
-    mvwin(_win, _position[0], _position[1]);
-    wrefresh(_win);
-  }
+  virtual void setWin(WINDOW *window) override;
   /// display Kgrid
   virtual void display() override {
 
@@ -279,36 +208,21 @@ public:
     clear();
     wrefresh(_win);
   }
-  /// return Window Object
-  virtual WINDOW *
-  window(/*TODO: option to return cleared / uncleared*/) const override {
-    return this->_win;
-  }
   /// set style of BlackOS Window border
-  virtual void setBorderStyle(const int &ch = 0) override {
-    _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
-  }
+  virtual void setBorderStyle(const int &ch = 0) override;
   /// set style of BlackOS Window border
   virtual void setBorderStyle(const int &L, const int &R, const int &T,
                               const int &B, const int &TL, const int &TR,
-                              const int &BL, const int &BR) override {
-    _borderStyle = {L, R, T, B, TL, TR, BL, BR};
-  }
-  ///
-  virtual void label(const std::string &label) const override {
-    int labellocy = _size[0] - 1;
-    int labellocx = _size[1] - (3 + (int)label.length());
-    mvwaddstr(_win, labellocy, labellocx, label.c_str());
-  }
-  ///
-  virtual std::vector<int> maxSize() const override {
-    int yMax, xMax;
-    getmaxyx(_win, yMax, xMax);
-    std::vector<int> size{yMax, xMax};
-    return size;
-  }
-  virtual std::string winType() const override { return "Kgrid"; }
-  virtual std::string name() const override { return this->_name; }
+                              const int &BL, const int &BR) override;
+  /// return window
+  virtual WINDOW *window() const override;
+  /// set window label
+  virtual void label(const std::string &label) const override;
+  /// return max size of window
+  virtual std::vector<int> maxSize() const override;
+  /// return type of Kwindow
+  virtual std::string winType() const override;
+  virtual std::string name() const override;
 
   Eigen::Matrix<dataType, rows, cols> matrix() const { return _matrix; }
   ///
@@ -337,7 +251,48 @@ public:
     wclear(_win);
     // delwin(_win); TODO: delete window at end of program
   }
+
+private:
+  /// private member variables
+  std::string _name;
+  Eigen::Matrix<dataType, rows, cols> _matrix;
+  WINDOW *_win;
+  std::vector<WINDOW *> _subwins;
+  std::vector<int> _size;
+  int _xAlign = 0;
+  int _yAlign = 0;
+  Eigen::Vector2i _position;
+  int _precision;
+  int _vPadding{1};
+  std::string _title;
+  bool _setGrid{false};
+  bool _showTitle{false};
+  size_t _highlightedRow{0};
+  size_t _highlightedCol{0};
+  std::vector<int> _borderStyle{0, 0, 0, 0, 0, 0, 0, 0}; // size = 8.
+  std::vector<std::string> _attributes;
+
+  /// private member functions
+  std::string attributeString() {
+    std::string str;
+    for (std::vector<std::string>::iterator it = _attributes.begin();
+         it != _attributes.end(); ++it) {
+      str += " " + *it;
+    }
+    return str;
+  }
+  /// delete any additionally added windows.
+  void delWith(std::vector<WINDOW *> windows) {
+    if (!windows.empty())
+      for (std::vector<WINDOW *>::iterator it = windows.begin();
+           it != windows.end(); ++it) {
+        delwin(*it);
+      }
+  }
 };
 } // namespace BlackOSDisplay
+
+// implementation for template class Kgrid
+#include "Kgrid.tpp"
 
 #endif // BLACKOS_KGRID_H
