@@ -63,8 +63,6 @@ std::vector<int> Kmenu::maxSize() const {
   std::vector<int> size{yMax, xMax};
   return size;
 }
-/// set the position of the menu inside the local window
-void Kmenu::setWinPos(int x, int y) {}
 /// set field alignment
 void Kmenu::setFieldAlign(int x, int y) {
   _xAlign = x;
@@ -138,6 +136,78 @@ std::string Kmenu::attributeString() {
   }
   return str;
 }
+/// erase the area given by the top left to bottom right corners
+void Kmenu::kErase(const int y1, const int x1, const int y2, const int x2) {
+  int a, b, c, d;
+  int borderY = _size[0];
+  int borderX = _size[1];
+
+  // miss the border
+  a = y1 == 0 ? 1 : y1;
+  b = x1 == 0 ? 1 : x1;
+  c = y2 == borderY ? y2 - 1 : y2;
+  d = x2 == borderX ? x2 - 1 : x2;
+
+  int width = d - b;
+  std::string fill(width, ' ');
+  for (int i = a; i <= c; ++i) {
+    mvwprintw(_win, i, b, fill.c_str());
+  }
+}
+/// erase the entire window except the area given by the top left to bottom
+/// right corners
+void Kmenu::kEraseExcept(const int y1, const int x1, const int y2,
+                         const int x2) {
+
+  int borderY = _size[0];
+  int borderX = _size[1];
+
+  int width = borderX - 2;
+  int height = borderY - 2;
+  std::string fill(width, ' ');
+  std::string space = " ";
+
+  for (int i = 1; i <= height; ++i) {
+    if (i <= y2 && i >= y1) {
+      for (int j = 1; j <= width; ++j) {
+        if (!(j <= x2 && j >= x1)) {
+          mvwprintw(_win, i, j, space.c_str());
+        }
+      }
+    }
+    mvwprintw(_win, i, 1, fill.c_str());
+  }
+}
+/// erase multiple areas on the window
+void Kmenu::kErase(const std::vector<int> &elements) {
+
+  int numOfAreas = elements.size() / 4; /*two coordinates per block*/
+
+  for (int areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
+    int y1, x1, y2, x2;
+
+    y1 = elements[0 + (areaIdx * 4)];
+    x1 = elements[1 + (areaIdx * 4)];
+    y2 = elements[2 + (areaIdx * 4)];
+    x2 = elements[3 + (areaIdx * 4)];
+    kErase(y1, x1, y2, x2);
+  }
+}
+/// erase the screen except multiple areas on the window
+void Kmenu::kEraseExcept(const std::vector<int> &elements) {
+
+  int numOfAreas = elements.size() / 4; /*two coordinates per block*/
+
+  for (int areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
+    int y1, x1, y2, x2;
+
+    y1 = elements[0 + (areaIdx * 4)];
+    x1 = elements[1 + (areaIdx * 4)];
+    y2 = elements[2 + (areaIdx * 4)];
+    x2 = elements[3 + (areaIdx * 4)];
+    kEraseExcept(y1, x1, y2, x2);
+  }
+}
 /// display the menu onto private window
 void Kmenu::display() {
 
@@ -184,6 +254,8 @@ void Kmenu::display() {
       mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
       wattroff(_win, A_REVERSE);
     }
+
+    // title
 
     std::vector<Kfield> displayFields = paginatedFields[displayPage];
     int numOfDisplayFields = displayFields.size();

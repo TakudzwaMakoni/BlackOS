@@ -39,16 +39,17 @@ public:
   virtual std::string winType() const override;
   virtual std::string name() const override;
   virtual void setWin(WINDOW *window) override;
-  /*  virtual void Kerase(int y1, int x1, int y2, int x2) override;
-    virtual void KeraseExcept(int y1, int x1, int y2, int x2) override;
-    virtual void Kerase(std::vector<int> &elements) override;
-    virtual void KeraseExcept(std::vector<int> &elements) override; */
+  virtual void kErase(const int y1, const int x1, const int y2,
+                      const int x2) override;
+  virtual void kEraseExcept(const int y1, const int x1, const int y2,
+                            const int x2) override;
+  virtual void kErase(const std::vector<int> &elements) override;
+  virtual void kEraseExcept(const std::vector<int> &elements) override;
 
   virtual void setFields(const std::vector<Kfield> &fields);
   virtual void addDisplayObj(Kwindow &obj) const;
   virtual Kfield getSelectedField() const;
 
-  void setWinPos(int x, int y);
   void setFieldAlign(int x, int y);
   void addFieldPadding();
   void setFieldStyle(std::string style);

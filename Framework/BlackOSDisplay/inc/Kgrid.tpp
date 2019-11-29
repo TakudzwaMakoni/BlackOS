@@ -78,8 +78,24 @@ template <typename dataType, size_t rows, size_t cols>
 std::string Kgrid<dataType, rows, cols>::name() const {
   return this->_name;
 }
+
 // member functions
 
+/// return selected element from matrix
+template <typename dataType, size_t rows, size_t cols>
+dataType Kgrid<dataType, rows, cols>::selectedRaw() const {
+  return this->_matrix(_highlightedRow, _highlightedCol);
+}
+/// return the indices (row and column) selected from Matrix
+template <typename dataType, size_t rows, size_t cols>
+std::vector<size_t> Kgrid<dataType, rows, cols>::selectedIndices() const {
+  return std::vector<size_t>{_highlightedRow, _highlightedCol};
+}
+/// set title for window
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::setTitle(std::string title) {
+  _title = title;
+}
 /// write Eigen Matrix to class matrix
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::write(
@@ -99,6 +115,289 @@ void Kgrid<dataType, rows, cols>::write(std::vector<dataType> &data) {
       _matrix(i, j) = data[(i * rows) + j];
     }
   }
+}
+/// erase the area given by the top left to bottom right corners
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::kErase(const int y1, const int x1,
+                                         const int y2, const int x2) {
+  int a, b, c, d;
+  int borderY = _size[0];
+  int borderX = _size[1];
+
+  // miss the border
+  a = y1 == 0 ? 1 : y1;
+  b = x1 == 0 ? 1 : x1;
+  c = y2 == borderY ? y2 - 1 : y2;
+  d = x2 == borderX ? x2 - 1 : x2;
+
+  int width = d - b + 1;
+  std::string fill(width, ' ');
+  for (int i = a; i <= c; ++i) {
+    mvwprintw(_win, i, b, fill.c_str());
+  }
+}
+/// erase the entire window except the area given by the top left to bottom
+/// right corners
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::kEraseExcept(const int y1, const int x1,
+                                               const int y2, const int x2) {
+
+  int borderY = _size[0] - 2;
+  int borderX = _size[1] - 2;
+
+  std::string fill(borderX, ' ');
+  std::string space = " ";
+
+  for (int i = 1; i <= borderY; ++i) {
+    if (i < y1 || i > y2) {
+      mvwprintw(_win, i, 1, fill.c_str());
+    } else {
+      for (int j = 1; j <= borderX; ++j) {
+        if ((j > x2 || j < x1)) {
+          mvwprintw(_win, i, j, space.c_str());
+        }
+      }
+    }
+  }
+}
+/// erase multiple areas on the window
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::kErase(const std::vector<int> &elements) {
+
+  int numOfAreas = elements.size() / 4; /*two coordinates per block*/
+
+  for (int areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
+    int y1, x1, y2, x2;
+
+    y1 = elements[0 + (areaIdx * 4)];
+    x1 = elements[1 + (areaIdx * 4)];
+    y2 = elements[2 + (areaIdx * 4)];
+    x2 = elements[3 + (areaIdx * 4)];
+    kErase(y1, x1, y2, x2);
+  }
+}
+/// erase the screen except multiple areas on the window
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::kEraseExcept(
+    const std::vector<int> &elements) {
+
+  int numOfAreas = elements.size() / 4; /*two coordinates per block*/
+
+  for (int areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
+    int y1, x1, y2, x2;
+
+    y1 = elements[0 + (areaIdx * 4)];
+    x1 = elements[1 + (areaIdx * 4)];
+    y2 = elements[2 + (areaIdx * 4)];
+    x2 = elements[3 + (areaIdx * 4)];
+    kEraseExcept(y1, x1, y2, x2);
+  }
+}
+/// display the Kgrid to screen
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::display() {
+
+  keypad(_win, true);
+  int selection;
+  size_t highlightedRow = 0;
+  size_t highlightedCol = 0;
+  int topPad = 1;
+
+  // border styles
+  int L, R, T, B, TL, TR, BL, BR;
+  L = _borderStyle[0];
+  R = _borderStyle[1];
+  T = _borderStyle[2];
+  B = _borderStyle[3];
+  TL = _borderStyle[4];
+  TR = _borderStyle[5];
+  BL = _borderStyle[6];
+  BR = _borderStyle[7];
+
+  // set border
+  wborder(_win, L, R, T, B, TL, TR, BL, BR);
+
+  // title bar TODO: MODULARISE
+  if (_showTitle) {
+    _attributes = {"RAD", "PREC: " + std::to_string(_precision)};
+    // an extra space below for system / window messages.
+    wattron(_win, A_REVERSE);
+    std::string tPadding(_size[1], ' ');
+    int correction = _size[1] - _title.length() - 3;
+    std::string titleString = attributeString();
+    int titleStrLength = titleString.size();
+    tPadding.replace(0, titleStrLength, titleString);
+    tPadding.replace(correction, _size[1], _title + " ");
+    mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
+    wattroff(_win, A_REVERSE);
+  }
+
+  // precision of entries shown in matrix
+  int displayPrecision = 5;
+
+  while (true) {
+    // navigate through elements in matrix.
+    for (int i = 0; i < rows; ++i) {
+      for (int j = 0; j < cols; ++j) {
+        if (j == highlightedCol && i == highlightedRow) {
+          wattron(_win, A_REVERSE);
+        }
+
+        auto element = _matrix(highlightedRow, highlightedCol);
+        std::stringstream elementStream;
+        elementStream << std::setprecision(_precision) << element;
+        const std::string elementStr = elementStream.str();
+        const int elementStrSize = elementStr.size();
+        std::string elementDisplay(_size[1] / 2, ' ');
+        elementDisplay.replace(0, elementStrSize, elementStr);
+
+        std::stringstream numStream;
+
+        // length of matrix cells set to 8.
+        std::string str(8, ' ');
+        int strSize = str.size();
+
+        // if number is greater than two digits, express in scientific format,
+        // which requires 4 spaces for exponent, two for front digit and
+        // decimal point, allowing two d.p for total width 8.
+
+        if (_matrix.coeff(i, j) > 99.99) {
+          numStream << std::scientific << std::setprecision(2)
+                    << _matrix.coeff(i, j);
+        } else {
+          // three spaces reserved for decimal and front digits, max width
+          // is 8.
+          // displayPrecision = _precision > 5 ? 5 : _precision;
+          numStream << std::setprecision(displayPrecision) << std::fixed
+                    << _matrix.coeff(i, j);
+        }
+
+        std::string numStr = numStream.str();
+        int numStrSize = numStr.size();
+
+        int correction = strSize - numStrSize;
+        str.replace(correction, numStrSize, numStr);
+
+        int yAlign = 0;
+        int xAlign = 0;
+        int left, right, top, bottom, v_centre, h_centre;
+
+        // left align
+        left = 2;
+
+        int hPadding{4};
+
+        // TODO: MODULARISE
+        if (_setGrid) {
+          hPadding = 6;
+          str = "|" + str + "|";
+        }
+        int gridWidth = (cols * 8) + (cols - 2);
+        int gridHeight = rows * _vPadding; // avoid collision with status bar
+
+        int bottomPad = -gridHeight + i;
+        int rightPad = gridWidth - 1;
+        int hCentrePad = gridWidth;
+        int vCentrPad = gridHeight;
+
+        // right align
+        right = _size[1];
+
+        // centre align
+        v_centre = i + (_size[0] / 2) - vCentrPad;
+        h_centre = (_size[1] - hCentrePad) / 2;
+
+        // top align
+        top = i + topPad;
+        bottom = _size[0] - 2;
+
+        if (_xAlign == 1)
+          xAlign = right + rightPad;
+        else if (_xAlign == 0)
+          xAlign = h_centre;
+        else if (_xAlign == -1)
+          xAlign = left;
+
+        if (_yAlign == 1)
+          yAlign = top;
+        else if (_yAlign == 0)
+          yAlign = v_centre;
+        else if (_yAlign == -1)
+          yAlign = bottom + bottomPad;
+        mvwprintw(_win, yAlign + i * _vPadding,
+                  xAlign + (displayPrecision + hPadding) * j, (str).c_str());
+        wattroff(_win, A_REVERSE);
+
+        // display the element highlighted to full user precision.
+        mvwprintw(_win, bottom, left, elementDisplay.c_str());
+        kErase(1, 2, 1, 4);
+        wrefresh(_win);
+      }
+    }
+    selection = wgetch(_win);
+    switch (selection) {
+    case KEY_UP:
+      highlightedRow--;
+      if (highlightedRow == -1) {
+        highlightedRow = 0;
+      }
+      break;
+    case KEY_DOWN:
+      highlightedRow++;
+      if (highlightedRow == rows) {
+        highlightedRow = rows - 1;
+      }
+      break;
+    case KEY_LEFT:
+      highlightedCol--;
+      if (highlightedCol == -1) {
+        highlightedCol = 0;
+      }
+      break;
+    case KEY_RIGHT:
+      highlightedCol++;
+      if (highlightedCol == cols) {
+        highlightedCol = cols - 1;
+      }
+      break;
+    default:
+      break;
+    }
+    if (selection == 10) {
+      break;
+    }
+  }
+  _highlightedRow = highlightedRow;
+  _highlightedCol = highlightedCol;
+  wrefresh(_win);
+}
+
+// private memeber functions
+
+/// generate attribute string
+template <typename dataType, size_t rows, size_t cols>
+std::string Kgrid<dataType, rows, cols>::attributeString() {
+  std::string str;
+  for (std::vector<std::string>::iterator it = _attributes.begin();
+       it != _attributes.end(); ++it) {
+    str += " " + *it;
+  }
+  return str;
+}
+/// delete an additional windows
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::delWith(std::vector<WINDOW *> windows) {
+  if (!windows.empty())
+    for (std::vector<WINDOW *>::iterator it = windows.begin();
+         it != windows.end(); ++it) {
+      delwin(*it);
+    }
+}
+/// destructor for Kgrid
+template <typename dataType, size_t rows, size_t cols>
+Kgrid<dataType, rows, cols>::~Kgrid() {
+  delWith(_subwins);
+  wclear(_win);
 }
 
 } // namespace BlackOSDisplay

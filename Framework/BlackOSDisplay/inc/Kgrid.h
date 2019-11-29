@@ -32,182 +32,7 @@ public:
   // assign a window Object
   virtual void setWin(WINDOW *window) override;
   /// display Kgrid
-  virtual void display() override {
-
-    keypad(_win, true);
-    int selection;
-    size_t highlightedRow = 0;
-    size_t highlightedCol = 0;
-    int topPad = 1;
-
-    // border styles
-    int L, R, T, B, TL, TR, BL, BR;
-    L = _borderStyle[0];
-    R = _borderStyle[1];
-    T = _borderStyle[2];
-    B = _borderStyle[3];
-    TL = _borderStyle[4];
-    TR = _borderStyle[5];
-    BL = _borderStyle[6];
-    BR = _borderStyle[7];
-
-    // set border
-    wborder(_win, L, R, T, B, TL, TR, BL, BR);
-
-    // title bar TODO: MODULARISE
-    if (_showTitle) {
-      _attributes = {"RAD", "PREC: " + std::to_string(_precision)};
-      // an extra space below for system / window messages.
-      wattron(_win, A_REVERSE);
-      std::string tPadding(_size[1], ' ');
-      int correction = _size[1] - _title.length() - 3;
-      std::string titleString = attributeString();
-      int titleStrLength = titleString.size();
-      tPadding.replace(0, titleStrLength, titleString);
-      tPadding.replace(correction, _size[1], _title + " ");
-      mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
-      wattroff(_win, A_REVERSE);
-    }
-
-    // precision of entries shown in matrix
-    int displayPrecision = 5;
-
-    while (true) {
-      // navigate through elements in matrix.
-      for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-          if (j == highlightedCol && i == highlightedRow) {
-            wattron(_win, A_REVERSE);
-          }
-
-          auto element = _matrix(highlightedRow, highlightedCol);
-          std::stringstream elementStream;
-          elementStream << std::setprecision(_precision) << element;
-          const std::string elementStr = elementStream.str();
-          const int elementStrSize = elementStr.size();
-          std::string elementDisplay(_size[1] / 2, ' ');
-          elementDisplay.replace(0, elementStrSize, elementStr);
-
-          std::stringstream numStream;
-
-          // length of matrix cells set to 8.
-          std::string str(8, ' ');
-          int strSize = str.size();
-
-          // if number is greater than two digits, express in scientific format,
-          // which requires 4 spaces for exponent, two for front digit and
-          // decimal point, allowing two d.p for total width 8.
-
-          if (_matrix.coeff(i, j) > 99.99) {
-            numStream << std::scientific << std::setprecision(2)
-                      << _matrix.coeff(i, j);
-          } else {
-            // three spaces reserved for decimal and front digits, max width
-            // is 8.
-            // displayPrecision = _precision > 5 ? 5 : _precision;
-            numStream << std::setprecision(displayPrecision) << std::fixed
-                      << _matrix.coeff(i, j);
-          }
-
-          std::string numStr = numStream.str();
-          int numStrSize = numStr.size();
-
-          int correction = strSize - numStrSize;
-          str.replace(correction, numStrSize, numStr);
-
-          int yAlign = 0;
-          int xAlign = 0;
-          int left, right, top, bottom, v_centre, h_centre;
-
-          // left align
-          left = 2;
-
-          int hPadding{4};
-
-          // TODO: MODULARISE
-          if (_setGrid) {
-            hPadding = 6;
-            str = "|" + str + "|";
-          }
-          int gridWidth = (cols * 8) + (cols - 2);
-          int gridHeight = rows * _vPadding; // avoid collision with status bar
-
-          int bottomPad = -gridHeight + i;
-          int rightPad = gridWidth - 1;
-          int hCentrePad = gridWidth;
-          int vCentrPad = gridHeight;
-
-          // right align
-          right = _size[1];
-
-          // centre align
-          v_centre = i + (_size[0] / 2) - vCentrPad;
-          h_centre = (_size[1] - hCentrePad) / 2;
-
-          // top align
-          top = i + topPad;
-          bottom = _size[0] - 2;
-
-          if (_xAlign == 1)
-            xAlign = right + rightPad;
-          else if (_xAlign == 0)
-            xAlign = h_centre;
-          else if (_xAlign == -1)
-            xAlign = left;
-
-          if (_yAlign == 1)
-            yAlign = top;
-          else if (_yAlign == 0)
-            yAlign = v_centre;
-          else if (_yAlign == -1)
-            yAlign = bottom + bottomPad;
-          mvwprintw(_win, yAlign + i * _vPadding,
-                    xAlign + (displayPrecision + hPadding) * j, (str).c_str());
-          wattroff(_win, A_REVERSE);
-
-          // display the element highlighted to full user precision.
-          mvwprintw(_win, bottom, left, elementDisplay.c_str());
-          wrefresh(_win);
-        }
-      }
-      selection = wgetch(_win);
-      switch (selection) {
-      case KEY_UP:
-        highlightedRow--;
-        if (highlightedRow == -1) {
-          highlightedRow = 0;
-        }
-        break;
-      case KEY_DOWN:
-        highlightedRow++;
-        if (highlightedRow == rows) {
-          highlightedRow = rows - 1;
-        }
-        break;
-      case KEY_LEFT:
-        highlightedCol--;
-        if (highlightedCol == -1) {
-          highlightedCol = 0;
-        }
-        break;
-      case KEY_RIGHT:
-        highlightedCol++;
-        if (highlightedCol == cols) {
-          highlightedCol = cols - 1;
-        }
-        break;
-      default:
-        break;
-      }
-      if (selection == 10) {
-        break;
-      }
-    }
-    _highlightedRow = highlightedRow;
-    _highlightedCol = highlightedCol;
-    clear();
-    wrefresh(_win);
-  }
+  virtual void display() override;
   /// set style of BlackOS Window border
   virtual void setBorderStyle(const int &ch = 0) override;
   /// set style of BlackOS Window border
@@ -222,8 +47,19 @@ public:
   virtual std::vector<int> maxSize() const override;
   /// return type of Kwindow
   virtual std::string winType() const override;
+  /// return name of Kwindow
   virtual std::string name() const override;
-
+  ///
+  virtual void kErase(const int y1, const int x1, const int y2,
+                      const int x2) override;
+  ///
+  virtual void kEraseExcept(const int y1, const int x1, const int y2,
+                            const int x2) override;
+  ///
+  virtual void kErase(const std::vector<int> &elements) override;
+  ///
+  virtual void kEraseExcept(const std::vector<int> &elements) override;
+  ///
   Eigen::Matrix<dataType, rows, cols> matrix() const { return _matrix; }
   ///
   int centreX() const { return _size[1] / 2; }
@@ -236,21 +72,13 @@ public:
     _yAlign = y;
   }
   // get the raw element selected from matrix
-  dataType selectedRaw() const {
-    return this->_matrix(_highlightedRow, _highlightedCol);
-  }
+  dataType selectedRaw() const;
   // get the i and j indices of the t element selected in the matrix
-  std::vector<size_t> selectedIndices() const {
-    return std::vector<size_t>{_highlightedRow, _highlightedCol};
-  }
+  std::vector<size_t> selectedIndices() const;
   /// set the title
-  void setTitle(std::string title) { _title = title; }
-
-  ~Kgrid() {
-    delWith(_subwins);
-    wclear(_win);
-    // delwin(_win); TODO: delete window at end of program
-  }
+  void setTitle(std::string title);
+  /// destructor for Kgrid
+  ~Kgrid();
 
 private:
   /// private member variables
@@ -272,23 +100,12 @@ private:
   std::vector<int> _borderStyle{0, 0, 0, 0, 0, 0, 0, 0}; // size = 8.
   std::vector<std::string> _attributes;
 
-  /// private member functions
-  std::string attributeString() {
-    std::string str;
-    for (std::vector<std::string>::iterator it = _attributes.begin();
-         it != _attributes.end(); ++it) {
-      str += " " + *it;
-    }
-    return str;
-  }
+  // private member functions
+
+  /// genetrate attribute string
+  std::string attributeString();
   /// delete any additionally added windows.
-  void delWith(std::vector<WINDOW *> windows) {
-    if (!windows.empty())
-      for (std::vector<WINDOW *>::iterator it = windows.begin();
-           it != windows.end(); ++it) {
-        delwin(*it);
-      }
-  }
+  void delWith(std::vector<WINDOW *> windows);
 };
 } // namespace BlackOSDisplay
 

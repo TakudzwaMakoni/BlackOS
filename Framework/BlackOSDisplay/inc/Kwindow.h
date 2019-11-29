@@ -34,10 +34,12 @@ public:
   virtual std::string winType() const = 0;
   virtual std::string name() const = 0;
   virtual void setWin(WINDOW *window) = 0;
-  /*  virtual void Kerase(int y1, int x1, int y2, int x2) = 0;
-    virtual void KeraseExcept(int y1, int x1, int y2, int x2) = 0;
-    virtual void Kerase(std::vector<int> &elements) = 0;
-    virtual void KeraseExcept(std::vector<int> &elements) = 0; */
+  virtual void kErase(const int y1, const int x1, const int y2,
+                      const int x2) = 0;
+  virtual void kEraseExcept(const int y1, const int x1, const int y2,
+                            const int x2) = 0;
+  virtual void kErase(const std::vector<int> &elements) = 0;
+  virtual void kEraseExcept(const std::vector<int> &elements) = 0;
 };
 } // namespace BlackOSDisplay
 
