@@ -64,10 +64,9 @@ int main(int argc, const char *argv[]) {
 
     main_menu.setWin(world); // must set the window!
     main_menu.setFieldAlign(0, 0);
-    main_menu.setBorderStyle(0, 0, 0, 0, '*', '*', '*', '*');
-    main_menu.paginate(4);
+    main_menu.setBorderStyle(); // 0, 0, 0, 0, '*', '*', '*', '*');
+    main_menu.paginate(3);
 
-    main_menu.label("main menu");
     main_menu.setFields(mainFields);
     main_menu.setTitle("BlackOS Menu");
     main_menu.showTitle(true);

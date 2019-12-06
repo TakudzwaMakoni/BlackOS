@@ -29,7 +29,7 @@ public:
   /// return window
   virtual WINDOW *window() const override;
   /// set style of BlackOS Window border
-  virtual void setBorderStyle(const int &ch) override;
+  virtual void setBorderStyle(const int &ch = 0) override;
   /// set style of BlackOS Window border
   virtual void setBorderStyle(const int &L, const int &R, const int &T,
                               const int &B, const int &TL, const int &TR,

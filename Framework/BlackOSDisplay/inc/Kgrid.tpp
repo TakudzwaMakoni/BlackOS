@@ -11,8 +11,36 @@
 #include <iomanip>
 #include <memory>
 #include <ncurses.h>
+#include <numeric>
 #include <sstream>
 #include <string>
+
+namespace {
+std::vector<int> blocksFound(const int yValue, const int numOfBlocks,
+                             const std::vector<int> &elements) {
+  std::vector<int> iteratorList(numOfBlocks);
+  std::iota(iteratorList.begin(), iteratorList.end(), 0);
+  std::vector<int> _linesUnclear;
+  for (const int block : iteratorList) {
+    int y1 = elements[0 + (block * 4)];
+    int y2 = elements[2 + (block * 4)];
+    if (y1 <= yValue && yValue <= y2)
+      _linesUnclear.push_back(block);
+  }
+  return _linesUnclear;
+}
+
+bool inBlocks(const int xValue, const std::vector<int> &blocks,
+              const std::vector<int> &elements) {
+  for (const int block : blocks) {
+    int x1 = elements[1 + (block * 4)];
+    int x2 = elements[3 + (block * 4)];
+    if (x1 <= xValue && xValue <= x2)
+      return true;
+  }
+  return false;
+}
+} // namespace
 
 namespace BlackOSDisplay {
 
@@ -181,22 +209,34 @@ template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::kEraseExcept(
     const std::vector<int> &elements) {
 
-  int numOfAreas = elements.size() / 4; /*two coordinates per block*/
+  int numOfBlocks = elements.size() / 4; /*two coordinates per block*/
 
-  for (int areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
-    int y1, x1, y2, x2;
+  int borderY = _size[0];
+  int borderX = _size[1];
 
-    y1 = elements[0 + (areaIdx * 4)];
-    x1 = elements[1 + (areaIdx * 4)];
-    y2 = elements[2 + (areaIdx * 4)];
-    x2 = elements[3 + (areaIdx * 4)];
-    kEraseExcept(y1, x1, y2, x2);
+  int width = borderX - 2;
+  int height = borderY - 2;
+
+  std::string fill(width, ' ');
+  std::string space = " ";
+
+  for (int i = 1; i <= height; ++i) {
+    std::vector<int> blocks = blocksFound(i, numOfBlocks, elements);
+    if (blocks.empty()) {
+      mvwprintw(_win, i, 1, fill.c_str());
+    } else {
+      for (int j = 1; j <= width; ++j) {
+        bool _inBlocks = inBlocks(j, blocks, elements);
+        if (!_inBlocks) {
+          mvwprintw(_win, i, j, space.c_str());
+        }
+      }
+    }
   }
 }
 /// display the Kgrid to screen
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::display() {
-
   keypad(_win, true);
   int selection;
   size_t highlightedRow = 0;
@@ -217,7 +257,7 @@ void Kgrid<dataType, rows, cols>::display() {
   // set border
   wborder(_win, L, R, T, B, TL, TR, BL, BR);
 
-  // title bar TODO: MODULARISE
+  // title bar TODO: make modular
   if (_showTitle) {
     _attributes = {"RAD", "PREC: " + std::to_string(_precision)};
     // an extra space below for system / window messages.
@@ -330,7 +370,6 @@ void Kgrid<dataType, rows, cols>::display() {
 
         // display the element highlighted to full user precision.
         mvwprintw(_win, bottom, left, elementDisplay.c_str());
-        kErase(1, 2, 1, 4);
         wrefresh(_win);
       }
     }
