@@ -50,8 +50,9 @@ int main(int argc, const char *argv[]) {
   BlackOSDisplay::Kfield field5(fname5, Directives::doNothing, fmessage5);
 
   std::vector<BlackOSDisplay::Kfield> mainFields = {
-      field1, field2, field3, field4, field5, field0, field0,
-      field0, field0, field0, field5, field0, field0, field0};
+      field1, field2, field3, field4, field5,
+      field0, field0, field0, field0, field0,
+      /*field5, field0, field0, field0*/};
 
   std::string mainMenuName = "BlackOS version 1.0 ";
 
@@ -64,12 +65,13 @@ int main(int argc, const char *argv[]) {
 
     main_menu.setWin(world); // must set the window!
     main_menu.setFieldAlign(0, 0);
-    main_menu.setBorderStyle(); // 0, 0, 0, 0, '*', '*', '*', '*');
-    main_menu.paginate(3);
+    main_menu.borderStyle(' ', ' ', ' ', ' ', '*', '*', '*', '*');
 
+    main_menu.paginate(4);
     main_menu.setFields(mainFields);
+
     main_menu.setTitle("BlackOS Menu");
-    main_menu.showTitle(true);
+    main_menu.showTitle();
     main_menu.setFieldStyle("="); // must do this before padding
     main_menu.addFieldPadding();  // must do this before displaying
     main_menu.display();

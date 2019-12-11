@@ -23,11 +23,11 @@ public:
   /// return window
   virtual WINDOW *window() const = 0;
   /// set style of corners of BlackOS Window
-  virtual void setBorderStyle(const int &ch) = 0;
+  virtual void borderStyle(const int ch) = 0;
   /// set style for each corner of BlackOS Window
-  virtual void setBorderStyle(const int &L, const int &R, const int &T,
-                              const int &B, const int &TL, const int &TR,
-                              const int &BL, const int &BR) = 0;
+  virtual void borderStyle(const int L, const int R, const int T, const int B,
+                           const int TL, const int TR, const int BL,
+                           const int BR) = 0;
   /// set corner label of BlackOS Window
   virtual void label(const std::string &label) const = 0;
   virtual std::vector<int> maxSize() const = 0;

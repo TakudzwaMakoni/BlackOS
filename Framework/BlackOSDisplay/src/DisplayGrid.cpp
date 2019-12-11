@@ -41,7 +41,7 @@ int main(int argc, const char *argv[]) {
     grid.setWin(world);   // must set the window!
     grid.write(testData); // must write the data!
     grid.setPrecision(8);
-    grid.setBorderStyle();
+    grid.borderStyle();
     grid.gridLines(false);
     grid.label(grid.name());
     grid.setTitle("Matrix Editor Program");

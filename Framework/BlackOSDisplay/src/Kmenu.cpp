@@ -61,13 +61,13 @@ std::string Kmenu::winType() const { return "Kmenu"; }
 /// return name of Kwindow instance
 std::string Kmenu::name() const { return _name; }
 /// set style of corners of BlackOS Window
-void Kmenu::setBorderStyle(const int &ch) {
+void Kmenu::borderStyle(const int ch) {
   _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
 }
 /// set style for each corner of BlackOS Window
-void Kmenu::setBorderStyle(const int &L, const int &R, const int &T,
-                           const int &B, const int &TL, const int &TR,
-                           const int &BL, const int &BR) {
+void Kmenu::borderStyle(const int L, const int R, const int T, const int B,
+                        const int TL, const int TR, const int BL,
+                        const int BR) {
   _borderStyle = {L, R, T, B, TL, TR, BL, BR};
 }
 
@@ -266,14 +266,8 @@ void Kmenu::kEraseExcept(const std::vector<int> &elements) {
     }
   }
 }
-/// display the menu onto private window
-void Kmenu::display() {
 
-  keypad(_win, true);
-  int selection;
-  int highlighted = 0;
-  int numOfFields = _fields.size();
-
+void Kmenu::_setBorderStyle() {
   // border styles
   int L, R, T, B, TL, TR, BL, BR;
   L = _borderStyle[0];
@@ -287,14 +281,15 @@ void Kmenu::display() {
 
   // set border
   wborder(_win, L, R, T, B, TL, TR, BL, BR);
+}
 
-  _pagination = _pagination == -1 ? _fields.size() : _pagination;
-
-  // number of pages and leftover
-  int pages = numOfFields / _pagination;
-  int residue = numOfFields % _pagination;
-  // correction for total number of pages
-  int totalPages = residue == 0 ? pages : pages + 1;
+std::vector<std::vector<Kfield>> Kmenu::_paginate(const int pages,
+                                                  const int residue) {
+  int max = _fields.size();
+  if (_fields.empty())
+    throw std::runtime_error("Trying to paginate set of empty fields.");
+  bool inRange = 0 < _pagination && _pagination <= max;
+  _pagination = inRange ? _pagination : max;
   std::vector<std::vector<Kfield>> paginatedFields;
   for (int page = 0; page < pages; ++page) {
     std::vector<Kfield> sub(_fields.begin() + (page * _pagination),
@@ -306,14 +301,34 @@ void Kmenu::display() {
                                     _fields.end());
     paginatedFields.push_back(residualSub);
   }
+  return paginatedFields;
+}
 
-  int displayPage = 0;
+/// display the menu onto private window
+void Kmenu::display() {
+
+  keypad(_win, true);
+  int selection;
+  int highlighted = 0;
+  const int numOfFields = _fields.size();
+
+  _setBorderStyle();
+
+  int test = _pagination;
+  // number of pages and leftover
+  const int pages = numOfFields / _pagination;
+  const int residue = numOfFields % _pagination;
+  // correction for total number of pages
+  int totalPages = residue == 0 ? pages : pages + 1;
+  auto paginatedFields = _paginate(pages, residue);
+
+  int page = 0;
 
   while (true) {
     // title bar
     if (_showTitle) {
 
-      _attributes = {"page: ", std::to_string(displayPage + 1), " of ",
+      _attributes = {"page: ", std::to_string(page + 1), " of ",
                      std::to_string(totalPages)};
 
       wattron(_win, A_REVERSE);
@@ -326,9 +341,8 @@ void Kmenu::display() {
       mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
       wattroff(_win, A_REVERSE);
     }
-
-    std::vector<Kfield> displayFields = paginatedFields[displayPage];
-    int numOfDisplayFields = displayFields.size();
+    std::vector<Kfield> fields = paginatedFields[page];
+    int numOfDisplayFields = fields.size();
     for (int i = 0; i < numOfDisplayFields; ++i) {
 
       if (i == highlighted)
@@ -342,7 +356,7 @@ void Kmenu::display() {
       left = 1;
       // right align
       int longest_string_len = 0;
-      std::for_each(displayFields.begin(), displayFields.end(),
+      std::for_each(fields.begin(), fields.end(),
                     [&longest_string_len](const Kfield &field) {
                       std::string str = field.name();
                       int len = str.length();
@@ -350,30 +364,25 @@ void Kmenu::display() {
                         longest_string_len = len;
                     });
       right = _size[1] - longest_string_len - 1;
-
       // centre align
-      v_centre = i + (_size[0] / 2) - numOfDisplayFields;
-      h_centre = (_size[1] - displayFields[i].name().length()) / 2;
-
+      v_centre = i + (_size[0] - numOfDisplayFields) / 2;
+      h_centre = (_size[1] - fields[i].name().length()) / 2;
       // top align
       top = i + 1;
       bottom = _size[0] - 2 - numOfDisplayFields + i;
-
       if (_xAlign == 1)
         xAlign = right;
       else if (_xAlign == 0)
         xAlign = h_centre;
       else if (_xAlign == -1)
         xAlign = left;
-
       if (_yAlign == 1)
         yAlign = top;
       else if (_yAlign == 0)
         yAlign = v_centre;
       else if (_yAlign == -1)
         yAlign = bottom;
-
-      mvwprintw(_win, yAlign, xAlign, displayFields[i].name().c_str());
+      mvwprintw(_win, yAlign, xAlign, fields[i].name().c_str());
       wattroff(_win, A_REVERSE);
       wrefresh(_win);
     }
@@ -381,18 +390,18 @@ void Kmenu::display() {
     selection = wgetch(_win);
     switch (selection) {
     case KEY_LEFT:
-      displayPage--;
+      page--;
       highlighted = 0;
-      if (displayPage == -1) {
-        displayPage = 0;
+      if (page == -1) {
+        page = 0;
       }
       kErase(2, 2, _size[0] - 3, _size[1] - 3);
       break;
     case KEY_RIGHT:
-      displayPage++;
+      page++;
       highlighted = 0;
-      if (displayPage == paginatedFields.size()) {
-        displayPage--;
+      if (page == paginatedFields.size()) {
+        page--;
       }
       kErase(2, 2, _size[0] - 3, _size[1] - 3);
       break;
@@ -404,7 +413,7 @@ void Kmenu::display() {
       break;
     case KEY_DOWN:
       highlighted++;
-      if (highlighted == displayFields.size()) {
+      if (highlighted == fields.size()) {
         highlighted--;
       }
       break;
@@ -415,7 +424,7 @@ void Kmenu::display() {
       break;
     }
   }
-  _highlighted = highlighted + (_pagination * displayPage);
+  _highlighted = highlighted + (_pagination * page);
   wrefresh(_win);
 }
 Kmenu::~Kmenu() {

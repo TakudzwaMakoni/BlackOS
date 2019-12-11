@@ -29,11 +29,11 @@ public:
   /// return window
   virtual WINDOW *window() const override;
   /// set style of BlackOS Window border
-  virtual void setBorderStyle(const int &ch = 0) override;
+  virtual void borderStyle(const int ch = 0) override;
   /// set style of BlackOS Window border
-  virtual void setBorderStyle(const int &L, const int &R, const int &T,
-                              const int &B, const int &TL, const int &TR,
-                              const int &BL, const int &BR) override;
+  virtual void borderStyle(const int L, const int R, const int T, const int B,
+                           const int TL, const int TR, const int BL,
+                           const int BR) override;
   virtual void label(const std::string &label) const override;
   virtual std::vector<int> maxSize() const override;
   virtual std::string winType() const override;
@@ -59,7 +59,7 @@ public:
   std::vector<Kfield> fields() const;
   std::vector<int> size() const;
   Eigen::Vector2i position() const;
-  void showTitle(bool show);
+  void showTitle(bool show = true);
   void setTitle(std::string title);
   void delWith(std::vector<WINDOW *> windows);
   std::string attributeString();
@@ -74,14 +74,18 @@ private:
   std::vector<std::string> _attributes;
   int _xAlign = 0;
   int _yAlign = 0;
-  std::string _fieldStyle = "";
+  std::string _fieldStyle;
   Eigen::Vector2i _position;
   std::string _name;
   int _highlighted{-1};
-  int _pagination = -1;
+  int _pagination = 1;
   bool _showTitle{false};
   std::string _title;
   std::vector<int> _borderStyle{0, 0, 0, 0, 0, 0, 0, 0}; // size = 8.
+
+  void _setBorderStyle();
+  std::vector<std::vector<Kfield>> _paginate(const int pages,
+                                             const int residue);
 };
 
 } // namespace BlackOSDisplay

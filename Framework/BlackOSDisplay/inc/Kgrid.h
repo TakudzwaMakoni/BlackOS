@@ -34,11 +34,11 @@ public:
   /// display Kgrid
   virtual void display() override;
   /// set style of BlackOS Window border
-  virtual void setBorderStyle(const int &ch = 0) override;
+  virtual void borderStyle(const int ch = 0) override;
   /// set style of BlackOS Window border
-  virtual void setBorderStyle(const int &L, const int &R, const int &T,
-                              const int &B, const int &TL, const int &TR,
-                              const int &BL, const int &BR) override;
+  virtual void borderStyle(const int L, const int R, const int T, const int B,
+                           const int TL, const int TR, const int BL,
+                           const int BR) override;
   /// return window
   virtual WINDOW *window() const override;
   /// set window label
@@ -104,6 +104,7 @@ private:
 
   /// genetrate attribute string
   std::string attributeString();
+  void _setBorderStyle();
   /// delete any additionally added windows.
   void delWith(std::vector<WINDOW *> windows);
 };

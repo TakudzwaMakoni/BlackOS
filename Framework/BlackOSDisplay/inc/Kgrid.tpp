@@ -65,15 +65,15 @@ void Kgrid<dataType, rows, cols>::setWin(WINDOW *window) {
 }
 /// set style of BlackOS Window border
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::setBorderStyle(const int &ch) {
+void Kgrid<dataType, rows, cols>::borderStyle(const int ch) {
   _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
 }
 /// set style of BlackOS Window border
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::setBorderStyle(const int &L, const int &R,
-                                                 const int &T, const int &B,
-                                                 const int &TL, const int &TR,
-                                                 const int &BL, const int &BR) {
+void Kgrid<dataType, rows, cols>::borderStyle(const int L, const int R,
+                                              const int T, const int B,
+                                              const int TL, const int TR,
+                                              const int BL, const int BR) {
   _borderStyle = {L, R, T, B, TL, TR, BL, BR};
 }
 /// return window
@@ -234,15 +234,9 @@ void Kgrid<dataType, rows, cols>::kEraseExcept(
     }
   }
 }
-/// display the Kgrid to screen
-template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::display() {
-  keypad(_win, true);
-  int selection;
-  size_t highlightedRow = 0;
-  size_t highlightedCol = 0;
-  int topPad = 1;
 
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::_setBorderStyle() {
   // border styles
   int L, R, T, B, TL, TR, BL, BR;
   L = _borderStyle[0];
@@ -256,6 +250,17 @@ void Kgrid<dataType, rows, cols>::display() {
 
   // set border
   wborder(_win, L, R, T, B, TL, TR, BL, BR);
+}
+/// display the Kgrid to screen
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::display() {
+  keypad(_win, true);
+  int selection;
+  size_t highlightedRow = 0;
+  size_t highlightedCol = 0;
+  int topPad = 1;
+
+  _setBorderStyle();
 
   // title bar TODO: make modular
   if (_showTitle) {
