@@ -17,7 +17,6 @@
 #define X_CENTRE (COLS - WORLD_WIDTH) / 2
 
 int main(int argc, const char *argv[]) {
-
   initscr();
   cbreak();
   cursor(0);
@@ -25,7 +24,6 @@ int main(int argc, const char *argv[]) {
   WINDOW *world = newwin(WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
 
   std::string name = "Matrix A";
-
   Eigen::Matrix<double, 4, 4> testData;
   testData << 11.089, 2.436, 3.5268, 4.721346, 5.8654, 6.345, 7.1743, 8.13673,
       9100.4564, 12, 231, 3453, 1231, 453, 13, 11;
@@ -35,9 +33,7 @@ int main(int argc, const char *argv[]) {
                                            Y_CENTRE, X_CENTRE);
 
   auto mat = grid.matrix();
-
   while (true) {
-
     grid.setWin(world);   // must set the window!
     grid.write(testData); // must write the data!
     grid.setPrecision(8);
@@ -47,7 +43,6 @@ int main(int argc, const char *argv[]) {
     grid.setTitle("Matrix Editor Program");
     grid.showTitle(true);
     grid.align(0, 0);
-
     grid.display();
     auto selectedElement = grid.selectedRaw();
     WINDOW *grid_window = grid.window();

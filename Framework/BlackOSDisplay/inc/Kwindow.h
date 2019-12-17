@@ -8,27 +8,17 @@
 #include "ncurses.h"
 #include <memory>
 #include <vector>
-
 #define cursor(x) curs_set(x)
-
 namespace BlackOSDisplay {
-
 typedef WINDOW *cwin;
-
-/// BlackOS Window Interface
 class Kwindow {
-
 public:
   virtual void display() = 0;
-  /// return window
   virtual WINDOW *window() const = 0;
-  /// set style of corners of BlackOS Window
   virtual void borderStyle(const int ch) = 0;
-  /// set style for each corner of BlackOS Window
   virtual void borderStyle(const int L, const int R, const int T, const int B,
                            const int TL, const int TR, const int BL,
                            const int BR) = 0;
-  /// set corner label of BlackOS Window
   virtual void label(const std::string &label) const = 0;
   virtual std::vector<int> maxSize() const = 0;
   virtual std::string winType() const = 0;

@@ -29,7 +29,6 @@ std::vector<int> blocksFound(const int yValue, const int numOfBlocks,
   }
   return _linesUnclear;
 }
-
 bool inBlocks(const int xValue, const std::vector<int> &blocks,
               const std::vector<int> &elements) {
   for (const int block : blocks) {
@@ -43,8 +42,6 @@ bool inBlocks(const int xValue, const std::vector<int> &blocks,
 } // namespace
 
 namespace BlackOSDisplay {
-
-// constructor for Kgrid;
 template <typename dataType, size_t rows, size_t cols>
 Kgrid<dataType, rows, cols>::Kgrid(std::string &name, int sizeY, int sizeX,
                                    int posY, int posX) {
@@ -53,9 +50,6 @@ Kgrid<dataType, rows, cols>::Kgrid(std::string &name, int sizeY, int sizeX,
   _position = {posY, posX};
 }
 
-// overrides
-
-// assign a window object
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::setWin(WINDOW *window) {
   _win = window;
@@ -63,12 +57,12 @@ void Kgrid<dataType, rows, cols>::setWin(WINDOW *window) {
   mvwin(_win, _position[0], _position[1]);
   wrefresh(_win);
 }
-/// set style of BlackOS Window border
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::borderStyle(const int ch) {
   _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
 }
-/// set style of BlackOS Window border
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::borderStyle(const int L, const int R,
                                               const int T, const int B,
@@ -76,19 +70,19 @@ void Kgrid<dataType, rows, cols>::borderStyle(const int L, const int R,
                                               const int BL, const int BR) {
   _borderStyle = {L, R, T, B, TL, TR, BL, BR};
 }
-/// return window
+
 template <typename dataType, size_t rows, size_t cols>
 WINDOW *Kgrid<dataType, rows, cols>::window() const {
   return this->_win;
 };
-///
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::label(const std::string &label) const {
   int labellocy = _size[0] - 1;
   int labellocx = _size[1] - (3 + (int)label.length());
   mvwaddstr(_win, labellocy, labellocx, label.c_str());
 }
-/// return max size of window
+
 template <typename dataType, size_t rows, size_t cols>
 std::vector<int> Kgrid<dataType, rows, cols>::maxSize() const {
   int yMax, xMax;
@@ -96,41 +90,38 @@ std::vector<int> Kgrid<dataType, rows, cols>::maxSize() const {
   std::vector<int> size{yMax, xMax};
   return size;
 }
-/// return type of Kwindow
+
 template <typename dataType, size_t rows, size_t cols>
 std::string Kgrid<dataType, rows, cols>::winType() const {
   return "Kgrid";
 }
-/// return name of Kwindow
+
 template <typename dataType, size_t rows, size_t cols>
 std::string Kgrid<dataType, rows, cols>::name() const {
   return this->_name;
 }
 
-// member functions
-
-/// return selected element from matrix
 template <typename dataType, size_t rows, size_t cols>
 dataType Kgrid<dataType, rows, cols>::selectedRaw() const {
   return this->_matrix(_highlightedRow, _highlightedCol);
 }
-/// return the indices (row and column) selected from Matrix
+
 template <typename dataType, size_t rows, size_t cols>
 std::vector<size_t> Kgrid<dataType, rows, cols>::selectedIndices() const {
   return std::vector<size_t>{_highlightedRow, _highlightedCol};
 }
-/// set title for window
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::setTitle(std::string title) {
   _title = title;
 }
-/// write Eigen Matrix to class matrix
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::write(
     Eigen::Matrix<dataType, rows, cols> &data) {
   _matrix = data;
 }
-/// write data from vector to class matrix
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::write(std::vector<dataType> &data) {
   if (data.size() != rows * cols) {
@@ -144,38 +135,31 @@ void Kgrid<dataType, rows, cols>::write(std::vector<dataType> &data) {
     }
   }
 }
-/// erase the area given by the top left to bottom right corners
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::kErase(const int y1, const int x1,
                                          const int y2, const int x2) {
   int a, b, c, d;
   int borderY = _size[0];
   int borderX = _size[1];
-
-  // miss the border
   a = y1 == 0 ? 1 : y1;
   b = x1 == 0 ? 1 : x1;
   c = y2 == borderY ? y2 - 1 : y2;
   d = x2 == borderX ? x2 - 1 : x2;
-
   int width = d - b + 1;
   std::string fill(width, ' ');
   for (int i = a; i <= c; ++i) {
     mvwprintw(_win, i, b, fill.c_str());
   }
 }
-/// erase the entire window except the area given by the top left to bottom
-/// right corners
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::kEraseExcept(const int y1, const int x1,
                                                const int y2, const int x2) {
-
   int borderY = _size[0] - 2;
   int borderX = _size[1] - 2;
-
   std::string fill(borderX, ' ');
   std::string space = " ";
-
   for (int i = 1; i <= borderY; ++i) {
     if (i < y1 || i > y2) {
       mvwprintw(_win, i, 1, fill.c_str());
@@ -188,15 +172,12 @@ void Kgrid<dataType, rows, cols>::kEraseExcept(const int y1, const int x1,
     }
   }
 }
-/// erase multiple areas on the window
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::kErase(const std::vector<int> &elements) {
-
   int numOfAreas = elements.size() / 4; /*two coordinates per block*/
-
   for (int areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
     int y1, x1, y2, x2;
-
     y1 = elements[0 + (areaIdx * 4)];
     x1 = elements[1 + (areaIdx * 4)];
     y2 = elements[2 + (areaIdx * 4)];
@@ -204,22 +185,17 @@ void Kgrid<dataType, rows, cols>::kErase(const std::vector<int> &elements) {
     kErase(y1, x1, y2, x2);
   }
 }
-/// erase the screen except multiple areas on the window
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::kEraseExcept(
     const std::vector<int> &elements) {
-
   int numOfBlocks = elements.size() / 4; /*two coordinates per block*/
-
   int borderY = _size[0];
   int borderX = _size[1];
-
   int width = borderX - 2;
   int height = borderY - 2;
-
   std::string fill(width, ' ');
   std::string space = " ";
-
   for (int i = 1; i <= height; ++i) {
     std::vector<int> blocks = blocksFound(i, numOfBlocks, elements);
     if (blocks.empty()) {
@@ -237,7 +213,6 @@ void Kgrid<dataType, rows, cols>::kEraseExcept(
 
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::_setBorderStyle() {
-  // border styles
   int L, R, T, B, TL, TR, BL, BR;
   L = _borderStyle[0];
   R = _borderStyle[1];
@@ -247,11 +222,9 @@ void Kgrid<dataType, rows, cols>::_setBorderStyle() {
   TR = _borderStyle[5];
   BL = _borderStyle[6];
   BR = _borderStyle[7];
-
-  // set border
   wborder(_win, L, R, T, B, TL, TR, BL, BR);
 }
-/// display the Kgrid to screen
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::display() {
   keypad(_win, true);
@@ -259,13 +232,9 @@ void Kgrid<dataType, rows, cols>::display() {
   size_t highlightedRow = 0;
   size_t highlightedCol = 0;
   int topPad = 1;
-
   _setBorderStyle();
-
-  // title bar TODO: make modular
   if (_showTitle) {
     _attributes = {"RAD", "PREC: " + std::to_string(_precision)};
-    // an extra space below for system / window messages.
     wattron(_win, A_REVERSE);
     std::string tPadding(_size[1], ' ');
     int correction = _size[1] - _title.length() - 3;
@@ -276,18 +245,13 @@ void Kgrid<dataType, rows, cols>::display() {
     mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
     wattroff(_win, A_REVERSE);
   }
-
-  // precision of entries shown in matrix
   int displayPrecision = 5;
-
   while (true) {
-    // navigate through elements in matrix.
     for (int i = 0; i < rows; ++i) {
       for (int j = 0; j < cols; ++j) {
         if (j == highlightedCol && i == highlightedRow) {
           wattron(_win, A_REVERSE);
         }
-
         auto element = _matrix(highlightedRow, highlightedCol);
         std::stringstream elementStream;
         elementStream << std::setprecision(_precision) << element;
@@ -295,74 +259,46 @@ void Kgrid<dataType, rows, cols>::display() {
         const int elementStrSize = elementStr.size();
         std::string elementDisplay(_size[1] / 2, ' ');
         elementDisplay.replace(0, elementStrSize, elementStr);
-
         std::stringstream numStream;
-
-        // length of matrix cells set to 8.
         std::string str(8, ' ');
         int strSize = str.size();
-
-        // if number is greater than two digits, express in scientific format,
-        // which requires 4 spaces for exponent, two for front digit and
-        // decimal point, allowing two d.p for total width 8.
-
         if (_matrix.coeff(i, j) > 99.99) {
           numStream << std::scientific << std::setprecision(2)
                     << _matrix.coeff(i, j);
         } else {
-          // three spaces reserved for decimal and front digits, max width
-          // is 8.
-          // displayPrecision = _precision > 5 ? 5 : _precision;
           numStream << std::setprecision(displayPrecision) << std::fixed
                     << _matrix.coeff(i, j);
         }
-
         std::string numStr = numStream.str();
         int numStrSize = numStr.size();
-
         int correction = strSize - numStrSize;
         str.replace(correction, numStrSize, numStr);
-
         int yAlign = 0;
         int xAlign = 0;
         int left, right, top, bottom, v_centre, h_centre;
-
-        // left align
         left = 2;
-
         int hPadding{4};
-
-        // TODO: MODULARISE
         if (_setGrid) {
           hPadding = 6;
           str = "|" + str + "|";
         }
         int gridWidth = (cols * 8) + (cols - 2);
         int gridHeight = rows * _vPadding; // avoid collision with status bar
-
         int bottomPad = -gridHeight + i;
         int rightPad = gridWidth - 1;
         int hCentrePad = gridWidth;
         int vCentrPad = gridHeight;
-
-        // right align
         right = _size[1];
-
-        // centre align
         v_centre = i + (_size[0] / 2) - vCentrPad;
         h_centre = (_size[1] - hCentrePad) / 2;
-
-        // top align
         top = i + topPad;
         bottom = _size[0] - 2;
-
         if (_xAlign == 1)
           xAlign = right + rightPad;
         else if (_xAlign == 0)
           xAlign = h_centre;
         else if (_xAlign == -1)
           xAlign = left;
-
         if (_yAlign == 1)
           yAlign = top;
         else if (_yAlign == 0)
@@ -372,8 +308,6 @@ void Kgrid<dataType, rows, cols>::display() {
         mvwprintw(_win, yAlign + i * _vPadding,
                   xAlign + (displayPrecision + hPadding) * j, (str).c_str());
         wattroff(_win, A_REVERSE);
-
-        // display the element highlighted to full user precision.
         mvwprintw(_win, bottom, left, elementDisplay.c_str());
         wrefresh(_win);
       }
@@ -416,9 +350,6 @@ void Kgrid<dataType, rows, cols>::display() {
   wrefresh(_win);
 }
 
-// private memeber functions
-
-/// generate attribute string
 template <typename dataType, size_t rows, size_t cols>
 std::string Kgrid<dataType, rows, cols>::attributeString() {
   std::string str;
@@ -428,7 +359,7 @@ std::string Kgrid<dataType, rows, cols>::attributeString() {
   }
   return str;
 }
-/// delete an additional windows
+
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::delWith(std::vector<WINDOW *> windows) {
   if (!windows.empty())
@@ -437,13 +368,11 @@ void Kgrid<dataType, rows, cols>::delWith(std::vector<WINDOW *> windows) {
       delwin(*it);
     }
 }
-/// destructor for Kgrid
+
 template <typename dataType, size_t rows, size_t cols>
 Kgrid<dataType, rows, cols>::~Kgrid() {
   delWith(_subwins);
   wclear(_win);
 }
-
 } // namespace BlackOSDisplay
-
 #endif // BLACKOS_KGRID_TPP

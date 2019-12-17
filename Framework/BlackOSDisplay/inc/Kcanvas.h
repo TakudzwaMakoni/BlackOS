@@ -1,25 +1,16 @@
-//
-// Created by Takudzwa Makoni on 2019-07-27.
-//
+#ifndef BLACKOS_KCANVAS_H
+#define BLACKOS_KCANVAS_H
 
-#ifndef BLACKOS_KMENU_H
-#define BLACKOS_KMENU_H
-
+#include "../inc/Directives.h"
 #include "Eigen/Dense"
-#include "Kfield.h"
 #include "Kwindow.h"
-#include "ncurses.h"
-#include <memory>
 #include <string>
 #include <vector>
 
 namespace BlackOSDisplay {
-namespace {
-std::string emptyField;
-}
-class Kmenu : public Kwindow {
+class Kcanvas : public Kwindow {
 public:
-  Kmenu(std::string &name, int sizeY, int sizeX, int posY, int posX);
+  Kcanvas(std::string &name, int sizeY, int sizeX, int posY, int posX);
   virtual void display() override;
   virtual WINDOW *window() const override;
   virtual void borderStyle(const int ch = 0) override;
@@ -38,47 +29,32 @@ public:
   virtual void kErase(const std::vector<int> &elements) override;
   virtual void kEraseExcept(const std::vector<int> &elements) override;
 
-  virtual void setFields(const std::vector<Kfield> &fields);
-  virtual void addDisplayObj(Kwindow &obj) const;
-  virtual Kfield getSelectedField() const;
-
-  void setFieldAlign(int x, int y);
-  void addFieldPadding();
-  void setFieldStyle(std::string style);
-  void paginate(int divisor);
   int centreX() const;
   int centreY() const;
-  std::vector<Kfield> fields() const;
   std::vector<int> size() const;
   Eigen::Vector2i position() const;
   void showTitle(bool show = true);
   void setTitle(std::string title);
   void delWith(std::vector<WINDOW *> windows);
+  void _setBorderStyle();
   std::string attributeString();
 
-  ~Kmenu();
+  ~Kcanvas();
 
 private:
   WINDOW *_win;
   std::vector<WINDOW *> _subwins;
   std::vector<int> _size;
-  std::vector<Kfield> _fields;
   std::vector<std::string> _attributes;
   int _xAlign = 0;
   int _yAlign = 0;
-  std::string _fieldStyle;
   Eigen::Vector2i _position;
   std::string _name;
-  int _highlighted{-1};
-  int _pagination = 1;
   bool _showTitle{false};
   std::string _title;
   std::vector<int> _borderStyle{0, 0, 0, 0, 0, 0, 0, 0}; // size = 8.
 
   void _setBorderStyle();
-  std::vector<std::vector<Kfield>> _paginate(const int pages,
-                                             const int residue);
 };
 } // namespace BlackOSDisplay
-
-#endif // BLACKOS_KMENU_H
+#endif
