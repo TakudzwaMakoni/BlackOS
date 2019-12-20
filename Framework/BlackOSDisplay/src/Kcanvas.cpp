@@ -1,11 +1,45 @@
 
 #include "../inc/Kcanvas.h"
 #include "../inc/Directives.h"
+#include "../inc/Kwindow.h"
 #include "Eigen/Dense"
-#include "Kwindow.h"
+#include <algorithm>
+#include <memory>
+#include <numeric>
 #include <string>
 #include <vector>
 
+namespace {
+const int PADDING = 1;
+std::vector<int> blocksFound(const int yValue, const int numOfBlocks,
+                             const std::vector<int> &elements) {
+  std::vector<int> iteratorList(numOfBlocks);
+  std::iota(iteratorList.begin(), iteratorList.end(), 0);
+  std::vector<int> _linesUnclear;
+  for (const int block : iteratorList) {
+    int y1 = elements[0 + (block * 4)];
+    int y2 = elements[2 + (block * 4)];
+    if (y1 <= yValue && yValue <= y2)
+      _linesUnclear.push_back(block);
+  }
+  return _linesUnclear;
+}
+bool inBlocks(const int xValue, const std::vector<int> &blocks,
+              const std::vector<int> &elements) {
+  for (const int block : blocks) {
+    int x1 = elements[1 + (block * 4)];
+    int x2 = elements[3 + (block * 4)];
+    if (x1 <= xValue && xValue <= x2)
+      return true;
+  }
+  return false;
+}
+} // namespace
+using namespace BlackOSDisplay;
+Kcanvas::Kcanvas(std::string &name, int sizeY, int sizeX, int posY, int posX) {
+  _size = {sizeY, sizeX};
+  _position = {posY, posX};
+}
 WINDOW *Kcanvas::window() const { return this->_win; };
 void Kcanvas::borderStyle(const int ch) {
   _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
@@ -28,7 +62,7 @@ std::vector<int> Kcanvas::maxSize() const {
 }
 std::string Kcanvas::winType() const { return "Kcanvas"; }
 std::string Kcanvas::name() const { return _name; }
-void Kmenu::setWin(WINDOW *window) {
+void Kcanvas::setWin(WINDOW *window) {
   _win = window;
   wresize(_win, _size[0], _size[1]);
   mvwin(_win, _position[0], _position[1]);
@@ -114,7 +148,7 @@ void Kcanvas::kEraseExcept(const std::vector<int> &elements) {
 int Kcanvas::centreX() const { return _size[1] / 2; }
 int Kcanvas::centreY() const { return _size[0] / 2; }
 std::vector<int> Kcanvas::size() const { return _size; }
-Eigen::Vector2i Kmenu::position() const { return _position; }
+Eigen::Vector2i Kcanvas::position() const { return _position; }
 void Kcanvas::showTitle(bool show) { _showTitle = show; }
 void Kcanvas::setTitle(std::string title) { _title = title; }
 std::string Kcanvas::attributeString() {
@@ -132,6 +166,13 @@ void Kcanvas::delWith(std::vector<WINDOW *> windows) {
       delwin(*it);
     }
 }
+void Kcanvas::fill(char ch) {
+  std::string fillString(_size[1] - 2, ch);
+  for (int i = 1; i <= _size[0]; ++i) {
+    mvwprintw(_win, i, 1, fillString.c_str());
+  }
+  wrefresh(_win);
+}
 void Kcanvas::_setBorderStyle() {
   int L, R, T, B, TL, TR, BL, BR;
   L = _borderStyle[0];
@@ -146,19 +187,19 @@ void Kcanvas::_setBorderStyle() {
 }
 void Kcanvas::display() {
   keypad(_win, true);
-  _setBorderStyle)();
-  while (true) {
-    if (_showTitle) {
-      _attributes = {"Kcanvas"};
-      wattron(_win, A_REVERSE);
-      std::string tPadding(_size[1], ' ');
-      int correction = _size[1] - _title.length() - 3;
-      std::string titleString = attributeString();
-      int titleStrLength = titleString.size();
-      tPadding.replace(0, titleStrLength, titleString);
-      tPadding.replace(correction, _size[1], _title + " ");
-      mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
-      wattroff(_win, A_REVERSE);
-    }
+  _setBorderStyle();
+  if (_showTitle) {
+    _attributes = {"Kcanvas"};
+    wattron(_win, A_REVERSE);
+    std::string tPadding(_size[1], ' ');
+    int correction = _size[1] - _title.length() - 3;
+    std::string titleString = attributeString();
+    int titleStrLength = titleString.size();
+    tPadding.replace(0, titleStrLength, titleString);
+    tPadding.replace(correction, _size[1], _title + " ");
+    mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
+    wattroff(_win, A_REVERSE);
   }
-  Kcanvas::~Kcanvas() { delWith(_subwins); }
+  wrefresh(_win);
+}
+Kcanvas::~Kcanvas() { delWith(_subwins); }

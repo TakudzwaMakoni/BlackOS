@@ -23,6 +23,10 @@ set(SRC_GRID
     src/Kfield.cpp
     src/Kmenu.cpp)
 
+set(SRC_CANVAS
+    src/DisplayCanvas.cpp
+    src/Kcanvas.cpp)
+
 set(INC_FILES
     inc/Directives.h
     inc/Kfield.h
@@ -41,6 +45,9 @@ add_executable(Kmenu
 add_executable(Kgrid
     ${SRC_GRID}
     ${INC_FILES})
+add_executable(Kcanvas
+      ${SRC_CANVAS}
+      ${INC_FILES})
 add_executable(KmenuTests
     ${TEST_FILES})
 
@@ -51,6 +58,9 @@ target_link_libraries (Kmenu ${CURSES_LIBRARIES})
 
 target_link_libraries (Kgrid Eigen3::Eigen)
 target_link_libraries (Kgrid ${CURSES_LIBRARIES})
+
+target_link_libraries(Kcanvas Eigen3::Eigen)
+target_link_libraries(Kcanvas ${CURSES_LIBRARIES})
 
 target_link_libraries (KmenuTests Eigen3::Eigen)
 target_link_libraries (KmenuTests ${CURSES_LIBRARIES})

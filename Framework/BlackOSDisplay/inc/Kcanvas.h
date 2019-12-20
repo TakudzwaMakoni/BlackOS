@@ -36,8 +36,8 @@ public:
   void showTitle(bool show = true);
   void setTitle(std::string title);
   void delWith(std::vector<WINDOW *> windows);
-  void _setBorderStyle();
   std::string attributeString();
+  void fill(char ch);
 
   ~Kcanvas();
 

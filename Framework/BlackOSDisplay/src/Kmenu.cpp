@@ -57,7 +57,6 @@ void Kmenu::borderStyle(const int L, const int R, const int T, const int B,
                         const int BR) {
   _borderStyle = {L, R, T, B, TL, TR, BL, BR};
 }
-
 void Kmenu::setFields(const std::vector<Kfield> &fields) {
   this->_fields = fields;
 }
@@ -87,7 +86,6 @@ void Kmenu::addFieldPadding() {
   }
   for (std::vector<Kfield>::iterator it = _fields.begin(); it != _fields.end();
        ++it) {
-
     std::string str = it->name(); // retrieve field name
     const int newStrLen = maxLen % 2 == 0 ? maxLen : maxLen + 1;
     const int oldStrLen = str.size();   // retrieve size of field name
@@ -115,7 +113,7 @@ void Kmenu::delWith(std::vector<WINDOW *> windows) {
          it != windows.end(); ++it) {
       delwin(*it);
     }
-};
+}
 void Kmenu::showTitle(bool show) { _showTitle = show; }
 void Kmenu::setTitle(std::string title) { _title = title; }
 void Kmenu::addDisplayObj(BlackOSDisplay::Kwindow &obj) const {
@@ -143,6 +141,7 @@ void Kmenu::kErase(const int y1, const int x1, const int y2, const int x2) {
   for (int i = _y1; i <= _y2; ++i) {
     mvwprintw(_win, i, _x1, fill.c_str());
   }
+  wrefresh(_win);
 }
 void Kmenu::kEraseExcept(const int y1, const int x1, const int y2,
                          const int x2) {
@@ -167,6 +166,7 @@ void Kmenu::kEraseExcept(const int y1, const int x1, const int y2,
       mvwprintw(_win, i, 1, fill.c_str());
     }
   }
+  wrefresh(_win);
 }
 void Kmenu::kErase(const std::vector<int> &elements) {
   int numOfAreas = elements.size() / 4; /*two coordinates per block*/
@@ -207,6 +207,7 @@ void Kmenu::kEraseExcept(const std::vector<int> &elements) {
       }
     }
   }
+  wrefresh(_win);
 }
 void Kmenu::_setBorderStyle() {
   int L, R, T, B, TL, TR, BL, BR;

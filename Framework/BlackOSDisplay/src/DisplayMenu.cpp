@@ -1,9 +1,8 @@
-#include "../inc/Kfield.h"
-#include "../inc/Kgrid.h"
-#include "../inc/Kmenu.h"
-#include "../inc/Kwindow.h"
 
 #include "../inc/Directives.h"
+#include "../inc/Kfield.h"
+#include "../inc/Kmenu.h"
+#include "../inc/Kwindow.h"
 
 #include <iostream>
 #include <memory>
@@ -55,7 +54,7 @@ int main(int argc, const char *argv[]) {
                                     Y_CENTRE, X_CENTRE);
     main_menu.setWin(world); // must set the window!
     main_menu.setFieldAlign(0, 0);
-    main_menu.borderStyle(' ', ' ', ' ', ' ', '*', '*', '*', '*');
+    main_menu.borderStyle(0, 0, 0, 0, '*', '*', '*', '*');
     main_menu.paginate(4);
     main_menu.setFields(mainFields);
     main_menu.setTitle("BlackOS Menu");

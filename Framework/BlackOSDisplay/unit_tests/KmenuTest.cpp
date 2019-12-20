@@ -2,7 +2,15 @@
 #define CATCH_CONFIG_MAIN
 
 #include "../inc/Kmenu.h"
+#include "ncurses.h"
 #include <catch2/catch.hpp>
+
+int Factorial(int x){
+	if(x <= 1)
+		return 1;
+	else
+		return x * Factorial(x-1);
+}
 
 TEST_CASE("Factorials are computed", "[factorial]") {
   REQUIRE(Factorial(1) == 1);
