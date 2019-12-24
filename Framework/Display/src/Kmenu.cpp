@@ -36,7 +36,9 @@ bool inBlocks(const int xValue, const std::vector<int> &blocks,
   return false;
 }
 } // namespace
-using namespace BlackOSDisplay;
+
+namespace BlackOS {
+namespace Display {
 Kmenu::Kmenu(std::string const &name, int sizeY, int sizeX, int posY,
              int posX) {
   _size = {sizeY, sizeX};
@@ -117,7 +119,7 @@ void Kmenu::delWith(std::vector<WINDOW *> windows) {
 }
 void Kmenu::showTitle(bool show) { _showTitle = show; }
 void Kmenu::setTitle(std::string title) { _title = title; }
-void Kmenu::addDisplayObj(BlackOSDisplay::Kwindow &obj) const {
+void Kmenu::addDisplayObj(Kwindow &obj) const {
   std::vector<int> childSize = _size;
   std::for_each(childSize.begin(), childSize.end(),
                 [](const int &i) { return i - PADDING; });
@@ -260,9 +262,7 @@ void Kmenu::wipe(bool titleBar) {
   }
   wrefresh(_win);
 }
-void Kmenu::
-
-    display() {
+void Kmenu::display() {
   keypad(_win, true);
   int selection;
   int highlighted = 0;
@@ -368,3 +368,5 @@ void Kmenu::
   wrefresh(_win);
 }
 Kmenu::~Kmenu() { delWith(_subwins); }
+} // namespace Display
+} // namespace BlackOS

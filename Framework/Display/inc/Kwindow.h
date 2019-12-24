@@ -9,7 +9,9 @@
 #include <memory>
 #include <vector>
 #define cursor(x) curs_set(x)
-namespace BlackOSDisplay {
+
+namespace BlackOS {
+namespace Display {
 typedef WINDOW *cwin;
 class Kwindow {
 public:
@@ -31,6 +33,6 @@ public:
   virtual void kErase(const std::vector<int> &elements) = 0;
   virtual void kEraseExcept(const std::vector<int> &elements) = 0;
 };
-} // namespace BlackOSDisplay
-
+} // namespace Display
+} // namespace BlackOS
 #endif // BLACKOS_KWINDOW_H

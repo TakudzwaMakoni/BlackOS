@@ -1,8 +1,8 @@
-#blackosdipslay
+#dipslay
 
 cmake_minimum_required( VERSION 3.14 FATAL_ERROR)
 
-project (BlackOSDisplay LANGUAGES CXX)
+project (Display LANGUAGES CXX)
 
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 

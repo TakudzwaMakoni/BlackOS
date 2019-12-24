@@ -7,7 +7,8 @@
 #include <string>
 #include <vector>
 
-namespace BlackOSDisplay {
+namespace BlackOS {
+namespace Display {
 class Kcanvas : public Kwindow {
 public:
   Kcanvas(std::string &name, int sizeY, int sizeX, int posY, int posX);
@@ -57,5 +58,6 @@ private:
 
   void _setBorderStyle();
 };
-} // namespace BlackOSDisplay
+} // namespace Display
+} // namespace BlackOS
 #endif

@@ -10,13 +10,14 @@
 #define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
 #define X_CENTRE (COLS - WORLD_WIDTH) / 2
 
-namespace BlackOSDisplay {
+namespace BlackOS {
+namespace Display {
 namespace TestHelpers {
-using Kmenu_sptr = std::shared_ptr<BlackOSDisplay::Kmenu>;
+using Kmenu_sptr = std::shared_ptr<Kmenu>;
 Kmenu_sptr testMenuWithPagination(int pagination) {
   std::string const menuName = "test_menu";
-  auto menu = std::make_shared<BlackOSDisplay::Kmenu>(
-      menuName, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
+  auto menu = std::make_shared<Kmenu>(menuName, WORLD_HEIGHT, WORLD_WIDTH,
+                                      Y_CENTRE, X_CENTRE);
   std::string const fname0 = "FIELD 1";
   std::string const fmessage0 = "you selected 'FIELD 1'.";
   std::string const fname1 = "FIELD 2";
@@ -33,17 +34,17 @@ Kmenu_sptr testMenuWithPagination(int pagination) {
   std::string const fmessage6 = "you selected 'FIELD 7'.";
   std::string const fname7 = "QUIT";
 
-  BlackOSDisplay::Kfield field0(fname0, Directives::doNothing, fmessage0);
-  BlackOSDisplay::Kfield field1(fname1, Directives::doNothing, fmessage1);
-  BlackOSDisplay::Kfield field2(fname2, Directives::doNothing, fmessage2);
-  BlackOSDisplay::Kfield field3(fname3, Directives::doNothing, fmessage3);
-  BlackOSDisplay::Kfield field4(fname4, Directives::doNothing, fmessage4);
-  BlackOSDisplay::Kfield field5(fname5, Directives::doNothing, fmessage5);
-  BlackOSDisplay::Kfield field6(fname6, Directives::doNothing, fmessage6);
-  BlackOSDisplay::Kfield field7(fname7, Directives::exitProgram);
+  Kfield field0(fname0, Directives::doNothing, fmessage0);
+  Kfield field1(fname1, Directives::doNothing, fmessage1);
+  Kfield field2(fname2, Directives::doNothing, fmessage2);
+  Kfield field3(fname3, Directives::doNothing, fmessage3);
+  Kfield field4(fname4, Directives::doNothing, fmessage4);
+  Kfield field5(fname5, Directives::doNothing, fmessage5);
+  Kfield field6(fname6, Directives::doNothing, fmessage6);
+  Kfield field7(fname7, Directives::exitProgram);
 
-  std::vector<BlackOSDisplay::Kfield> test_fields = {
-      field0, field1, field2, field3, field4, field5, field6, field7};
+  std::vector<Kfield> test_fields = {field0, field1, field2, field3,
+                                     field4, field5, field6, field7};
 
   menu->setFields(test_fields);
   menu->setFieldStyle("!TEST!");
@@ -61,10 +62,10 @@ Kmenu_sptr testMenuWithPagination(int pagination) {
 Kmenu_sptr testMenuInitialisedWithSizeAndPos(int const sizeY, int const sizeX,
                                              int const posY, int const posX) {
   std::string const menuName = "test_menu";
-  auto menu = std::make_shared<BlackOSDisplay::Kmenu>(menuName, sizeY, sizeX,
-                                                      posY, posX);
+  auto menu = std::make_shared<Kmenu>(menuName, sizeY, sizeX, posY, posX);
   return menu;
 }
 
 } // namespace TestHelpers
-} // namespace BlackOSDisplay
+} // namespace Display
+} // namespace BlackOS

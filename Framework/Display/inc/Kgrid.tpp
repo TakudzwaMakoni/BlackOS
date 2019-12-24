@@ -41,7 +41,8 @@ bool inBlocks(const int xValue, const std::vector<int> &blocks,
 }
 } // namespace
 
-namespace BlackOSDisplay {
+namespace BlackOS {
+namespace Display {
 template <typename dataType, size_t rows, size_t cols>
 Kgrid<dataType, rows, cols>::Kgrid(std::string &name, int sizeY, int sizeX,
                                    int posY, int posX) {
@@ -374,5 +375,6 @@ Kgrid<dataType, rows, cols>::~Kgrid() {
   delWith(_subwins);
   wclear(_win);
 }
-} // namespace BlackOSDisplay
+} // namespace Display
+} // namespace BlackOS
 #endif // BLACKOS_KGRID_TPP

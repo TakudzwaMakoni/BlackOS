@@ -16,6 +16,11 @@
 #define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
 #define X_CENTRE (COLS - WORLD_WIDTH) / 2
 
+// namespace BlackOS {
+// namespace Display {
+
+using namespace BlackOS::Display;
+
 int main(int argc, const char *argv[]) {
   initscr();
   cbreak();
@@ -29,8 +34,7 @@ int main(int argc, const char *argv[]) {
       9100.4564, 12, 231, 3453, 1231, 453, 13, 11;
   std::vector<double> testData2{34.2763,     21.25021, 37.243,  54.2343, 5.0243,
                                 6546.218856, 7.774276, 75358.2, 9.2};
-  BlackOSDisplay::Kgrid<double, 4, 4> grid(name, WORLD_HEIGHT, WORLD_WIDTH,
-                                           Y_CENTRE, X_CENTRE);
+  Kgrid<double, 4, 4> grid(name, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
 
   auto mat = grid.matrix();
   while (true) {
@@ -57,3 +61,5 @@ int main(int argc, const char *argv[]) {
   endwin();
   return 0;
 }
+//} // namespace Display
+//} // namespace BlackOS

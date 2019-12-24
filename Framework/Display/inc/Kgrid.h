@@ -13,7 +13,8 @@
 #include <sstream>
 #include <string>
 
-namespace BlackOSDisplay {
+namespace BlackOS {
+namespace Display {
 template <typename dataType, size_t rows, size_t cols>
 class Kgrid : public Kwindow {
 public:
@@ -77,6 +78,7 @@ private:
   void _setBorderStyle();
   void delWith(std::vector<WINDOW *> windows);
 };
-} // namespace BlackOSDisplay
+} // namespace Display
+} // namespace BlackOS
 #include "Kgrid.tpp"
 #endif // BLACKOS_KGRID_H

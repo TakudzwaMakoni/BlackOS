@@ -6,6 +6,8 @@
 #include "../inc/Directives.h"
 #include <ncurses.h>
 
+namespace BlackOS {
+namespace Display {
 namespace Directives {
 void doNothing() {}
 void exitProgram() {
@@ -23,5 +25,6 @@ void writeToFile() {
   file.close();
 }
 void animate(int aniCode) {}
-
 } // namespace Directives
+} // namespace Display
+} // namespace BlackOS

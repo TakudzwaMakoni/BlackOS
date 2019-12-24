@@ -11,6 +11,11 @@
 #define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
 #define X_CENTRE (COLS - WORLD_WIDTH) / 2
 
+// namespace BlackOS {
+// namespace BlackOSDisplay {
+
+using namespace BlackOS::Display;
+
 int main(int argc, const char *argv[]) {
   initscr();
   cbreak();
@@ -20,8 +25,7 @@ int main(int argc, const char *argv[]) {
 
   std::string canvasName = "BlackOS canvas version 1.0 ";
 
-  BlackOSDisplay::Kcanvas canvas(canvasName, WORLD_HEIGHT, WORLD_WIDTH,
-                                 Y_CENTRE, X_CENTRE);
+  Kcanvas canvas(canvasName, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
 
   canvas.setWin(world);
   canvas.setTitle("test canvas");
@@ -42,3 +46,5 @@ int main(int argc, const char *argv[]) {
 
   return 0;
 }
+//} // namespace BlackOSDisplay
+//} // namespace BlackOS

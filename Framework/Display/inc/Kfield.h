@@ -7,9 +7,9 @@
 
 #include "Directives.h"
 #include <string>
-namespace BlackOSDisplay {
+namespace BlackOS {
+namespace Display {
 
-typedef void (*directive)();
 /// BlackOS Field Object
 class Kfield {
 public:
@@ -23,9 +23,9 @@ public:
 
 private:
   std::string _name;
-  directive _script = Directives::doNothing;
+  directive _script = BlackOS::Display::Directives::doNothing;
   std::string _message;
 };
-} // namespace BlackOSDisplay
-
+} // namespace Display
+} // namespace BlackOS
 #endif // BLACKOS_KFIELD_H

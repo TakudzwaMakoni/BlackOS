@@ -13,7 +13,8 @@
 #include <string>
 #include <vector>
 
-namespace BlackOSDisplay {
+namespace BlackOS {
+namespace Display {
 namespace {
 std::string emptyField;
 }
@@ -81,6 +82,7 @@ private:
   std::vector<std::vector<Kfield>> _paginate(const int pages,
                                              const int residue);
 };
-} // namespace BlackOSDisplay
+} // namespace Display
+} // namespace BlackOS
 
 #endif // BLACKOS_KMENU_H
