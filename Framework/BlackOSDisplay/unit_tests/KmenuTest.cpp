@@ -2,19 +2,12 @@
 #define CATCH_CONFIG_MAIN
 
 #include "../inc/Kmenu.h"
-#include "ncurses.h"
+#include "../inc/Directives.h"
+#include "../inc/Kfield.h"
+#include "../testHelpers/inc/MenuGenerator.h"
 #include <catch2/catch.hpp>
 
-int Factorial(int x){
-	if(x <= 1)
-		return 1;
-	else
-		return x * Factorial(x-1);
-}
-
-TEST_CASE("Factorials are computed", "[factorial]") {
-  REQUIRE(Factorial(1) == 1);
-  REQUIRE(Factorial(2) == 2);
-  REQUIRE(Factorial(3) == 6);
-  REQUIRE(Factorial(10) == 3628800);
-}
+namespace BlackOSDisplay {
+auto const &menu = TestHelpers::testMenuWithPagination(3);
+TEST_CASE("test paginated fields map", "[pagination]") { REQUIRE(1 == 1); }
+} // namespace BlackOSDisplay

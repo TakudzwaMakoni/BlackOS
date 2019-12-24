@@ -38,6 +38,7 @@ public:
   void delWith(std::vector<WINDOW *> windows);
   std::string attributeString();
   void fill(char ch);
+  void wipe(bool titleBar);
 
   ~Kcanvas();
 

@@ -1,5 +1,4 @@
 #include "../inc/Kcanvas.h"
-
 #include <iostream>
 #include <memory>
 #include <ncurses.h>

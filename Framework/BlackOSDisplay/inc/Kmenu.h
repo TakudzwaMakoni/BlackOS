@@ -19,7 +19,7 @@ std::string emptyField;
 }
 class Kmenu : public Kwindow {
 public:
-  Kmenu(std::string &name, int sizeY, int sizeX, int posY, int posX);
+  Kmenu(std::string const &name, int sizeY, int sizeX, int posY, int posX);
   virtual void display() override;
   virtual WINDOW *window() const override;
   virtual void borderStyle(const int ch = 0) override;
@@ -55,6 +55,8 @@ public:
   void setTitle(std::string title);
   void delWith(std::vector<WINDOW *> windows);
   std::string attributeString();
+  void fill(char ch);
+  void wipe(bool titleBar);
 
   ~Kmenu();
 

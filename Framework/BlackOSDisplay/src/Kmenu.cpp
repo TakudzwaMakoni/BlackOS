@@ -37,7 +37,8 @@ bool inBlocks(const int xValue, const std::vector<int> &blocks,
 }
 } // namespace
 using namespace BlackOSDisplay;
-Kmenu::Kmenu(std::string &name, int sizeY, int sizeX, int posY, int posX) {
+Kmenu::Kmenu(std::string const &name, int sizeY, int sizeX, int posY,
+             int posX) {
   _size = {sizeY, sizeX};
   _position = {posY, posX};
 }
@@ -241,7 +242,27 @@ std::vector<std::vector<Kfield>> Kmenu::_paginate(const int pages,
   }
   return paginatedFields;
 }
-void Kmenu::display() {
+void Kmenu::fill(char ch) {
+  std::string fillString(_size[1] - 2, ch);
+  for (int i = 1; i <= _size[0]; ++i) {
+    mvwprintw(_win, i, 1, fillString.c_str());
+  }
+  wrefresh(_win);
+}
+void Kmenu::wipe(bool titleBar) {
+  if (titleBar) {
+    std::string fillString(_size[1] - 2, ' ');
+    for (int i = 2; i <= _size[0] - 3; ++i) {
+      mvwprintw(_win, i, 1, fillString.c_str());
+    }
+  } else {
+    fill(' ');
+  }
+  wrefresh(_win);
+}
+void Kmenu::
+
+    display() {
   keypad(_win, true);
   int selection;
   int highlighted = 0;
@@ -267,6 +288,7 @@ void Kmenu::display() {
       mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
       wattroff(_win, A_REVERSE);
     }
+    wipe(_showTitle);
     std::vector<Kfield> fields = paginatedFields[page];
     int numOfDisplayFields = fields.size();
     for (int i = 0; i < numOfDisplayFields; ++i) {

@@ -166,13 +166,7 @@ void Kcanvas::delWith(std::vector<WINDOW *> windows) {
       delwin(*it);
     }
 }
-void Kcanvas::fill(char ch) {
-  std::string fillString(_size[1] - 2, ch);
-  for (int i = 1; i <= _size[0]; ++i) {
-    mvwprintw(_win, i, 1, fillString.c_str());
-  }
-  wrefresh(_win);
-}
+
 void Kcanvas::_setBorderStyle() {
   int L, R, T, B, TL, TR, BL, BR;
   L = _borderStyle[0];
@@ -184,6 +178,24 @@ void Kcanvas::_setBorderStyle() {
   BL = _borderStyle[6];
   BR = _borderStyle[7];
   wborder(_win, L, R, T, B, TL, TR, BL, BR);
+}
+void Kcanvas::fill(char ch) {
+  std::string fillString(_size[1] - 2, ch);
+  for (int i = 1; i <= _size[0]; ++i) {
+    mvwprintw(_win, i, 1, fillString.c_str());
+  }
+  wrefresh(_win);
+}
+void Kcanvas::wipe(bool titleBar) {
+  if (titleBar) {
+    std::string fillString(_size[1] - 2, ' ');
+    for (int i = 2; i <= _size[0] - 3; ++i) {
+      mvwprintw(_win, i, 1, fillString.c_str());
+    }
+  } else {
+    fill(' ');
+  }
+  wrefresh(_win);
 }
 void Kcanvas::display() {
   keypad(_win, true);
