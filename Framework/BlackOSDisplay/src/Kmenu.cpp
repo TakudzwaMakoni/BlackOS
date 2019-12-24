@@ -68,10 +68,10 @@ void Kmenu::label(const std::string &label) const {
   mvwaddstr(_win, labellocy, labellocx, label.c_str());
 }
 std::vector<int> Kmenu::maxSize() const {
-  int yMax, xMax;
-  getmaxyx(_win, yMax, xMax);
-  std::vector<int> size{yMax, xMax};
-  return size;
+  int winSzY, winSzX;
+  winSzX = getmaxx(_win);
+  std::vector<int> winSz{winSzY, winSzX};
+  return winSz;
 }
 void Kmenu::setFieldAlign(int x, int y) {
   _xAlign = x;

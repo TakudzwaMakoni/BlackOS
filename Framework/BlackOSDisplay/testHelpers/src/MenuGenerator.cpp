@@ -57,5 +57,14 @@ Kmenu_sptr testMenuWithPagination(int pagination) {
 
   return menu;
 }
+
+Kmenu_sptr testMenuInitialisedWithSizeAndPos(int const sizeY, int const sizeX,
+                                             int const posY, int const posX) {
+  std::string const menuName = "test_menu";
+  auto menu = std::make_shared<BlackOSDisplay::Kmenu>(menuName, sizeY, sizeX,
+                                                      posY, posX);
+  return menu;
+}
+
 } // namespace TestHelpers
 } // namespace BlackOSDisplay

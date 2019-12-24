@@ -35,8 +35,10 @@ int main(int argc, const char *argv[]) {
       canvas.display();
     }
   }
+
   wgetch(world);
   delwin(world);
   endwin();
+
   return 0;
 }
