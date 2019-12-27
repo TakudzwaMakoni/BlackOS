@@ -38,13 +38,12 @@ public:
                             const int x2) override;
   virtual void kErase(const std::vector<int> &elements) override;
   virtual void kEraseExcept(const std::vector<int> &elements) override;
-  Eigen::Matrix<dataType, rows, cols> matrix() const { return _matrix; }
 
-  int centreX() const { return _size[1] / 2; }
-  int centreY() const { return _size[0] / 2; }
+  Eigen::Matrix<dataType, rows, cols> matrix() const { return _matrix; }
   void setPrecision(int precision) { _precision = precision; }
   void gridLines(bool show) { _setGrid = show; }
   void showTitle(bool show) { _showTitle = show; }
+  void setBorderStyle();
   void align(int x, int y) {
     _xAlign = x;
     _yAlign = y;
@@ -75,7 +74,6 @@ private:
   std::vector<std::string> _attributes;
 
   std::string attributeString();
-  void _setBorderStyle();
   void delWith(std::vector<WINDOW *> windows);
 };
 } // namespace Display

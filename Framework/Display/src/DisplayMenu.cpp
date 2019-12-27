@@ -81,7 +81,7 @@ int main(int argc, const char *argv[]) {
     std::string msg = selectedField.message();
     int msgLen = msg.length();
     wclear(main_win);
-    mvwprintw(main_win, main_menu.centreY(), main_menu.centreX() - msgLen,
+    mvwprintw(main_win, Y_CENTRE / 2, X_CENTRE / 2 - msgLen,
               selectedField.message().c_str());
     auto script = selectedField.script();
     script();

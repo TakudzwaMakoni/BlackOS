@@ -13,5 +13,6 @@ std::string Kfield::name() const { return this->_name; }
 directive Kfield::script() const { return this->_script; }
 std::string Kfield::message() const { return this->_message; }
 void Kfield::setName(const std::string &name) { _name = name; }
+// Kfield::~Kfield(){};
 } // namespace Display
 } // namespace BlackOS

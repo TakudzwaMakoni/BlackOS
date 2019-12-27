@@ -15,9 +15,6 @@
 
 namespace BlackOS {
 namespace Display {
-namespace {
-std::string emptyField;
-}
 class Kmenu : public Kwindow {
 public:
   Kmenu(std::string const &name, int sizeY, int sizeX, int posY, int posX);
@@ -31,7 +28,7 @@ public:
   virtual std::vector<int> maxSize() const override;
   virtual std::string winType() const override;
   virtual std::string name() const override;
-  virtual void setWin(WINDOW *window) override;
+  virtual void setWin(WINDOW *window = nullptr) override;
   virtual void kErase(const int y1, const int x1, const int y2,
                       const int x2) override;
   virtual void kEraseExcept(const int y1, const int x1, const int y2,
@@ -40,21 +37,19 @@ public:
   virtual void kEraseExcept(const std::vector<int> &elements) override;
 
   virtual void setFields(const std::vector<Kfield> &fields);
-  virtual void addDisplayObj(Kwindow &obj) const;
   virtual Kfield getSelectedField() const;
 
   void setFieldAlign(int x, int y);
   void addFieldPadding();
   void setFieldStyle(std::string style);
   void paginate(int divisor);
-  int centreX() const;
-  int centreY() const;
   std::vector<Kfield> fields() const;
   std::vector<int> size() const;
   Eigen::Vector2i position() const;
   void showTitle(bool show = true);
   void setTitle(std::string title);
-  void delWith(std::vector<WINDOW *> windows);
+  void setBorderStyle();
+
   std::string attributeString();
   void fill(char ch);
   void wipe(bool titleBar);
@@ -62,7 +57,7 @@ public:
   ~Kmenu();
 
 private:
-  WINDOW *_win;
+  WINDOW *_win = nullptr;
   std::vector<WINDOW *> _subwins;
   std::vector<int> _size;
   std::vector<Kfield> _fields;
@@ -78,9 +73,9 @@ private:
   std::string _title;
   std::vector<int> _borderStyle{0, 0, 0, 0, 0, 0, 0, 0}; // size = 8.
 
-  void _setBorderStyle();
-  std::vector<std::vector<Kfield>> _paginate(const int pages,
-                                             const int residue);
+  void _delWith(std::vector<WINDOW *> windows);
+  std::vector<std::vector<BlackOS::Display::Kfield>>
+  _paginate(int const pages, int const residue);
 };
 } // namespace Display
 } // namespace BlackOS

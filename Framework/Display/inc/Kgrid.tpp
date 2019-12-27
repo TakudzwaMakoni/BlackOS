@@ -213,7 +213,7 @@ void Kgrid<dataType, rows, cols>::kEraseExcept(
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::_setBorderStyle() {
+void Kgrid<dataType, rows, cols>::setBorderStyle() {
   int L, R, T, B, TL, TR, BL, BR;
   L = _borderStyle[0];
   R = _borderStyle[1];
@@ -233,7 +233,7 @@ void Kgrid<dataType, rows, cols>::display() {
   size_t highlightedRow = 0;
   size_t highlightedCol = 0;
   int topPad = 1;
-  _setBorderStyle();
+  setBorderStyle();
   if (_showTitle) {
     _attributes = {"RAD", "PREC: " + std::to_string(_precision)};
     wattron(_win, A_REVERSE);

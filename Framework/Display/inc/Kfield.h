@@ -7,19 +7,21 @@
 
 #include "Directives.h"
 #include <string>
+
 namespace BlackOS {
 namespace Display {
 
 /// BlackOS Field Object
-class Kfield {
+struct Kfield {
 public:
-  Kfield(const std::string &name, const directive script,
-         const std::string &message = "");
-  Kfield();
+  Kfield(std::string const &name, directive const script,
+         std::string const &message = "");
   std::string name() const;
   directive script() const;
   std::string message() const;
   void setName(const std::string &name);
+
+  //  ~Kfield();
 
 private:
   std::string _name;

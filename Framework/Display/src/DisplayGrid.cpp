@@ -26,7 +26,7 @@ int main(int argc, const char *argv[]) {
   cbreak();
   cursor(0);
 
-  WINDOW *world = newwin(WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
+  WINDOW *world = newwin(0, 0, 0, 0);
 
   std::string name = "Matrix A";
   Eigen::Matrix<double, 4, 4> testData;
@@ -51,7 +51,7 @@ int main(int argc, const char *argv[]) {
     auto selectedElement = grid.selectedRaw();
     WINDOW *grid_window = grid.window();
     wclear(grid_window);
-    mvwprintw(grid_window, grid.centreY(), grid.centreX(),
+    mvwprintw(grid_window, Y_CENTRE, X_CENTRE,
               std::to_string(selectedElement).c_str());
     wgetch(grid_window);
 
