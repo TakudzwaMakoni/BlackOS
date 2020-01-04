@@ -29,17 +29,17 @@ public:
                             const int x2) override;
   virtual void kErase(const std::vector<int> &elements) override;
   virtual void kEraseExcept(const std::vector<int> &elements) override;
+  virtual void refresh() override;
+  virtual int getChrfromW(int const y, int const x,
+                          bool const preserve_cursor_pos) const override;
 
-  int centreX() const;
-  int centreY() const;
   std::vector<int> size() const;
   Eigen::Vector2i position() const;
   void showTitle(bool show = true);
   void setTitle(std::string title);
   void delWith(std::vector<WINDOW *> windows);
   std::string attributeString();
-  void fill(char ch);
-  void wipe(bool titleBar);
+  void fill(char ch, bool titleBar = false);
 
   ~Kcanvas();
 

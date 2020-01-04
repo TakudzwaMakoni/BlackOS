@@ -13,8 +13,16 @@
 namespace BlackOS {
 namespace Display {
 namespace TestHelpers {
-using Kmenu_sptr = std::shared_ptr<Kmenu>;
-Kmenu_sptr testMenuWithPagination(int pagination) {
+
+Kmenu_sptr testMenu() {
+  std::string const menuName = "test_menu";
+  auto menu = std::make_shared<Kmenu>(menuName, WORLD_HEIGHT, WORLD_WIDTH,
+                                      Y_CENTRE, X_CENTRE);
+  menu->setTitle("test_menu_title");
+  return menu;
+}
+
+Kmenu_sptr testMenuWithEightPaginatedFields(int pagination) {
   std::string const menuName = "test_menu";
   auto menu = std::make_shared<Kmenu>(menuName, WORLD_HEIGHT, WORLD_WIDTH,
                                       Y_CENTRE, X_CENTRE);
@@ -65,7 +73,6 @@ Kmenu_sptr testMenuInitialisedWithSizeAndPos(int const sizeY, int const sizeX,
   auto menu = std::make_shared<Kmenu>(menuName, sizeY, sizeX, posY, posX);
   return menu;
 }
-
 } // namespace TestHelpers
 } // namespace Display
 } // namespace BlackOS

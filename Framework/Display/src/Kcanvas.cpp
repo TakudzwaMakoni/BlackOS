@@ -147,8 +147,7 @@ void Kcanvas::kEraseExcept(const std::vector<int> &elements) {
     }
   }
 }
-int Kcanvas::centreX() const { return _size[1] / 2; }
-int Kcanvas::centreY() const { return _size[0] / 2; }
+void Kcanvas::refresh() { wrefresh(_win); }
 std::vector<int> Kcanvas::size() const { return _size; }
 Eigen::Vector2i Kcanvas::position() const { return _position; }
 void Kcanvas::showTitle(bool show) { _showTitle = show; }
@@ -169,6 +168,17 @@ void Kcanvas::delWith(std::vector<WINDOW *> windows) {
     }
 }
 
+/// MF
+int Kcanvas::getChrfromW(int const y, int const x,
+                         bool preserve_cursor_pos) const {
+  int curr_y, curr_x;
+  getyx(_win, curr_y, curr_x);
+  int wch = mvwinch(_win, y, x);
+  if (preserve_cursor_pos)
+    wmove(_win, curr_y, curr_x);
+  return wch;
+}
+
 void Kcanvas::_setBorderStyle() {
   int L, R, T, B, TL, TR, BL, BR;
   L = _borderStyle[0];
@@ -181,23 +191,14 @@ void Kcanvas::_setBorderStyle() {
   BR = _borderStyle[7];
   wborder(_win, L, R, T, B, TL, TR, BL, BR);
 }
-void Kcanvas::fill(char ch) {
+void Kcanvas::fill(char ch, bool titleBar) {
+  int start = titleBar ? 2 : 1;
+  int end = _size[0] - 2;
+
   std::string fillString(_size[1] - 2, ch);
-  for (int i = 1; i <= _size[0]; ++i) {
+  for (int i = start; i <= end; ++i) {
     mvwprintw(_win, i, 1, fillString.c_str());
   }
-  wrefresh(_win);
-}
-void Kcanvas::wipe(bool titleBar) {
-  if (titleBar) {
-    std::string fillString(_size[1] - 2, ' ');
-    for (int i = 2; i <= _size[0] - 3; ++i) {
-      mvwprintw(_win, i, 1, fillString.c_str());
-    }
-  } else {
-    fill(' ');
-  }
-  wrefresh(_win);
 }
 void Kcanvas::display() {
   keypad(_win, true);

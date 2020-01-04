@@ -8,6 +8,7 @@
 #include "ncurses.h"
 #include <memory>
 #include <vector>
+
 #define cursor(x) curs_set(x)
 
 namespace BlackOS {
@@ -17,21 +18,24 @@ class Kwindow {
 public:
   virtual void display() = 0;
   virtual WINDOW *window() const = 0;
-  virtual void borderStyle(const int ch) = 0;
-  virtual void borderStyle(const int L, const int R, const int T, const int B,
-                           const int TL, const int TR, const int BL,
-                           const int BR) = 0;
-  virtual void label(const std::string &label) const = 0;
+  virtual void borderStyle(int const ch) = 0;
+  virtual void borderStyle(int const L, int const R, int const T, int const B,
+                           int const TL, int const TR, int const BL,
+                           int const BR) = 0;
+  virtual void label(std::string const &label) const = 0;
   virtual std::vector<int> maxSize() const = 0;
   virtual std::string winType() const = 0;
   virtual std::string name() const = 0;
   virtual void setWin(WINDOW *window) = 0;
-  virtual void kErase(const int y1, const int x1, const int y2,
-                      const int x2) = 0;
-  virtual void kEraseExcept(const int y1, const int x1, const int y2,
-                            const int x2) = 0;
-  virtual void kErase(const std::vector<int> &elements) = 0;
-  virtual void kEraseExcept(const std::vector<int> &elements) = 0;
+  virtual void kErase(int const y1, int const x1, int const y2,
+                      int const x2) = 0;
+  virtual void kEraseExcept(int const y1, int const x1, int const y2,
+                            int const x2) = 0;
+  virtual void kErase(std::vector<int> const &elements) = 0;
+  virtual void kEraseExcept(std::vector<int> const &elements) = 0;
+  virtual void refresh() = 0;
+  virtual int getChrfromW(int const y, int const x,
+                          bool const preserve_cursor_pos) const = 0;
 };
 } // namespace Display
 } // namespace BlackOS

@@ -64,7 +64,7 @@ int main(int argc, const char *argv[]) {
   int pagination = 3;
 
   main_menu.setFieldAlign(0, 0);
-  main_menu.borderStyle('!', '!', '!', '!', '!', '!', '!', '!');
+  main_menu.borderStyle('#', '#', '#', '#', '#', '#', '#', '#');
   main_menu.paginate(pagination);
   main_menu.setFields(test_fields);
   main_menu.setTitle("TEST_MENU with" + std::to_string(pagination) +

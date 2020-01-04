@@ -17,26 +17,25 @@ using namespace BlackOS::Display;
 
 TEST_CASE("test window is resized to initialised menu size after call setWin",
           "[window]") {
-
   // generic lambda forces destructor of class Object to be called while still
   // in curses mode.
-  auto glambda = [](int menuSzY, int menuSzX) {
+  auto glambda = [](WINDOW *world) {
     int winSzX, winSzY;
 
-    WINDOW *world = newwin(0, 0, 0, 0);
-    auto const &menu = TestHelpers::testMenuInitialisedWithSizeAndPos(
-        menuSzY, menuSzX, 20, 19);
+    auto const &menu = TestHelpers::testMenu();
     menu->setWin(world);
     getmaxyx(world, winSzY, winSzX);
 
-    return winSzX == menuSzX && winSzY == menuSzY;
+    return winSzY == WORLD_HEIGHT && winSzX == WORLD_WIDTH;
   };
 
   initscr(); // initialise curses data
   cbreak();  // allow screen to echo
+  WINDOW *world = newwin(0, 0, 0, 0);
 
-  bool resize_success = glambda(24, 12);
+  bool resize_success = glambda(world);
 
+  delwin(world);
   endwin(); // exit curses mode
 
   REQUIRE(resize_success);
@@ -45,30 +44,91 @@ TEST_CASE("test window is resized to initialised menu size after call setWin",
 TEST_CASE("test window is repositioned to initialised menu position after call "
           "setWin",
           "[window]") {
-
   // generic lambda forces destructor of class Object to be called while still
   // in curses mode.
-  auto glambda = [](int menuPosY, int menuPosX) {
+  auto glambda = [](WINDOW *world) {
     int winPosX, winPosY;
 
-    WINDOW *world = newwin(0, 0, 0, 0);
-    auto const &menu = TestHelpers::testMenuInitialisedWithSizeAndPos(
-        24, 12, menuPosY, menuPosX);
+    auto const &menu = TestHelpers::testMenu();
 
     menu->setWin(world);
     getbegyx(world, winPosY, winPosX);
 
-    return winPosX == menuPosX && winPosY == menuPosY;
+    return winPosY == Y_CENTRE && winPosX == X_CENTRE;
   };
 
   initscr(); // initialise curses data
   cbreak();  // allow screen to echo
+  WINDOW *world = newwin(0, 0, 0, 0);
 
-  bool reposition_success = glambda(20, 19);
+  bool reposition_success = glambda(world);
 
+  delwin(world);
   endwin(); // exit curses mode
 
   REQUIRE(reposition_success);
+}
+
+TEST_CASE("test window is unset on call setWin with empty parameters",
+          "[window]") {
+  // generic lambda forces destructor of class Object to be called while still
+  // in curses mode.
+  auto glambda = [](WINDOW *world) {
+    auto const &menu = TestHelpers::testMenu();
+    menu->setWin(world);
+    menu->setWin();
+    return menu->window() == nullptr;
+  };
+
+  initscr(); // initialise curses data
+  cbreak();  // allow screen to echo
+  WINDOW *world = newwin(0, 0, 0, 0);
+
+  bool window_is_null = glambda(world);
+
+  delwin(world);
+  endwin(); // exit curses mode
+
+  REQUIRE(window_is_null);
+}
+
+TEST_CASE("test menu is filled excluding title bar", "[window]") {
+  // generic lambda forces destructor of class Object to be called while still
+  // in curses mode.
+  auto glambda_fill = [](WINDOW *world) {
+    auto const &menu = TestHelpers::testMenu();
+    menu->setWin(world);
+    menu->fill('w', true);
+
+    bool filled = true;
+    for (int i = 2; i <= 8; ++i) {
+      for (int j = 1; j <= 8; ++j) {
+        auto character = menu->getChrfromW(i, j, false);
+        int wint = (int)'w';
+        if (!(character == wint))
+          filled = false;
+      }
+    }
+
+    bool titleBar_preserved = true;
+    for (int j = 1; j <= 8; ++j) {
+      if (menu->getChrfromW(1, j, false) == 'w')
+        titleBar_preserved = false;
+    }
+
+    return filled && titleBar_preserved;
+  };
+
+  initscr(); // initialise curses data
+  cbreak();  // prevent input buffer
+  WINDOW *world = newwin(0, 0, 0, 0);
+
+  bool wipe_successful = glambda_fill(world);
+
+  delwin(world);
+  endwin(); // exit curses mode
+
+  REQUIRE(wipe_successful);
 }
 
 int main(int argc, char const *argv[]) {

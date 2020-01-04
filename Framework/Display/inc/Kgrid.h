@@ -38,6 +38,9 @@ public:
                             const int x2) override;
   virtual void kErase(const std::vector<int> &elements) override;
   virtual void kEraseExcept(const std::vector<int> &elements) override;
+  virtual void refresh() override;
+  virtual int getChrfromW(int const y, int const x,
+                          bool const preserve_cursor_pos = true) const override;
 
   Eigen::Matrix<dataType, rows, cols> matrix() const { return _matrix; }
   void setPrecision(int precision) { _precision = precision; }

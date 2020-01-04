@@ -124,6 +124,21 @@ void Kgrid<dataType, rows, cols>::write(
 }
 
 template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::refresh() {
+  wrefresh(_win);
+}
+template <typename dataType, size_t rows, size_t cols>
+int Kgrid<dataType, rows, cols>::getChrfromW(
+    int const y, int const x, bool const preserve_cursor_pos) const {
+  int curr_y, curr_x;
+  getyx(_win, curr_y, curr_x);
+  int wch = mvwinch(_win, y, x);
+  if (preserve_cursor_pos)
+    wmove(_win, curr_y, curr_x);
+  return wch;
+}
+
+template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::write(std::vector<dataType> &data) {
   if (data.size() != rows * cols) {
     std::string message = "expected vector size: " + std::to_string(rows) +

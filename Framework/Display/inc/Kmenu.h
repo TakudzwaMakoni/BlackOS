@@ -17,42 +17,45 @@ namespace BlackOS {
 namespace Display {
 class Kmenu : public Kwindow {
 public:
-  Kmenu(std::string const &name, int sizeY, int sizeX, int posY, int posX);
+  Kmenu(std::string const &name, int const sizeY, int const sizeX,
+        int const posY, int const posX);
   virtual void display() override;
   virtual WINDOW *window() const override;
-  virtual void borderStyle(const int ch = 0) override;
-  virtual void borderStyle(const int L, const int R, const int T, const int B,
-                           const int TL, const int TR, const int BL,
-                           const int BR) override;
-  virtual void label(const std::string &label) const override;
+  virtual void borderStyle(int const ch = 0) override;
+  virtual void borderStyle(int const L, int const R, int const T, int const B,
+                           int const TL, int const TR, int const BL,
+                           int const BR) override;
+  virtual void label(std::string const &label) const override;
   virtual std::vector<int> maxSize() const override;
   virtual std::string winType() const override;
   virtual std::string name() const override;
   virtual void setWin(WINDOW *window = nullptr) override;
-  virtual void kErase(const int y1, const int x1, const int y2,
-                      const int x2) override;
-  virtual void kEraseExcept(const int y1, const int x1, const int y2,
-                            const int x2) override;
-  virtual void kErase(const std::vector<int> &elements) override;
-  virtual void kEraseExcept(const std::vector<int> &elements) override;
+  virtual void kErase(int const y1, int const x1, int const y2,
+                      int const x2) override;
+  virtual void kEraseExcept(int const y1, int const x1, int const y2,
+                            int const x2) override;
+  virtual void kErase(std::vector<int> const &elements) override;
+  virtual void kEraseExcept(std::vector<int> const &elements) override;
+  virtual void refresh() override;
+  virtual int getChrfromW(int const y, int const x,
+                          bool const preserve_cursor_pos = true) const override;
 
-  virtual void setFields(const std::vector<Kfield> &fields);
+  virtual void setFields(std::vector<Kfield> const &fields);
   virtual Kfield getSelectedField() const;
 
-  void setFieldAlign(int x, int y);
+  void setFieldAlign(int const x, int const y);
   void addFieldPadding();
-  void setFieldStyle(std::string style);
-  void paginate(int divisor);
+  void setFieldStyle(std::string const &style);
+  void paginate(int const divisor);
   std::vector<Kfield> fields() const;
   std::vector<int> size() const;
   Eigen::Vector2i position() const;
-  void showTitle(bool show = true);
-  void setTitle(std::string title);
+  void showTitle(bool const show = true);
+  void setTitle(std::string const &title);
   void setBorderStyle();
 
   std::string attributeString();
-  void fill(char ch);
-  void wipe(bool titleBar);
+  void fill(char ch, bool titleBar = false);
 
   ~Kmenu();
 

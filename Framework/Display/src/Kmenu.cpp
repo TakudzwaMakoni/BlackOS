@@ -14,8 +14,8 @@ namespace {
 const int PADDING = 1;
 
 /// SUBROUTINE ANONYMOUS
-std::vector<int> blocksFound(const int yValue,
-                             const std::vector<int> &elements) {
+std::vector<int> blocksFound(int const yValue,
+                             std::vector<int> const &elements) {
   int numOfBlocks = elements.size() / 4; /*two coordinates per block*/
   std::vector<int> iteratorList(numOfBlocks);
   std::iota(iteratorList.begin(), iteratorList.end(), 0);
@@ -30,8 +30,8 @@ std::vector<int> blocksFound(const int yValue,
 }
 
 /// SUBROUTINE ANONYMOUS
-bool inBlocks(const int xValue, const std::vector<int> &blocks,
-              const std::vector<int> &elements) {
+bool inBlocks(int const xValue, std::vector<int> const &blocks,
+              std::vector<int> const &elements) {
   for (const int block : blocks) {
     int x1 = elements[1 + (block * 4)];
     int x2 = elements[3 + (block * 4)];
@@ -45,8 +45,8 @@ bool inBlocks(const int xValue, const std::vector<int> &blocks,
 namespace BlackOS {
 namespace Display {
 
-Kmenu::Kmenu(std::string const &name, int sizeY, int sizeX, int posY,
-             int posX) {
+Kmenu::Kmenu(std::string const &name, int const sizeY, int const sizeX,
+             int const posY, int const posX) {
   _size = {sizeY, sizeX};
   _position = {posY, posX};
 }
@@ -91,39 +91,41 @@ std::string Kmenu::attributeString() {
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::borderStyle(const int ch) {
+void Kmenu::borderStyle(int const ch) {
   _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::borderStyle(const int L, const int R, const int T, const int B,
-                        const int TL, const int TR, const int BL,
-                        const int BR) {
+void Kmenu::borderStyle(int const L, int const R, int const T, int const B,
+                        int const TL, int const TR, int const BL,
+                        int const BR) {
   _borderStyle = {L, R, T, B, TL, TR, BL, BR};
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::setFields(const std::vector<Kfield> &fields) {
+void Kmenu::setFields(std::vector<Kfield> const &fields) {
   this->_fields = fields;
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::setFieldAlign(int x, int y) {
+void Kmenu::setFieldAlign(int const x, int const y) {
   _xAlign = x;
   _yAlign = y;
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::setFieldStyle(std::string style) { this->_fieldStyle = style; }
+void Kmenu::setFieldStyle(std::string const &style) {
+  this->_fieldStyle = style;
+}
 
 /// MUTATOR RETROACTIVE
-void Kmenu::paginate(int divisor) { _pagination = divisor; }
+void Kmenu::paginate(int const divisor) { _pagination = divisor; }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::showTitle(bool show) { _showTitle = show; }
+void Kmenu::showTitle(bool const show) { _showTitle = show; }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::setTitle(std::string title) { _title = title; }
+void Kmenu::setTitle(std::string const &title) { _title = title; }
 
 /// MUTATOR RETROACTIVE
 void Kmenu::addFieldPadding() {
@@ -149,8 +151,19 @@ void Kmenu::addFieldPadding() {
   }
 }
 
+/// MF
+int Kmenu::getChrfromW(int const y, int const x,
+                       bool preserve_cursor_pos) const {
+  int curr_y, curr_x;
+  getyx(_win, curr_y, curr_x);
+  int wch = mvwinch(_win, y, x);
+  if (preserve_cursor_pos)
+    wmove(_win, curr_y, curr_x);
+  return wch;
+}
+
 /// MF ACTIVE
-void Kmenu::kErase(const int y1, const int x1, const int y2, const int x2) {
+void Kmenu::kErase(int const y1, int const x1, int const y2, int const x2) {
   int borderY = _size[0];
   int borderX = _size[1];
   int _y1 = y1 <= 0 ? 1 : y1;
@@ -166,8 +179,8 @@ void Kmenu::kErase(const int y1, const int x1, const int y2, const int x2) {
 }
 
 /// MF ACTIVE
-void Kmenu::kEraseExcept(const int y1, const int x1, const int y2,
-                         const int x2) {
+void Kmenu::kEraseExcept(int const y1, int const x1, int const y2,
+                         int const x2) {
   int borderY = _size[0];
   int borderX = _size[1];
   int width = borderX - 2;
@@ -193,7 +206,7 @@ void Kmenu::kEraseExcept(const int y1, const int x1, const int y2,
 }
 
 /// MF ACTIVE
-void Kmenu::kErase(const std::vector<int> &elements) {
+void Kmenu::kErase(std::vector<int> const &elements) {
   int numOfAreas = elements.size() / 4; /*two coordinates per block*/
   for (int areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
     int borderY = _size[0];
@@ -213,7 +226,7 @@ void Kmenu::kErase(const std::vector<int> &elements) {
 }
 
 /// MF ACTIVE
-void Kmenu::kEraseExcept(const std::vector<int> &elements) {
+void Kmenu::kEraseExcept(std::vector<int> const &elements) {
   int borderY = _size[0];
   int borderX = _size[1];
   int width = borderX - 2;
@@ -236,8 +249,10 @@ void Kmenu::kEraseExcept(const std::vector<int> &elements) {
   wrefresh(_win);
 }
 
+void Kmenu::refresh() { wrefresh(_win); }
+
 /// MF ACTIVE
-void Kmenu::label(const std::string &label) const {
+void Kmenu::label(std::string const &label) const {
   int labellocy = _size[0] - 1;
   int labellocx = _size[1] - (3 + (int)label.length());
   mvwaddstr(_win, labellocy, labellocx, label.c_str());
@@ -268,26 +283,15 @@ void Kmenu::setBorderStyle() {
   wrefresh(_win);
 }
 
-/// MF ACTIVE
-void Kmenu::fill(char ch) {
+/// MF RETROACTIVE
+void Kmenu::fill(char ch, bool titleBar) {
+  int start = titleBar ? 2 : 1;
+  int end = _size[0] - 2;
+
   std::string fillString(_size[1] - 2, ch);
-  for (int i = 1; i <= _size[0]; ++i) {
+  for (int i = start; i <= end; ++i) {
     mvwprintw(_win, i, 1, fillString.c_str());
   }
-  wrefresh(_win);
-}
-
-/// MF ACTIVE
-void Kmenu::wipe(bool titleBar) {
-  if (titleBar) {
-    std::string fillString(_size[1] - 2, ' ');
-    for (int i = 2; i <= _size[0] - 3; ++i) {
-      mvwprintw(_win, i, 1, fillString.c_str());
-    }
-  } else {
-    fill(' ');
-  }
-  wrefresh(_win);
 }
 
 /// MF ACTIVE
@@ -317,7 +321,7 @@ void Kmenu::display() {
       mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
       wattroff(_win, A_REVERSE);
     }
-    wipe(_showTitle);
+    fill(' ', _showTitle);
     std::vector<Kfield> fields = paginatedFields[page];
     int numOfDisplayFields = fields.size();
     for (int i = 0; i < numOfDisplayFields; ++i) {
@@ -364,7 +368,7 @@ void Kmenu::display() {
       if (page == -1) {
         page = 0;
       }
-      kErase(2, 2, _size[0] - 3, _size[1] - 3);
+      fill(' ', _showTitle);
       break;
     case KEY_RIGHT:
       page++;
@@ -372,7 +376,7 @@ void Kmenu::display() {
       if (page == paginatedFields.size()) {
         page--;
       }
-      kErase(2, 2, _size[0] - 3, _size[1] - 3);
+      fill(' ', _showTitle);
       break;
     case KEY_UP:
       highlighted--;
@@ -430,8 +434,8 @@ std::vector<std::vector<Kfield>> Kmenu::_paginate(int const pages,
 }
 
 Kmenu::~Kmenu() {
-  _delWith(_subwins);
-  setWin();
+  _delWith(_subwins); // delete windows created by Kmenu
+  setWin();           // diisociate with window
 }
 
 } // namespace Display
