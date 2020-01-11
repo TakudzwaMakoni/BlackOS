@@ -18,7 +18,6 @@ Kmenu_sptr testMenu() {
   std::string const menuName = "test_menu";
   auto menu = std::make_shared<Kmenu>(menuName, WORLD_HEIGHT, WORLD_WIDTH,
                                       Y_CENTRE, X_CENTRE);
-  menu->setTitle("test_menu_title");
   return menu;
 }
 

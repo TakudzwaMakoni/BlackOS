@@ -27,7 +27,6 @@ public:
   virtual void borderStyle(const int L, const int R, const int T, const int B,
                            const int TL, const int TR, const int BL,
                            const int BR) override;
-  virtual WINDOW *window() const override;
   virtual void label(const std::string &label) const override;
   virtual std::vector<int> maxSize() const override;
   virtual std::string winType() const override;
@@ -58,9 +57,9 @@ public:
   ~Kgrid();
 
 private:
+  WINDOW *_win;
   std::string _name;
   Eigen::Matrix<dataType, rows, cols> _matrix;
-  WINDOW *_win;
   std::vector<WINDOW *> _subwins;
   std::vector<int> _size;
   int _xAlign = 0;

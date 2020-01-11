@@ -13,7 +13,6 @@ class Kcanvas : public Kwindow {
 public:
   Kcanvas(std::string &name, int sizeY, int sizeX, int posY, int posX);
   virtual void display() override;
-  virtual WINDOW *window() const override;
   virtual void borderStyle(const int ch = 0) override;
   virtual void borderStyle(const int L, const int R, const int T, const int B,
                            const int TL, const int TR, const int BL,

@@ -42,7 +42,6 @@ Kcanvas::Kcanvas(std::string &name, int sizeY, int sizeX, int posY, int posX) {
   _size = {sizeY, sizeX};
   _position = {posY, posX};
 }
-WINDOW *Kcanvas::window() const { return this->_win; };
 void Kcanvas::borderStyle(const int ch) {
   _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
 }

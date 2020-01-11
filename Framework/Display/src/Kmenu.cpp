@@ -61,9 +61,6 @@ std::vector<int> Kmenu::size() const { return _size; }
 Eigen::Vector2i Kmenu::position() const { return _position; }
 
 /// ACCESSOR
-WINDOW *Kmenu::window() const { return this->_win; };
-
-/// ACCESSOR
 std::string Kmenu::winType() const { return "Kmenu"; }
 
 /// ACCESSOR
@@ -80,19 +77,10 @@ std::vector<int> Kmenu::maxSize() const {
   return winSz;
 }
 
-/// ACCESSOR
-std::string Kmenu::attributeString() {
-  std::string str;
-  for (std::vector<std::string>::iterator it = _attributes.begin();
-       it != _attributes.end(); ++it) {
-    str += " " + *it;
-  }
-  return str;
-}
-
 /// MUTATOR RETROACTIVE
 void Kmenu::borderStyle(int const ch) {
   _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
+  wborder(_win, ch, ch, ch, ch, ch, ch, ch, ch);
 }
 
 /// MUTATOR RETROACTIVE
@@ -100,32 +88,73 @@ void Kmenu::borderStyle(int const L, int const R, int const T, int const B,
                         int const TL, int const TR, int const BL,
                         int const BR) {
   _borderStyle = {L, R, T, B, TL, TR, BL, BR};
+  wborder(_win, L, R, T, B, TL, TR, BL, BR);
 }
 
 /// MUTATOR RETROACTIVE
 void Kmenu::setFields(std::vector<Kfield> const &fields) {
-  this->_fields = fields;
+  _fields = fields;
+  _p_fields = {fields};
+  if (_pagination != 1)
+    _paginate();
 }
 
 /// MUTATOR RETROACTIVE
 void Kmenu::setFieldAlign(int const x, int const y) {
-  _xAlign = x;
-  _yAlign = y;
+
+  int left, right, top, bottom, v_centre, h_centre;
+  left = 1;
+  int longest_string_len = 0;
+  std::for_each(subFields.begin(), subFields.end(),
+                [&longest_string_len](const Kfield &subField) {
+                  std::string str = subField.name();
+                  int len = str.length();
+                  if (len > longest_string_len)
+                    longest_string_len = len;
+                });
+  right = _size[1] - longest_string_len - 1;
+  v_centre = i + (_size[0] - numOfSubFields) / 2;
+  h_centre = (_size[1] - subFields[i].name().length()) / 2;
+  top = i + 1;
+  bottom = _size[0] - 2 - numOfSubFields + i;
+  if (x == 1)
+    _xAlign = right;
+  else if (x == 0)
+    _xAlign = h_centre;
+  else if (x == -1)
+    _xAlign = left;
+  if (y == 1)
+    _yAlign = top;
+  else if (y == 0)
+    _yAlign = v_centre;
+  else if (y == -1)
+    _yAlign = bottom;
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::setFieldStyle(std::string const &style) {
-  this->_fieldStyle = style;
-}
+void Kmenu::setFieldStyle(std::string const &style) { _fieldStyle = style; }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::paginate(int const divisor) { _pagination = divisor; }
+void Kmenu::paginate(int const divisor) {
+  _pagination = divisor;
+  _paginate();
+}
 
 /// MUTATOR RETROACTIVE
 void Kmenu::showTitle(bool const show) { _showTitle = show; }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::setTitle(std::string const &title) { _title = title; }
+void Kmenu::setTitle(std::string const &title) {
+  _title = title;
+  if (_showTitle) {
+    int correction = _size[1] - _title.length() - 3;
+    std::string tPadding(_size[1], ' ');
+    tPadding.replace(correction, _size[1], _title + " ");
+    wattron(_win, A_REVERSE);
+    mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
+    wattroff(_win, A_REVERSE);
+  }
+}
 
 /// MUTATOR RETROACTIVE
 void Kmenu::addFieldPadding() {
@@ -265,22 +294,6 @@ void Kmenu::setWin(WINDOW *window) {
     wresize(_win, _size[0], _size[1]);
     mvwin(_win, _position[0], _position[1]);
   }
-  wrefresh(_win);
-}
-
-/// MF ACTIVE
-void Kmenu::setBorderStyle() {
-  int L, R, T, B, TL, TR, BL, BR;
-  L = _borderStyle[0];
-  R = _borderStyle[1];
-  T = _borderStyle[2];
-  B = _borderStyle[3];
-  TL = _borderStyle[4];
-  TR = _borderStyle[5];
-  BL = _borderStyle[6];
-  BR = _borderStyle[7];
-  wborder(_win, L, R, T, B, TL, TR, BL, BR);
-  wrefresh(_win);
 }
 
 /// MF RETROACTIVE
@@ -299,82 +312,44 @@ void Kmenu::display() {
   keypad(_win, true);
   int selection;
   int highlighted = 0;
-  const int numOfFields = _fields.size();
-  setBorderStyle();
-  int test = _pagination;
-  const int pages = numOfFields / _pagination;
-  const int residue = numOfFields % _pagination;
-  int totalPages = residue == 0 ? pages : pages + 1;
-  auto paginatedFields = _paginate(pages, residue);
-  int page = 0;
+
+  // pagination
+
   while (true) {
     if (_showTitle) {
-      _attributes = {"page: ", std::to_string(page + 1), " of ",
-                     std::to_string(totalPages)};
+      std::string pageInfo = "page: " + std::to_string(_page + 1) + " of " +
+                             std::to_string(totalPages) + " * ";
       wattron(_win, A_REVERSE);
-      std::string tPadding(_size[1], ' ');
-      int correction = _size[1] - _title.length() - 3;
-      std::string titleString = attributeString();
-      int titleStrLength = titleString.size();
-      tPadding.replace(0, titleStrLength, titleString);
-      tPadding.replace(correction, _size[1], _title + " ");
-      mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
+      mvwprintw(_win, _position[0], _position[1], pageInfo.c_str());
       wattroff(_win, A_REVERSE);
     }
     fill(' ', _showTitle);
-    std::vector<Kfield> fields = paginatedFields[page];
-    int numOfDisplayFields = fields.size();
-    for (int i = 0; i < numOfDisplayFields; ++i) {
+    std::vector<Kfield> subFields = _fields[page];
+    int numOfSubFields = subFields.size();
+    for (int i = 0; i < numOfSubFields; ++i) {
       if (i == highlighted)
         wattron(_win, A_REVERSE);
-      int yAlign = 0;
-      int xAlign = 0;
-      int left, right, top, bottom, v_centre, h_centre;
-      left = 1;
-      int longest_string_len = 0;
-      std::for_each(fields.begin(), fields.end(),
-                    [&longest_string_len](const Kfield &field) {
-                      std::string str = field.name();
-                      int len = str.length();
-                      if (len > longest_string_len)
-                        longest_string_len = len;
-                    });
-      right = _size[1] - longest_string_len - 1;
-      v_centre = i + (_size[0] - numOfDisplayFields) / 2;
-      h_centre = (_size[1] - fields[i].name().length()) / 2;
-      top = i + 1;
-      bottom = _size[0] - 2 - numOfDisplayFields + i;
-      if (_xAlign == 1)
-        xAlign = right;
-      else if (_xAlign == 0)
-        xAlign = h_centre;
-      else if (_xAlign == -1)
-        xAlign = left;
-      if (_yAlign == 1)
-        yAlign = top;
-      else if (_yAlign == 0)
-        yAlign = v_centre;
-      else if (_yAlign == -1)
-        yAlign = bottom;
-      mvwprintw(_win, yAlign, xAlign, fields[i].name().c_str());
+      mvwprintw(_win, _yAlign, _xAlign, subFields[i].name().c_str());
       wattroff(_win, A_REVERSE);
-      wrefresh(_win);
     }
+    // refresh before getch
+    wrefresh(_win);
     selection = wgetch(_win);
+
     switch (selection) {
     case KEY_LEFT:
-      page--;
+      _page--;
       highlighted = 0;
       if (page == -1) {
-        page = 0;
+        _page = 0;
       }
       fill(' ', _showTitle);
       break;
     case KEY_RIGHT:
-      page++;
+      _page++;
       highlighted = 0;
-      if (page == paginatedFields.size()) {
-        page--;
+      if (_page == _fields.size()) {
+        _page--;
       }
       fill(' ', _showTitle);
       break;
@@ -386,7 +361,7 @@ void Kmenu::display() {
       break;
     case KEY_DOWN:
       highlighted++;
-      if (highlighted == fields.size()) {
+      if (highlighted == subFields.size()) {
         highlighted--;
       }
       break;
@@ -398,7 +373,6 @@ void Kmenu::display() {
     }
   }
   _highlighted = highlighted + (_pagination * page);
-  wrefresh(_win);
 }
 
 /// MF ACTIVE PRIVATE
@@ -412,25 +386,19 @@ void Kmenu::_delWith(std::vector<WINDOW *> windows) {
 }
 
 /// MF RETROACTIVE PRIVATE
-std::vector<std::vector<Kfield>> Kmenu::_paginate(int const pages,
-                                                  int const residue) {
-  int max = _fields.size();
+std::vector<std::vector<Kfield>> Kmenu::_loadPage(int const page) {
+
   if (_fields.empty())
     throw std::runtime_error("Trying to paginate set of empty fields.");
-  bool inRange = 0 < _pagination && _pagination <= max;
-  _pagination = inRange ? _pagination : max;
-  std::vector<std::vector<Kfield>> paginatedFields;
-  for (int page = 0; page < pages; ++page) {
-    std::vector<Kfield> sub(_fields.begin() + (page * _pagination),
-                            _fields.begin() + ((page + 1) * _pagination));
-    paginatedFields.push_back(sub);
-  }
-  if (residue != 0) {
-    std::vector<Kfield> residualSub(_fields.begin() + (_pagination * pages),
-                                    _fields.end());
-    paginatedFields.push_back(residualSub);
-  }
-  return paginatedFields;
+  if (_pages.empty())
+    return _fields;
+  if (std::accumulate(_pages.begin(), _pages.end(), (int)0) == _fields.size())
+    throw std::runtime_error("pagination does not match size of fields.");
+
+  // extract subvector. TODO: O(N) for large data?? this may be expensive -
+  // maybe even pagination is better after all
+  int ignore =
+      std::accumulate(_pages.begin, _pages.begin() + _pages[page - 1], (int)0);
 }
 
 Kmenu::~Kmenu() {

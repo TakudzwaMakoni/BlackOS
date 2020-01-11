@@ -73,11 +73,6 @@ void Kgrid<dataType, rows, cols>::borderStyle(const int L, const int R,
 }
 
 template <typename dataType, size_t rows, size_t cols>
-WINDOW *Kgrid<dataType, rows, cols>::window() const {
-  return this->_win;
-};
-
-template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::label(const std::string &label) const {
   int labellocy = _size[0] - 1;
   int labellocx = _size[1] - (3 + (int)label.length());

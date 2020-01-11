@@ -19,8 +19,8 @@ class Kmenu : public Kwindow {
 public:
   Kmenu(std::string const &name, int const sizeY, int const sizeX,
         int const posY, int const posX);
+
   virtual void display() override;
-  virtual WINDOW *window() const override;
   virtual void borderStyle(int const ch = 0) override;
   virtual void borderStyle(int const L, int const R, int const T, int const B,
                            int const TL, int const TR, int const BL,
@@ -46,41 +46,38 @@ public:
   void setFieldAlign(int const x, int const y);
   void addFieldPadding();
   void setFieldStyle(std::string const &style);
-  void paginate(int const divisor);
-  std::vector<Kfield> fields() const;
-  std::vector<int> size() const;
-  Eigen::Vector2i position() const;
-  void showTitle(bool const show = true);
-  void setTitle(std::string const &title);
-  void setBorderStyle();
+  void paginate(std::vector<int> const &pages = {}});
+std::vector<Kfield> fields() const;
+std::vector<int> size() const;
+Eigen::Vector2i position() const;
+void showTitle(bool const show = true);
+void setTitle(std::string const &title);
 
-  std::string attributeString();
-  void fill(char ch, bool titleBar = false);
+void fill(char ch, bool titleBar = false);
 
-  ~Kmenu();
+~Kmenu();
 
 private:
-  WINDOW *_win = nullptr;
-  std::vector<WINDOW *> _subwins;
-  std::vector<int> _size;
-  std::vector<Kfield> _fields;
-  std::vector<std::string> _attributes;
-  int _xAlign = 0;
-  int _yAlign = 0;
-  std::string _fieldStyle;
-  Eigen::Vector2i _position;
-  std::string _name;
-  int _highlighted{-1};
-  int _pagination = 1;
-  bool _showTitle{false};
-  std::string _title;
-  std::vector<int> _borderStyle{0, 0, 0, 0, 0, 0, 0, 0}; // size = 8.
+WINDOW *_win = nullptr;
+std::vector<WINDOW *> _subwins;
+std::vector<int> _size;
+std::vector<Kfield> _fields;
+std::vector<int> _pages;
+int page = 0;
+int _xAlign = 0;
+int _yAlign = 0;
+std::string _fieldStyle;
+Eigen::Vector2i _position;
+std::string _name;
+int _highlighted{-1};
+bool _showTitle{false};
+std::string _title;
+std::vector<int> _borderStyle{0, 0, 0, 0, 0, 0, 0, 0}; // size = 8.
 
-  void _delWith(std::vector<WINDOW *> windows);
-  std::vector<std::vector<BlackOS::Display::Kfield>>
-  _paginate(int const pages, int const residue);
-};
-} // namespace Display
+void _delWith(std::vector<WINDOW *> windows);
+std::vector<std::vector<BlackOS::Display::Kfield>> _loadPage(int const page);
+}; // namespace Display
+} // namespace BlackOS
 } // namespace BlackOS
 
 #endif // BLACKOS_KMENU_H

@@ -17,7 +17,6 @@ typedef WINDOW *cwin;
 class Kwindow {
 public:
   virtual void display() = 0;
-  virtual WINDOW *window() const = 0;
   virtual void borderStyle(int const ch) = 0;
   virtual void borderStyle(int const L, int const R, int const T, int const B,
                            int const TL, int const TR, int const BL,
