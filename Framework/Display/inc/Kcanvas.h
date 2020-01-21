@@ -34,6 +34,7 @@ public:
                              bool const preserve_cursor_pos) const override;
   virtual void fill(char const ch, bool const titleBar = false) override;
   virtual void pause() const override;
+  virtual bool windowSet() const override;
 
   std::vector<size_t> size() const;
   std::vector<size_t> position() const;

@@ -182,6 +182,8 @@ int Kcanvas::getChrfromW(size_t const y, size_t const x,
 
 void Kcanvas::pause() const { wgetch(_win); }
 
+bool Kcanvas::windowSet() const { return _win != nullptr; }
+
 void Kcanvas::fill(char const ch, bool const titleBar) {
   size_t start = titleBar ? 2 : 1;
   int end = _size[0] - 2;

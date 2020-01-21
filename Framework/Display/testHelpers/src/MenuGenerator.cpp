@@ -55,12 +55,11 @@ Kmenu_sptr testMenuWithEightPaginatedFields(int pagination) {
 
   menu->setFields(test_fields);
   menu->setFieldStyle("!TEST!");
-  menu->setFieldAlign(0, 0);
+  menu->alignFields(0, 0);
   menu->borderStyle('!', '!', '!', '!', '!', '!', '!', '!');
   menu->addFieldPadding();
-  menu->setTitle("TEST_MENU with" + std::to_string(pagination) +
+  menu->addTitle("TEST_MENU with" + std::to_string(pagination) +
                  "fields per page.");
-  menu->showTitle();
   menu->paginate(pagination);
 
   return menu;

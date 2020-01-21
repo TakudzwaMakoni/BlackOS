@@ -387,6 +387,11 @@ void Kgrid<dataType, rows, cols>::pause() const {
 }
 
 template <typename dataType, size_t rows, size_t cols>
+bool Kgrid<dataType, rows, cols>::windowSet() const {
+  return _win != nullptr;
+}
+
+template <typename dataType, size_t rows, size_t cols>
 Kgrid<dataType, rows, cols>::~Kgrid() {
   delWith(_subwins);
   wclear(_win);

@@ -90,7 +90,7 @@ TEST_CASE("test window is unset on call setWin with empty parameters",
     auto const &menu = TestHelpers::testMenu();
     menu->setWin(world);
     menu->setWin();
-    return menu->window() == nullptr;
+    return !menu->windowSet();
   };
 
   initscr(); // initialise curses data
@@ -110,7 +110,7 @@ TEST_CASE("test menu is filled excluding title bar", "[window]") {
   // in curses mode.
   auto glambda = [](WINDOW *world) {
     auto const &menu = TestHelpers::testMenu();
-    menu->setTitle("test_menu_title");
+    menu->addTitle("test_menu_title");
     menu->setWin(world);
     menu->fill('w', true);
 
@@ -148,7 +148,7 @@ TEST_CASE("test menu is filled including title bar", "[window]") {
   // in curses mode.
   auto glambda = [](WINDOW *world) {
     auto const &menu = TestHelpers::testMenu();
-    menu->setTitle("test_menu_title");
+    menu->addTitle("test_menu_title");
     menu->setWin(world);
     menu->fill('w', false);
 

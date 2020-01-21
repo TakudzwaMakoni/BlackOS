@@ -39,6 +39,7 @@ public:
                       size_t const x) = 0;
   virtual void insert(char const *ch, size_t const y, size_t const x) = 0;
   virtual void pause() const = 0;
+  virtual bool windowSet() const = 0;
 };
 } // namespace Display
 } // namespace BlackOS

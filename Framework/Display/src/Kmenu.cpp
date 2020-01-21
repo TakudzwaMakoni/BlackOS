@@ -107,6 +107,8 @@ void Kmenu::borderStyle(int const L, int const R, int const T, int const B,
   wborder(_win, L, R, T, B, TL, TR, BL, BR);
 }
 
+bool Kmenu::windowSet() const { return _win != nullptr; }
+
 void Kmenu::_updateF() {
   if (_page == (_p - 1) && _pRem != 0)
     _f = _pRem;

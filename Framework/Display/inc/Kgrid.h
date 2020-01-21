@@ -43,6 +43,7 @@ public:
   getChrfromW(size_t const y, size_t const x,
               bool const preserve_cursor_pos = true) const override;
   virtual void fill(char const ch, bool const titleBar = false) override;
+  virtual bool windowSet() const override;
 
   Eigen::Matrix<dataType, rows, cols> matrix() const { return _matrix; }
   v void setPrecision(size_t const precision) { _precision = precision; }

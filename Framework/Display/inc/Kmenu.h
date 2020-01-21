@@ -44,6 +44,7 @@ public:
                       size_t const x) override;
   virtual void insert(char const *ch, size_t const y, size_t const x) override;
   virtual void pause() const override;
+  virtual bool windowSet() const override;
 
   virtual void setFields(std::vector<Kfield> const &fields);
   virtual Kfield selectedField() const;
