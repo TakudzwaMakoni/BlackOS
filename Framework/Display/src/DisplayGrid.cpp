@@ -47,10 +47,12 @@ int main(int argc, const char *argv[]) {
     grid.setTitle("Matrix Editor Program");
     grid.showTitle(true);
     grid.align(0, 0);
+
     grid.display();
+    grid.fill(' ', true);
+
     auto selectedElement = grid.selectedRaw();
-    WINDOW *grid_window = grid.window();
-    wclear(grid_window);
+
     mvwprintw(grid_window, Y_CENTRE, X_CENTRE,
               std::to_string(selectedElement).c_str());
     wgetch(grid_window);

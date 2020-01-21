@@ -16,24 +16,24 @@
 #include <string>
 
 namespace {
-std::vector<int> blocksFound(const int yValue, const int numOfBlocks,
-                             const std::vector<int> &elements) {
-  std::vector<int> iteratorList(numOfBlocks);
+std::vector<size_t> blocksFound(size_t const yValue, size_t const numOfBlocks,
+                                std::vector<size_t> const &elements) {
+  std::vector<size_t> iteratorList(numOfBlocks);
   std::iota(iteratorList.begin(), iteratorList.end(), 0);
-  std::vector<int> _linesUnclear;
-  for (const int block : iteratorList) {
-    int y1 = elements[0 + (block * 4)];
-    int y2 = elements[2 + (block * 4)];
+  std::vector<size_t> _linesUnclear;
+  for (size_t const block : iteratorList) {
+    size_t y1 = elements[0 + (block * 4)];
+    size_t y2 = elements[2 + (block * 4)];
     if (y1 <= yValue && yValue <= y2)
       _linesUnclear.push_back(block);
   }
   return _linesUnclear;
 }
-bool inBlocks(const int xValue, const std::vector<int> &blocks,
-              const std::vector<int> &elements) {
-  for (const int block : blocks) {
-    int x1 = elements[1 + (block * 4)];
-    int x2 = elements[3 + (block * 4)];
+bool inBlocks(size_t const xValue, std::vector<size_t> const &blocks,
+              std::vector<size_t> const &elements) {
+  for (size_t const block : blocks) {
+    size_t x1 = elements[1 + (block * 4)];
+    size_t x2 = elements[3 + (block * 4)];
     if (x1 <= xValue && xValue <= x2)
       return true;
   }
@@ -44,14 +44,15 @@ bool inBlocks(const int xValue, const std::vector<int> &blocks,
 namespace BlackOS {
 namespace Display {
 template <typename dataType, size_t rows, size_t cols>
-Kgrid<dataType, rows, cols>::Kgrid(std::string &name, int sizeY, int sizeX,
-                                   int posY, int posX) {
+Kgrid<dataType, rows, cols>::Kgrid(std::string const &name, size_t const sizeY,
+                                   size_t const sizeX, size_t const posY,
+                                   size_t const posX) {
   _name = name;
   _size = {sizeY, sizeX};
   _position = {posY, posX};
 }
 
-template <typename dataType, size_t rows, size_t cols>
+template <typename dataType, size_t const rows, size_t const cols>
 void Kgrid<dataType, rows, cols>::setWin(WINDOW *window) {
   _win = window;
   wresize(_win, _size[0], _size[1]);
@@ -60,30 +61,31 @@ void Kgrid<dataType, rows, cols>::setWin(WINDOW *window) {
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::borderStyle(const int ch) {
-  _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
+void Kgrid<dataType, rows, cols>::borderStyle(size_t const ch) {
+  wborder(_win, ch, ch, ch, ch, ch, ch, ch, ch);
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::borderStyle(const int L, const int R,
-                                              const int T, const int B,
-                                              const int TL, const int TR,
-                                              const int BL, const int BR) {
-  _borderStyle = {L, R, T, B, TL, TR, BL, BR};
+void Kgrid<dataType, rows, cols>::borderStyle(size_t const L, size_t const R,
+                                              size_t const T, size_t const B,
+                                              size_t const TL, size_t const TR,
+                                              size_t const BL,
+                                              size_t const BR) {
+  wborder(_win, L, R, T, B, TL, TR, BL, BR);
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::label(const std::string &label) const {
-  int labellocy = _size[0] - 1;
-  int labellocx = _size[1] - (3 + (int)label.length());
+void Kgrid<dataType, rows, cols>::label(std::string const &label) const {
+  size_t labellocy = _size[0] - 1;
+  size_t labellocx = _size[1] - (3 + (size_t)label.length());
   mvwaddstr(_win, labellocy, labellocx, label.c_str());
 }
 
 template <typename dataType, size_t rows, size_t cols>
-std::vector<int> Kgrid<dataType, rows, cols>::maxSize() const {
-  int yMax, xMax;
+std::vector<size_t> Kgrid<dataType, rows, cols>::maxSize() const {
+  size_t yMax, xMax;
   getmaxyx(_win, yMax, xMax);
-  std::vector<int> size{yMax, xMax};
+  std::vector<size_t> size{yMax, xMax};
   return size;
 }
 
@@ -108,13 +110,13 @@ std::vector<size_t> Kgrid<dataType, rows, cols>::selectedIndices() const {
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::setTitle(std::string title) {
+void Kgrid<dataType, rows, cols>::setTitle(std::string const &title) {
   _title = title;
 }
 
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::write(
-    Eigen::Matrix<dataType, rows, cols> &data) {
+    Eigen::Matrix<dataType, rows, cols> const &data) {
   _matrix = data;
 }
 
@@ -123,59 +125,61 @@ void Kgrid<dataType, rows, cols>::refresh() {
   wrefresh(_win);
 }
 template <typename dataType, size_t rows, size_t cols>
-int Kgrid<dataType, rows, cols>::getChrfromW(
-    int const y, int const x, bool const preserve_cursor_pos) const {
-  int curr_y, curr_x;
+size_t
+Kgrid<dataType, rows, cols>::getChrfromW(size_t const y, size_t const x,
+                                         bool const preserve_cursor_pos) const {
+  size_t curr_y, curr_x;
   getyx(_win, curr_y, curr_x);
-  int wch = mvwinch(_win, y, x);
+  size_t wch = mvwinch(_win, y, x);
   if (preserve_cursor_pos)
     wmove(_win, curr_y, curr_x);
   return wch;
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::write(std::vector<dataType> &data) {
+void Kgrid<dataType, rows, cols>::write(std::vector<dataType> const &data) {
   if (data.size() != rows * cols) {
     std::string message = "expected vector size: " + std::to_string(rows) +
                           " x " + std::to_string(cols);
     throw std::invalid_argument(message);
   }
-  for (int i = 0; i < rows; ++i) {
-    for (int j = 0; j < cols; ++j) {
+  for (size_t i = 0; i < rows; ++i) {
+    for (size_t j = 0; j < cols; ++j) {
       _matrix(i, j) = data[(i * rows) + j];
     }
   }
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::kErase(const int y1, const int x1,
-                                         const int y2, const int x2) {
-  int a, b, c, d;
-  int borderY = _size[0];
-  int borderX = _size[1];
+void Kgrid<dataType, rows, cols>::kErase(size_t const y1, size_t const x1,
+                                         size_t const y2, size_t const x2) {
+  size_t a, b, c, d;
+  size_t borderY = _size[0];
+  size_t borderX = _size[1];
   a = y1 == 0 ? 1 : y1;
   b = x1 == 0 ? 1 : x1;
   c = y2 == borderY ? y2 - 1 : y2;
   d = x2 == borderX ? x2 - 1 : x2;
-  int width = d - b + 1;
+  size_t width = d - b + 1;
   std::string fill(width, ' ');
-  for (int i = a; i <= c; ++i) {
+  for (size_t i = a; i <= c; ++i) {
     mvwprintw(_win, i, b, fill.c_str());
   }
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::kEraseExcept(const int y1, const int x1,
-                                               const int y2, const int x2) {
-  int borderY = _size[0] - 2;
-  int borderX = _size[1] - 2;
+void Kgrid<dataType, rows, cols>::kEraseExcept(size_t const y1, size_t const x1,
+                                               size_t const y2,
+                                               size_t const x2) {
+  size_t borderY = _size[0] - 2;
+  size_t borderX = _size[1] - 2;
   std::string fill(borderX, ' ');
   std::string space = " ";
-  for (int i = 1; i <= borderY; ++i) {
+  for (size_t i = 1; i <= borderY; ++i) {
     if (i < y1 || i > y2) {
       mvwprintw(_win, i, 1, fill.c_str());
     } else {
-      for (int j = 1; j <= borderX; ++j) {
+      for (size_t j = 1; j <= borderX; ++j) {
         if ((j > x2 || j < x1)) {
           mvwprintw(_win, i, j, space.c_str());
         }
@@ -185,10 +189,21 @@ void Kgrid<dataType, rows, cols>::kEraseExcept(const int y1, const int x1,
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::kErase(const std::vector<int> &elements) {
-  int numOfAreas = elements.size() / 4; /*two coordinates per block*/
-  for (int areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
-    int y1, x1, y2, x2;
+void Kgrid<dataType, rows, cols>::fill(char const ch, bool const titleBar) {
+  size_t start = titleBar ? 2 : 1;
+  size_t end = _size[0] - 2;
+
+  std::string fillString(_size[1] - 2, ch);
+  for (size_t i = start; i <= end; ++i) {
+    mvwprintw(_win, i, 1, fillString.c_str());
+  }
+}
+
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::kErase(std::vector<size_t> const &elements) {
+  size_t numOfAreas = elements.size() / 4; /*two coordinates per block*/
+  for (size_t areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
+    size_t y1, x1, y2, x2;
     y1 = elements[0 + (areaIdx * 4)];
     x1 = elements[1 + (areaIdx * 4)];
     y2 = elements[2 + (areaIdx * 4)];
@@ -199,20 +214,20 @@ void Kgrid<dataType, rows, cols>::kErase(const std::vector<int> &elements) {
 
 template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::kEraseExcept(
-    const std::vector<int> &elements) {
-  int numOfBlocks = elements.size() / 4; /*two coordinates per block*/
-  int borderY = _size[0];
-  int borderX = _size[1];
-  int width = borderX - 2;
-  int height = borderY - 2;
+    std::vector<size_t> const &elements) {
+  size_t numOfBlocks = elements.size() / 4; /*two coordinates per block*/
+  size_t borderY = _size[0];
+  size_t borderX = _size[1];
+  size_t width = borderX - 2;
+  size_t height = borderY - 2;
   std::string fill(width, ' ');
   std::string space = " ";
-  for (int i = 1; i <= height; ++i) {
-    std::vector<int> blocks = blocksFound(i, numOfBlocks, elements);
+  for (size_t i = 1; i <= height; ++i) {
+    std::vector<size_t> blocks = blocksFound(i, numOfBlocks, elements);
     if (blocks.empty()) {
       mvwprintw(_win, i, 1, fill.c_str());
     } else {
-      for (int j = 1; j <= width; ++j) {
+      for (size_t j = 1; j <= width; ++j) {
         bool _inBlocks = inBlocks(j, blocks, elements);
         if (!_inBlocks) {
           mvwprintw(_win, i, j, space.c_str());
@@ -223,43 +238,29 @@ void Kgrid<dataType, rows, cols>::kEraseExcept(
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::setBorderStyle() {
-  int L, R, T, B, TL, TR, BL, BR;
-  L = _borderStyle[0];
-  R = _borderStyle[1];
-  T = _borderStyle[2];
-  B = _borderStyle[3];
-  TL = _borderStyle[4];
-  TR = _borderStyle[5];
-  BL = _borderStyle[6];
-  BR = _borderStyle[7];
-  wborder(_win, L, R, T, B, TL, TR, BL, BR);
-}
-
-template <typename dataType, size_t rows, size_t cols>
 void Kgrid<dataType, rows, cols>::display() {
   keypad(_win, true);
-  int selection;
+  size_t selection;
   size_t highlightedRow = 0;
   size_t highlightedCol = 0;
-  int topPad = 1;
+  size_t topPad = 1;
   setBorderStyle();
   if (_showTitle) {
     _attributes = {"RAD", "PREC: " + std::to_string(_precision)};
     wattron(_win, A_REVERSE);
     std::string tPadding(_size[1], ' ');
-    int correction = _size[1] - _title.length() - 3;
+    size_t correction = _size[1] - _title.length() - 3;
     std::string titleString = attributeString();
-    int titleStrLength = titleString.size();
+    size_t titleStrLength = titleString.size();
     tPadding.replace(0, titleStrLength, titleString);
     tPadding.replace(correction, _size[1], _title + " ");
     mvwprintw(_win, _position[0], _position[1], tPadding.c_str());
     wattroff(_win, A_REVERSE);
   }
-  int displayPrecision = 5;
+  size_t displayPrecision = 5;
   while (true) {
-    for (int i = 0; i < rows; ++i) {
-      for (int j = 0; j < cols; ++j) {
+    for (size_t i = 0; i < rows; ++i) {
+      for (size_t j = 0; j < cols; ++j) {
         if (j == highlightedCol && i == highlightedRow) {
           wattron(_win, A_REVERSE);
         }
@@ -267,12 +268,12 @@ void Kgrid<dataType, rows, cols>::display() {
         std::stringstream elementStream;
         elementStream << std::setprecision(_precision) << element;
         const std::string elementStr = elementStream.str();
-        const int elementStrSize = elementStr.size();
+        size_t const elementStrSize = elementStr.size();
         std::string elementDisplay(_size[1] / 2, ' ');
         elementDisplay.replace(0, elementStrSize, elementStr);
         std::stringstream numStream;
         std::string str(8, ' ');
-        int strSize = str.size();
+        size_t strSize = str.size();
         if (_matrix.coeff(i, j) > 99.99) {
           numStream << std::scientific << std::setprecision(2)
                     << _matrix.coeff(i, j);
@@ -281,24 +282,24 @@ void Kgrid<dataType, rows, cols>::display() {
                     << _matrix.coeff(i, j);
         }
         std::string numStr = numStream.str();
-        int numStrSize = numStr.size();
-        int correction = strSize - numStrSize;
+        size_t numStrSize = numStr.size();
+        size_t correction = strSize - numStrSize;
         str.replace(correction, numStrSize, numStr);
         int yAlign = 0;
         int xAlign = 0;
-        int left, right, top, bottom, v_centre, h_centre;
+        size_t left, right, top, bottom, v_centre, h_centre;
         left = 2;
-        int hPadding{4};
+        size_t hPadding{4};
         if (_setGrid) {
           hPadding = 6;
           str = "|" + str + "|";
         }
-        int gridWidth = (cols * 8) + (cols - 2);
-        int gridHeight = rows * _vPadding; // avoid collision with status bar
-        int bottomPad = -gridHeight + i;
-        int rightPad = gridWidth - 1;
-        int hCentrePad = gridWidth;
-        int vCentrPad = gridHeight;
+        size_t gridWidth = (cols * 8) + (cols - 2);
+        size_t gridHeight = rows * _vPadding; // avoid collision with status bar
+        size_t bottomPad = -gridHeight + i;
+        size_t rightPad = gridWidth - 1;
+        size_t hCentrePad = gridWidth;
+        size_t vCentrPad = gridHeight;
         right = _size[1];
         v_centre = i + (_size[0] / 2) - vCentrPad;
         h_centre = (_size[1] - hCentrePad) / 2;
@@ -378,6 +379,11 @@ void Kgrid<dataType, rows, cols>::delWith(std::vector<WINDOW *> windows) {
          it != windows.end(); ++it) {
       delwin(*it);
     }
+}
+
+template <typename dataType, size_t rows, size_t cols>
+void Kgrid<dataType, rows, cols>::pause() const {
+  wgetch(_win);
 }
 
 template <typename dataType, size_t rows, size_t cols>

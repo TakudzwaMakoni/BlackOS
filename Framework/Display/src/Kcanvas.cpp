@@ -10,25 +10,25 @@
 #include <vector>
 
 namespace {
-const int PADDING = 1;
-std::vector<int> blocksFound(const int yValue, const int numOfBlocks,
-                             const std::vector<int> &elements) {
-  std::vector<int> iteratorList(numOfBlocks);
+
+std::vector<size_t> blocksFound(const size_t yValue, const size_t numOfBlocks,
+                                const std::vector<size_t> &elements) {
+  std::vector<size_t> iteratorList(numOfBlocks);
   std::iota(iteratorList.begin(), iteratorList.end(), 0);
-  std::vector<int> _linesUnclear;
-  for (const int block : iteratorList) {
-    int y1 = elements[0 + (block * 4)];
-    int y2 = elements[2 + (block * 4)];
+  std::vector<size_t> _linesUnclear;
+  for (const size_t block : iteratorList) {
+    size_t y1 = elements[0 + (block * 4)];
+    size_t y2 = elements[2 + (block * 4)];
     if (y1 <= yValue && yValue <= y2)
       _linesUnclear.push_back(block);
   }
   return _linesUnclear;
 }
-bool inBlocks(const int xValue, const std::vector<int> &blocks,
-              const std::vector<int> &elements) {
-  for (const int block : blocks) {
-    int x1 = elements[1 + (block * 4)];
-    int x2 = elements[3 + (block * 4)];
+bool inBlocks(const size_t xValue, const std::vector<size_t> &blocks,
+              const std::vector<size_t> &elements) {
+  for (const size_t block : blocks) {
+    size_t x1 = elements[1 + (block * 4)];
+    size_t x2 = elements[3 + (block * 4)];
     if (x1 <= xValue && xValue <= x2)
       return true;
   }
@@ -38,19 +38,20 @@ bool inBlocks(const int xValue, const std::vector<int> &blocks,
 
 namespace BlackOS {
 namespace Display {
-Kcanvas::Kcanvas(std::string &name, int sizeY, int sizeX, int posY, int posX) {
+Kcanvas::Kcanvas(std::string &name, size_t sizeY, size_t sizeX, size_t posY,
+                 size_t posX) {
   _size = {sizeY, sizeX};
   _position = {posY, posX};
 }
-void Kcanvas::borderStyle(const int ch) {
+void Kcanvas::borderStyle(int const ch) {
   _borderStyle = {ch, ch, ch, ch, ch, ch, ch, ch};
 }
-void Kcanvas::borderStyle(const int L, const int R, const int T, const int B,
-                          const int TL, const int TR, const int BL,
-                          const int BR) {
+void Kcanvas::borderStyle(int const L, int const R, int const T, int const B,
+                          int const TL, int const TR, int const BL,
+                          int const BR) {
   _borderStyle = {L, R, T, B, TL, TR, BL, BR};
 }
-void Kcanvas::label(const std::string &label) const {
+void Kcanvas::label(std::string const &label) const {
   int labellocy = _size[0] - 1;
   int labellocx = _size[1] - (3 + (int)label.length());
   mvwaddstr(_win, labellocy, labellocx, label.c_str());
@@ -69,34 +70,35 @@ void Kcanvas::setWin(WINDOW *window) {
   mvwin(_win, _position[0], _position[1]);
   wrefresh(_win);
 }
-void Kcanvas::kErase(const int y1, const int x1, const int y2, const int x2) {
-  int borderY = _size[0];
-  int borderX = _size[1];
-  int _y1 = y1 <= 0 ? 1 : y1;
-  int _x1 = x1 <= 0 ? 1 : x1;
-  int _y2 = y2 >= borderY ? borderY - 1 : y2;
-  int _x2 = x2 >= borderX ? borderX - 1 : x2;
-  int width = _x2 - _x1;
+void Kcanvas::kErase(size_t const y1, size_t const x1, size_t const y2,
+                     size_t const x2) {
+  size_t borderY = _size[0];
+  size_t borderX = _size[1];
+  size_t _y1 = y1 <= 0 ? 1 : y1;
+  size_t _x1 = x1 <= 0 ? 1 : x1;
+  size_t _y2 = y2 >= borderY ? borderY - 1 : y2;
+  size_t _x2 = x2 >= borderX ? borderX - 1 : x2;
+  size_t width = _x2 - _x1;
   std::string fill(width, ' ');
-  for (int i = _y1; i <= _y2; ++i) {
+  for (size_t i = _y1; i <= _y2; ++i) {
     mvwprintw(_win, i, _x1, fill.c_str());
   }
 }
-void Kcanvas::kEraseExcept(const int y1, const int x1, const int y2,
-                           const int x2) {
-  int borderY = _size[0];
-  int borderX = _size[1];
-  int width = borderX - 2;
-  int height = borderY - 2;
-  int _y1 = y1 <= 0 ? 1 : y1;
-  int _x1 = x1 <= 0 ? 1 : x1;
-  int _y2 = y2 >= borderY ? borderY - 1 : y2;
-  int _x2 = x2 >= borderX ? borderX - 1 : x2;
+void Kcanvas::kEraseExcept(size_t const y1, size_t const x1, size_t const y2,
+                           size_t const x2) {
+  size_t borderY = _size[0];
+  size_t borderX = _size[1];
+  size_t width = borderX - 2;
+  size_t height = borderY - 2;
+  size_t _y1 = y1 <= 0 ? 1 : y1;
+  size_t _x1 = x1 <= 0 ? 1 : x1;
+  size_t _y2 = y2 >= borderY ? borderY - 1 : y2;
+  size_t _x2 = x2 >= borderX ? borderX - 1 : x2;
   std::string fill(width, ' ');
   std::string space = " ";
-  for (int i = 1; i <= height; ++i) {
+  for (size_t i = 1; i <= height; ++i) {
     if (i <= _y2 && i >= _y1) {
-      for (int j = 1; j <= width; ++j) {
+      for (size_t j = 1; j <= width; ++j) {
         if (!(j <= _x2 && j >= _x1)) {
           mvwprintw(_win, i, j, space.c_str());
         }
@@ -106,38 +108,38 @@ void Kcanvas::kEraseExcept(const int y1, const int x1, const int y2,
     }
   }
 }
-void Kcanvas::kErase(const std::vector<int> &elements) {
-  int numOfAreas = elements.size() / 4; /*two coordinates per block*/
-  for (int areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
-    int borderY = _size[0];
-    int borderX = _size[1];
-    int width = borderX - 2;
-    int height = borderY - 2;
-    int y1 = elements[0 + (areaIdx * 4)];
-    int x1 = elements[1 + (areaIdx * 4)];
-    int y2 = elements[2 + (areaIdx * 4)];
-    int x2 = elements[3 + (areaIdx * 4)];
-    int _y1 = y1 <= 0 ? 1 : y1;
-    int _x1 = x1 <= 0 ? 1 : x1;
-    int _y2 = y2 >= borderY ? borderY - 1 : y2;
-    int _x2 = x2 >= borderX ? borderX - 1 : x2;
+void Kcanvas::kErase(std::vector<int> const &elements) {
+  size_t numOfAreas = elements.size() / 4; /*two coordinates per block*/
+  for (size_t areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
+    size_t borderY = _size[0];
+    size_t borderX = _size[1];
+    size_t width = borderX - 2;
+    size_t height = borderY - 2;
+    size_t y1 = elements[0 + (areaIdx * 4)];
+    size_t x1 = elements[1 + (areaIdx * 4)];
+    size_t y2 = elements[2 + (areaIdx * 4)];
+    size_t x2 = elements[3 + (areaIdx * 4)];
+    size_t _y1 = y1 <= 0 ? 1 : y1;
+    size_t _x1 = x1 <= 0 ? 1 : x1;
+    size_t _y2 = y2 >= borderY ? borderY - 1 : y2;
+    size_t _x2 = x2 >= borderX ? borderX - 1 : x2;
     kErase(_y1, _x1, _y2, _x2);
   }
 }
-void Kcanvas::kEraseExcept(const std::vector<int> &elements) {
-  int numOfBlocks = elements.size() / 4; /*two coordinates per block*/
-  int borderY = _size[0];
-  int borderX = _size[1];
-  int width = borderX - 2;
-  int height = borderY - 2;
+void Kcanvas::kEraseExcept(const std::vector<size_t> &elements) {
+  size_t numOfBlocks = elements.size() / 4; /*two coordinates per block*/
+  size_t borderY = _size[0];
+  size_t borderX = _size[1];
+  size_t width = borderX - 2;
+  size_t height = borderY - 2;
   std::string fill(width, ' ');
   std::string space = " ";
-  for (int i = 1; i <= height; ++i) {
-    std::vector<int> blocks = blocksFound(i, numOfBlocks, elements);
+  for (size_t i = 1; i <= height; ++i) {
+    std::vector<size_t> blocks = blocksFound(i, numOfBlocks, elements);
     if (blocks.empty()) {
       mvwprintw(_win, i, 1, fill.c_str());
     } else {
-      for (int j = 1; j <= width; ++j) {
+      for (size_t j = 1; j <= width; ++j) {
         bool _inBlocks = inBlocks(j, blocks, elements);
         if (!_inBlocks) {
           mvwprintw(_win, i, j, space.c_str());
@@ -147,8 +149,8 @@ void Kcanvas::kEraseExcept(const std::vector<int> &elements) {
   }
 }
 void Kcanvas::refresh() { wrefresh(_win); }
-std::vector<int> Kcanvas::size() const { return _size; }
-Eigen::Vector2i Kcanvas::position() const { return _position; }
+std::vector<size_t> Kcanvas::size() const { return _size; }
+std::vector<size_t> Kcanvas::position() const { return _position; }
 void Kcanvas::showTitle(bool show) { _showTitle = show; }
 void Kcanvas::setTitle(std::string title) { _title = title; }
 std::string Kcanvas::attributeString() {
@@ -168,30 +170,20 @@ void Kcanvas::delWith(std::vector<WINDOW *> windows) {
 }
 
 /// MF
-int Kcanvas::getChrfromW(int const y, int const x,
-                         bool preserve_cursor_pos) const {
-  int curr_y, curr_x;
+int Kcanvas::getChrfromW(size_t const y, size_t const x,
+                         bool const preserve_cursor_pos) const {
+  size_t curr_y, curr_x;
   getyx(_win, curr_y, curr_x);
-  int wch = mvwinch(_win, y, x);
+  int ch = mvwinch(_win, y, x);
   if (preserve_cursor_pos)
     wmove(_win, curr_y, curr_x);
-  return wch;
+  return ch;
 }
 
-void Kcanvas::_setBorderStyle() {
-  int L, R, T, B, TL, TR, BL, BR;
-  L = _borderStyle[0];
-  R = _borderStyle[1];
-  T = _borderStyle[2];
-  B = _borderStyle[3];
-  TL = _borderStyle[4];
-  TR = _borderStyle[5];
-  BL = _borderStyle[6];
-  BR = _borderStyle[7];
-  wborder(_win, L, R, T, B, TL, TR, BL, BR);
-}
-void Kcanvas::fill(char ch, bool titleBar) {
-  int start = titleBar ? 2 : 1;
+void Kcanvas::pause() const { wgetch(_win); }
+
+void Kcanvas::fill(char const ch, bool const titleBar) {
+  size_t start = titleBar ? 2 : 1;
   int end = _size[0] - 2;
 
   std::string fillString(_size[1] - 2, ch);

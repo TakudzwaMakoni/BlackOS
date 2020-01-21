@@ -62,31 +62,28 @@ int main(int argc, const char *argv[]) {
   main_menu.setWin(world); // must set the window!
 
   int pagination = 3;
+  main_menu.alignFields(0, 0);
 
-  main_menu.setFieldAlign(0, 0);
-  main_menu.borderStyle('#', '#', '#', '#', '#', '#', '#', '#');
-  main_menu.paginate(pagination);
+  main_menu.borderStyle(' ', ' ', '=', '=', '-', '-', '-', '-');
+  main_menu.addTitle("TEST_MENU with " + std::to_string(pagination) +
+                     " fields per page.");
+  main_menu.setFieldStyle("!"); // must do this before padding
+  main_menu.addFieldPadding();  // must do this before displaying
+
   main_menu.setFields(test_fields);
-  main_menu.setTitle("TEST_MENU with" + std::to_string(pagination) +
-                     "fields per page.");
-  main_menu.showTitle();
-  main_menu.setFieldStyle("!TEST!"); // must do this before padding
-  main_menu.addFieldPadding();       // must do this before displaying
+  main_menu.paginate(pagination);
+  main_menu.display();
+  auto message = main_menu.selectedField().message();
+  auto winSz = main_menu.size();
 
-  while (true) {
-    main_menu.display();
+  size_t centreY = winSz[0] / 2;
+  size_t centreX = (winSz[1] - message.length()) / 2;
 
-    auto selectedField = main_menu.getSelectedField();
-    WINDOW *main_win = main_menu.window();
-    std::string msg = selectedField.message();
-    int msgLen = msg.length();
-    wclear(main_win);
-    mvwprintw(main_win, Y_CENTRE / 2, X_CENTRE / 2 - msgLen,
-              selectedField.message().c_str());
-    auto script = selectedField.script();
-    script();
-    wgetch(main_win);
-  } // while true
+  main_menu.fill(' ', true);
+  main_menu.insert(message, centreY, centreX);
+  main_menu.refresh();
+  main_menu.pause();
+
   delwin(world);
   endwin();
   return 0;

@@ -19,9 +19,9 @@ public:
   std::string name() const;
   directive script() const;
   std::string message() const;
-  void setName(const std::string &name);
+  void setName(std::string const &name);
 
-  //  ~Kfield();
+  //~Kfield();
 
 private:
   std::string _name;

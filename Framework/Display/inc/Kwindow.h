@@ -13,7 +13,6 @@
 
 namespace BlackOS {
 namespace Display {
-typedef WINDOW *cwin;
 class Kwindow {
 public:
   virtual void display() = 0;
@@ -22,19 +21,24 @@ public:
                            int const TL, int const TR, int const BL,
                            int const BR) = 0;
   virtual void label(std::string const &label) const = 0;
-  virtual std::vector<int> maxSize() const = 0;
+  virtual std::vector<size_t> maxSize() const = 0;
   virtual std::string winType() const = 0;
   virtual std::string name() const = 0;
   virtual void setWin(WINDOW *window) = 0;
-  virtual void kErase(int const y1, int const x1, int const y2,
-                      int const x2) = 0;
-  virtual void kEraseExcept(int const y1, int const x1, int const y2,
-                            int const x2) = 0;
-  virtual void kErase(std::vector<int> const &elements) = 0;
-  virtual void kEraseExcept(std::vector<int> const &elements) = 0;
+  virtual void kErase(size_t const y1, size_t const x1, size_t const y2,
+                      size_t const x2) = 0;
+  virtual void kEraseExcept(size_t const y1, size_t const x1, size_t const y2,
+                            size_t const x2) = 0;
+  virtual void kErase(std::vector<size_t> const &elements) = 0;
+  virtual void kEraseExcept(std::vector<size_t> const &elements) = 0;
   virtual void refresh() = 0;
-  virtual int getChrfromW(int const y, int const x,
+  virtual int getChrfromW(size_t const y, size_t const x,
                           bool const preserve_cursor_pos) const = 0;
+  virtual void fill(char ch, bool titleBar = false) = 0;
+  virtual void insert(std::string const &str, size_t const y,
+                      size_t const x) = 0;
+  virtual void insert(char const *ch, size_t const y, size_t const x) = 0;
+  virtual void pause() const = 0;
 };
 } // namespace Display
 } // namespace BlackOS
