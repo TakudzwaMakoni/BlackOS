@@ -64,7 +64,7 @@ int main(int argc, const char *argv[]) {
   int pagination = 3;
   main_menu.alignFields(0, 0);
 
-  main_menu.borderStyle(' ', ' ', '=', '=', '-', '-', '-', '-');
+  main_menu.borderStyle('o', 'o', 'o', 'o', 'o', 'o', 'o', 'o');
   main_menu.addTitle("TEST_MENU with " + std::to_string(pagination) +
                      " fields per page.");
   main_menu.setFieldStyle("!"); // must do this before padding
@@ -72,6 +72,7 @@ int main(int argc, const char *argv[]) {
 
   main_menu.setFields(test_fields);
   main_menu.paginate(pagination);
+
   main_menu.display();
   auto message = main_menu.selectedField().message();
   auto winSz = main_menu.size();

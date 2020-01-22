@@ -70,8 +70,8 @@ void Kcanvas::setWin(WINDOW *window) {
   mvwin(_win, _position[0], _position[1]);
   wrefresh(_win);
 }
-void Kcanvas::kErase(size_t const y1, size_t const x1, size_t const y2,
-                     size_t const x2) {
+void Kcanvas::erase(size_t const y1, size_t const x1, size_t const y2,
+                    size_t const x2) {
   size_t borderY = _size[0];
   size_t borderX = _size[1];
   size_t _y1 = y1 <= 0 ? 1 : y1;
@@ -84,8 +84,8 @@ void Kcanvas::kErase(size_t const y1, size_t const x1, size_t const y2,
     mvwprintw(_win, i, _x1, fill.c_str());
   }
 }
-void Kcanvas::kEraseExcept(size_t const y1, size_t const x1, size_t const y2,
-                           size_t const x2) {
+void Kcanvas::eraseExcept(size_t const y1, size_t const x1, size_t const y2,
+                          size_t const x2) {
   size_t borderY = _size[0];
   size_t borderX = _size[1];
   size_t width = borderX - 2;
@@ -108,7 +108,7 @@ void Kcanvas::kEraseExcept(size_t const y1, size_t const x1, size_t const y2,
     }
   }
 }
-void Kcanvas::kErase(std::vector<int> const &elements) {
+void Kcanvas::erase(std::vector<int> const &elements) {
   size_t numOfAreas = elements.size() / 4; /*two coordinates per block*/
   for (size_t areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
     size_t borderY = _size[0];
@@ -123,10 +123,10 @@ void Kcanvas::kErase(std::vector<int> const &elements) {
     size_t _x1 = x1 <= 0 ? 1 : x1;
     size_t _y2 = y2 >= borderY ? borderY - 1 : y2;
     size_t _x2 = x2 >= borderX ? borderX - 1 : x2;
-    kErase(_y1, _x1, _y2, _x2);
+    erase(_y1, _x1, _y2, _x2);
   }
 }
-void Kcanvas::kEraseExcept(const std::vector<size_t> &elements) {
+void Kcanvas::eraseExcept(const std::vector<size_t> &elements) {
   size_t numOfBlocks = elements.size() / 4; /*two coordinates per block*/
   size_t borderY = _size[0];
   size_t borderX = _size[1];

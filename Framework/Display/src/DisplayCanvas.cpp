@@ -38,7 +38,7 @@ int main(int argc, const char *argv[]) {
 
   for (int i = 1; i < WORLD_HEIGHT - 1; i++) {
     for (int j = 1; j < WORLD_WIDTH - 1; j++) {
-      canvas.kErase(i, j, i, j + 1);
+      canvas.erase(i, j, i, j + 1);
       usleep(9000);
       canvas.refresh();
     }

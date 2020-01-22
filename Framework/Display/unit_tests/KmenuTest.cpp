@@ -115,8 +115,8 @@ TEST_CASE("test menu is filled excluding title bar", "[window]") {
     menu->fill('w', true);
 
     bool filled = true;
-    for (int i = 2; i <= 8; ++i) {
-      for (int j = 1; j <= 8; ++j) {
+    for (int i = 2; i < WORLD_HEIGHT - 1 /*window coord correction*/; ++i) {
+      for (int j = 1; j < WORLD_WIDTH - 1 /*window coord correction*/; ++j) {
         auto character = menu->getChrfromW(i, j, false);
         int ch = (int)'w';
         if (!(character == ch))
@@ -124,7 +124,7 @@ TEST_CASE("test menu is filled excluding title bar", "[window]") {
       }
     }
     bool titleBar_preserved = true;
-    for (int j = 1; j <= 8; ++j) {
+    for (int j = 1; j < WORLD_WIDTH - 1 /*window coord correction*/; ++j) {
       if (menu->getChrfromW(1, j, false) == 'w')
         titleBar_preserved = false;
     }
@@ -153,8 +153,8 @@ TEST_CASE("test menu is filled including title bar", "[window]") {
     menu->fill('w', false);
 
     bool filled = true;
-    for (int i = 1; i <= 8; ++i) {
-      for (int j = 1; j <= 8; ++j) {
+    for (int i = 1; i < WORLD_HEIGHT - 1 /*window coord correction*/; ++i) {
+      for (int j = 1; j < WORLD_WIDTH - 1 /*window coord correction*/; ++j) {
         auto character = menu->getChrfromW(i, j, false);
         int ch = (int)'w';
         if (!(character == ch))
@@ -175,13 +175,25 @@ TEST_CASE("test menu is filled including title bar", "[window]") {
 
   REQUIRE(fill_successful);
 }
-/*
-TEST_CASE("test kErase", "[member_functions]") {
+
+TEST_CASE("test erase call erases horizontal block", "[member_functions]") {
+
+  // horizontal block
   auto glambda = [](WINDOW *world) {
     auto const &menu = TestHelpers::testMenu();
-    menu->setTitle("test_menu_title");
+    menu->addTitle("test_menu_title");
     menu->setWin(world);
+    menu->fill('w', false);
+    // erase from y = 0  and x = (3,5)
+    menu->erase(0, 3, 0, 5);
+
+    bool isBlank1 = menu->getChrfromW(0, 3) == (int)' ';
+    bool isBlank2 = menu->getChrfromW(0, 4) == (int)' ';
+    bool isBlank3 = menu->getChrfromW(0, 5) == (int)' ';
+
+    return isBlank1 && isBlank2 && isBlank3;
   };
+
   initscr();
   cbreak();
   WINDOW *world = newwin(0, 0, 0, 0);
@@ -190,7 +202,69 @@ TEST_CASE("test kErase", "[member_functions]") {
   endwin();
   REQUIRE(exit_success);
 }
-*/
+
+TEST_CASE("test erase call erases vertical block", "[member_functions]") {
+
+  // vertical block
+  auto glambda = [](WINDOW *world) {
+    auto const &menu = TestHelpers::testMenu();
+    menu->addTitle("test_menu_title");
+    menu->setWin(world);
+    menu->fill('w', false);
+
+    // erase from y = (3,5) and x = 0
+    menu->erase(3, 0, 5, 0);
+
+    bool isBlank1 = menu->getChrfromW(3, 0) == (int)' ';
+    bool isBlank2 = menu->getChrfromW(4, 0) == (int)' ';
+    bool isBlank3 = menu->getChrfromW(5, 0) == (int)' ';
+
+    return isBlank1 && isBlank2 && isBlank3;
+  };
+
+  initscr();
+  cbreak();
+  WINDOW *world = newwin(0, 0, 0, 0);
+  bool exit_success = glambda(world);
+  delwin(world);
+  endwin();
+  REQUIRE(exit_success);
+}
+
+TEST_CASE("test erase call erases square block", "[member_functions]") {
+
+  // square block
+  auto glambda = [](WINDOW *world) {
+    auto const &menu = TestHelpers::testMenu();
+    menu->addTitle("test_menu_title");
+    menu->setWin(world);
+    menu->fill('w', false);
+    // erase from y = (0,2) and x = (0,2) i.e 3x3 block
+    menu->erase(0, 0, 2, 2);
+
+    bool isBlank1 = menu->getChrfromW(0, 0) == (int)' ';
+    bool isBlank2 = menu->getChrfromW(0, 1) == (int)' ';
+    bool isBlank3 = menu->getChrfromW(0, 2) == (int)' ';
+    bool isBlank4 = menu->getChrfromW(1, 0) == (int)' ';
+    bool isBlank5 = menu->getChrfromW(1, 1) == (int)' ';
+    bool isBlank6 = menu->getChrfromW(1, 2) == (int)' ';
+    bool isBlank7 = menu->getChrfromW(2, 0) == (int)' ';
+    bool isBlank8 = menu->getChrfromW(2, 1) == (int)' ';
+    bool isBlank9 = menu->getChrfromW(2, 2) == (int)' ';
+
+    return isBlank1 && isBlank2 && isBlank3 && isBlank4 && isBlank5 &&
+           isBlank6 && isBlank7 && isBlank8 && isBlank9;
+  };
+
+  initscr();
+  cbreak();
+  WINDOW *world = newwin(0, 0, 0, 0);
+  bool exit_success = glambda(world);
+  delwin(world);
+  endwin();
+  REQUIRE(exit_success);
+}
+
 int main(int argc, char const *argv[]) {
 
   int result = Catch::Session().run(argc, argv);

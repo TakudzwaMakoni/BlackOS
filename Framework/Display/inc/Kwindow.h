@@ -25,12 +25,12 @@ public:
   virtual std::string winType() const = 0;
   virtual std::string name() const = 0;
   virtual void setWin(WINDOW *window) = 0;
-  virtual void kErase(size_t const y1, size_t const x1, size_t const y2,
-                      size_t const x2) = 0;
-  virtual void kEraseExcept(size_t const y1, size_t const x1, size_t const y2,
-                            size_t const x2) = 0;
-  virtual void kErase(std::vector<size_t> const &elements) = 0;
-  virtual void kEraseExcept(std::vector<size_t> const &elements) = 0;
+  virtual void erase(size_t const y1, size_t const x1, size_t const y2,
+                     size_t const x2) = 0;
+  virtual void eraseExcept(size_t const y1, size_t const x1, size_t const y2,
+                           size_t const x2) = 0;
+  virtual void erase(std::vector<size_t> const &elements) = 0;
+  virtual void eraseExcept(std::vector<size_t> const &elements) = 0;
   virtual void refresh() = 0;
   virtual int getChrfromW(size_t const y, size_t const x,
                           bool const preserve_cursor_pos) const = 0;

@@ -23,12 +23,12 @@ public:
   virtual std::string winType() const override;
   virtual std::string name() const override;
   virtual void setWin(WINDOW *window) override;
-  virtual void kErase(size_t const y1, size_t const x1, size_t const y2,
-                      size_t const x2) override;
-  virtual void kEraseExcept(size_t const y1, size_t const x1, size_t const y2,
-                            size_t const x2) override;
-  virtual void kErase(std::vector<size_t> const &elements) override;
-  virtual void kEraseExcept(std::vector<size_t> const &elements) override;
+  virtual void erase(size_t const y1, size_t const x1, size_t const y2,
+                     size_t const x2) override;
+  virtual void eraseExcept(size_t const y1, size_t const x1, size_t const y2,
+                           size_t const x2) override;
+  virtual void erase(std::vector<size_t> const &elements) override;
+  virtual void eraseExcept(std::vector<size_t> const &elements) override;
   virtual void refresh() override;
   virtual size_t getChrfromW(size_t const y, size_t const x,
                              bool const preserve_cursor_pos) const override;

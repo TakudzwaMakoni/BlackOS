@@ -264,15 +264,17 @@ int Kmenu::getChrfromW(size_t const y, size_t const x,
 }
 
 /// MF ACTIVE
-void Kmenu::kErase(size_t const y1, size_t const x1, size_t const y2,
-                   size_t const x2) {
+void Kmenu::erase(size_t const y1, size_t const x1, size_t const y2,
+                  size_t const x2) {
   size_t borderY = _size[0];
   size_t borderX = _size[1];
+
   size_t _y1 = y1 <= 0 ? 1 : y1;
   size_t _x1 = x1 <= 0 ? 1 : x1;
   size_t _y2 = y2 >= borderY ? borderY - 1 : y2;
   size_t _x2 = x2 >= borderX ? borderX - 1 : x2;
-  size_t width = _x2 - _x1;
+
+  size_t width = _x2 - _x1 + 1;
   std::string fill(width, ' ');
   for (size_t i = _y1; i <= _y2; ++i) {
     mvwprintw(_win, i, _x1, fill.c_str());
@@ -280,9 +282,20 @@ void Kmenu::kErase(size_t const y1, size_t const x1, size_t const y2,
   wrefresh(_win);
 }
 
+/// MF RETROACTIVE
+void Kmenu::fill(char const ch, bool const titleBar) {
+  size_t start = titleBar ? 2 : 1;
+  size_t end = _size[0] - 2;
+
+  std::string fillString(_size[1] - 2, ch);
+  for (size_t i = start; i <= end; ++i) {
+    mvwprintw(_win, i, 1, fillString.c_str());
+  }
+}
+
 /// MF ACTIVE
-void Kmenu::kEraseExcept(size_t const y1, size_t const x1, size_t const y2,
-                         size_t const x2) {
+void Kmenu::eraseExcept(size_t const y1, size_t const x1, size_t const y2,
+                        size_t const x2) {
   size_t borderY = _size[0];
   size_t borderX = _size[1];
   size_t width = borderX - 2;
@@ -308,7 +321,7 @@ void Kmenu::kEraseExcept(size_t const y1, size_t const x1, size_t const y2,
 }
 
 /// MF ACTIVE
-void Kmenu::kErase(std::vector<size_t> const &elements) {
+void Kmenu::erase(std::vector<size_t> const &elements) {
   size_t numOfAreas = elements.size() / 4; /*two coordinates per block*/
   for (size_t areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
     size_t borderY = _size[0];
@@ -323,12 +336,12 @@ void Kmenu::kErase(std::vector<size_t> const &elements) {
     size_t _x1 = x1 <= 0 ? 1 : x1;
     size_t _y2 = y2 >= borderY ? borderY - 1 : y2;
     size_t _x2 = x2 >= borderX ? borderX - 1 : x2;
-    kErase(_y1, _x1, _y2, _x2);
+    erase(_y1, _x1, _y2, _x2);
   }
 }
 
 /// MF ACTIVE
-void Kmenu::kEraseExcept(std::vector<size_t> const &elements) {
+void Kmenu::eraseExcept(std::vector<size_t> const &elements) {
   size_t borderY = _size[0];
   size_t borderX = _size[1];
   size_t width = borderX - 2;
@@ -366,17 +379,6 @@ void Kmenu::setWin(WINDOW *window) {
   if (window != nullptr) {
     wresize(_win, _size[0], _size[1]);
     mvwin(_win, _position[0], _position[1]);
-  }
-}
-
-/// MF RETROACTIVE
-void Kmenu::fill(char const ch, bool const titleBar) {
-  size_t start = titleBar ? 2 : 1;
-  size_t end = _size[0] - 2;
-
-  std::string fillString(_size[1] - 2, ch);
-  for (size_t i = start; i <= end; ++i) {
-    mvwprintw(_win, i, 1, fillString.c_str());
   }
 }
 

@@ -151,8 +151,8 @@ void Kgrid<dataType, rows, cols>::write(std::vector<dataType> const &data) {
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::kErase(size_t const y1, size_t const x1,
-                                         size_t const y2, size_t const x2) {
+void Kgrid<dataType, rows, cols>::erase(size_t const y1, size_t const x1,
+                                        size_t const y2, size_t const x2) {
   size_t a, b, c, d;
   size_t borderY = _size[0];
   size_t borderX = _size[1];
@@ -168,9 +168,9 @@ void Kgrid<dataType, rows, cols>::kErase(size_t const y1, size_t const x1,
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::kEraseExcept(size_t const y1, size_t const x1,
-                                               size_t const y2,
-                                               size_t const x2) {
+void Kgrid<dataType, rows, cols>::eraseExcept(size_t const y1, size_t const x1,
+                                              size_t const y2,
+                                              size_t const x2) {
   size_t borderY = _size[0] - 2;
   size_t borderX = _size[1] - 2;
   std::string fill(borderX, ' ');
@@ -200,7 +200,7 @@ void Kgrid<dataType, rows, cols>::fill(char const ch, bool const titleBar) {
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::kErase(std::vector<size_t> const &elements) {
+void Kgrid<dataType, rows, cols>::erase(std::vector<size_t> const &elements) {
   size_t numOfAreas = elements.size() / 4; /*two coordinates per block*/
   for (size_t areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
     size_t y1, x1, y2, x2;
@@ -208,12 +208,12 @@ void Kgrid<dataType, rows, cols>::kErase(std::vector<size_t> const &elements) {
     x1 = elements[1 + (areaIdx * 4)];
     y2 = elements[2 + (areaIdx * 4)];
     x2 = elements[3 + (areaIdx * 4)];
-    kErase(y1, x1, y2, x2);
+    erase(y1, x1, y2, x2);
   }
 }
 
 template <typename dataType, size_t rows, size_t cols>
-void Kgrid<dataType, rows, cols>::kEraseExcept(
+void Kgrid<dataType, rows, cols>::eraseExcept(
     std::vector<size_t> const &elements) {
   size_t numOfBlocks = elements.size() / 4; /*two coordinates per block*/
   size_t borderY = _size[0];
