@@ -53,7 +53,7 @@ Kmenu::Kmenu(std::string const &name, size_t const sizeY, size_t const sizeX,
 }
 
 size_t Kmenu::_highlightedMap() const {
-  size_t map = (_pCoeff * _page) + _highlighted;
+  size_t const map = (_pCoeff() * _page) + _highlighted;
   return map;
 }
 
@@ -110,27 +110,28 @@ void Kmenu::borderStyle(int const L, int const R, int const T, int const B,
 bool Kmenu::windowSet() const { return _win != nullptr; }
 
 void Kmenu::_updateF() {
-  if (_page == (_p - 1) && _pRem != 0)
-    _f = _pRem;
+  size_t p = _p();
+  size_t pRem = _pRem();
+  size_t pCoeff = _pCoeff();
+  if (_page == (p - 1) && pRem != 0)
+    _f = pRem;
   else
-    _f = _pCoeff;
+    _f = pCoeff;
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::setFields(std::vector<Kfield> const &fields) {
+void Kmenu::loadFields(std::vector<Kfield> const &fields) {
   _fields = fields;
   _fieldSz = fields.size();
 
   // load defaults on new kFields
   _page = 0;
-  _pCoeff = _fieldSz;
-  _pQuot = 1;
-  _pRem = 0;
-  _p = _pQuot + _pRem;
+
+  _updateM();
   _updateF();
 }
 
-void Kmenu::_setFields() {
+void Kmenu::_loadFields() {
 
   _updateF();
   std::vector<Kfield> subFields = _loadPage();
@@ -139,7 +140,7 @@ void Kmenu::_setFields() {
 
   if (_showTitle) {
     std::string pageInfo = "page: " + std::to_string(_page + 1) + " of " +
-                           std::to_string(_p) + " * ";
+                           std::to_string(_p()) + " * ";
     wattron(_win, A_REVERSE);
     mvwprintw(_win, _position[0], _position[1], pageInfo.c_str());
     wattroff(_win, A_REVERSE);
@@ -173,9 +174,10 @@ void Kmenu::_setFields() {
       yCorrect = bottom + i;
     }
 
+    // TODO: MODIFY FIELDNAME STYLE HERE
     if (i == _highlighted)
       wattron(_win, A_REVERSE);
-    mvwprintw(_win, yCorrect, xCorrect, fieldName.c_str());
+    mvwprintw(_win, yCorrect, xCorrect, _addFieldPadding(fieldName).c_str());
     wattroff(_win, A_REVERSE);
   }
 }
@@ -187,7 +189,7 @@ void Kmenu::alignFields(int const x, int const y) {
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::setFieldStyle(std::string const &style) { _fieldStyle = style; }
+void Kmenu::fieldStyle(std::string const &style) { _fieldStyle = style; }
 
 /// MUTATOR RETROACTIVE
 void Kmenu::paginate(size_t const entriesPerPage) {
@@ -195,14 +197,26 @@ void Kmenu::paginate(size_t const entriesPerPage) {
     throw std::runtime_error(
         "Cannot have negative value number of entries per page.");
   if (_fieldSz == 0)
-    throw std::runtime_error("no fields were set.");
+    throw std::runtime_error("field size is zero.");
+  // set entriesPerPage member variable
+  _entriesPerPage = entriesPerPage;
+}
 
-  // _pCoeff means display all on window.
-  _pCoeff = entriesPerPage == 0 ? _fieldSz : entriesPerPage;
-  _pQuot = _fieldSz / _pCoeff;
-  _pRem = (size_t)(_fieldSz % _pCoeff != 0);
-  _p = _pQuot + _pRem;
-  _updateF();
+size_t Kmenu::_pCoeff() const {
+  size_t pCoeff = _entriesPerPage == 0 ? _fieldSz : _entriesPerPage;
+  return pCoeff;
+}
+size_t Kmenu::_pQuot() const {
+  size_t pQuot = _fieldSz / _pCoeff();
+  return pQuot;
+}
+size_t Kmenu::_pRem() const {
+  size_t pRem = (size_t)(_fieldSz % _pCoeff() != 0);
+  return pRem;
+}
+size_t Kmenu::_p() const {
+  size_t p = _pQuot() + _pRem();
+  return p;
 }
 
 /// MUTATOR RETROACTIVE
@@ -228,28 +242,27 @@ void Kmenu::addTitle(std::string const &title) {
   _addTitle();
 }
 
-/// MUTATOR RETROACTIVE
-void Kmenu::addFieldPadding() {
-  int maxLen = 1;
+void Kmenu::_updateM() {
   for (const Kfield field : _fields) {
     int len = field.name().size();
-    if (len > maxLen)
-      maxLen = len;
+    if (len > _m)
+      _m = len;
   }
-  for (std::vector<Kfield>::iterator it = _fields.begin(); it != _fields.end();
-       ++it) {
-    std::string str = it->name(); // retrieve field name
-    const int newStrLen = maxLen % 2 == 0 ? maxLen : maxLen + 1;
-    const int oldStrLen = str.size();   // retrieve size of field name
-    std::string newStr(newStrLen, ' '); // make empty new field
-    int correction = (newStrLen - oldStrLen) / 2;
-    newStr.replace(correction, oldStrLen, str);
-    std::string front = _fieldStyle + " ";
-    std::string back = " " + _fieldStyle;
-    newStr.insert(0, front);
-    newStr.append(back);
-    it->setName(newStr); // assign padded name to field
-  }
+}
+
+/// MUTATOR RETROACTIVE TODO: JUST ADD A FIELDSTYLE JUST DO THIS ON LOADFIELDS
+std::string Kmenu::_addFieldPadding(std::string const &fieldName) {
+
+  const int newStrLen = _m % 2 == 0 ? _m : _m + 1;
+  const int oldStrLen = fieldName.size(); // retrieve size of field name
+  std::string newStr(newStrLen, ' ');     // make empty new field
+  int correction = (newStrLen - oldStrLen) / 2;
+  newStr.replace(correction, oldStrLen, fieldName);
+  std::string front = _fieldStyle + " ";
+  std::string back = " " + _fieldStyle;
+  newStr.insert(0, front);
+  newStr.append(back);
+  return newStr;
 }
 
 /// MF
@@ -391,7 +404,7 @@ void Kmenu::display() {
 
   while (true) {
 
-    _setFields();
+    _loadFields();
     // refresh before getch
     wrefresh(_win);
     selection = wgetch(_win);
@@ -405,7 +418,7 @@ void Kmenu::display() {
       }
       break;
     case KEY_RIGHT:
-      if (_page != _p - 1) {
+      if (_page != _p() - 1) {
         _page++;
         _highlighted = 0;
         fill(' ', _showTitle);
@@ -445,15 +458,15 @@ std::vector<Kfield> Kmenu::_loadPage() {
 
   if (_fieldSz == 0)
     throw std::runtime_error("No fields were set.");
-  if (_p == 0)
+  if (_p() == 1)
     return _fields;
 
   std::vector<Kfield>::const_iterator first_iterator;
   std::vector<Kfield>::const_iterator last_iterator;
 
-  size_t first = _pCoeff * _page;
+  size_t first = _pCoeff() * _page;
   first_iterator = _fields.begin() + first;
-  if (_f != _pRem) {
+  if (_f != _pRem()) {
     size_t last = first + _f;
     last_iterator = _fields.begin() + last;
   } else {

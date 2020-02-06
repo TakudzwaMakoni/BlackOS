@@ -67,10 +67,9 @@ int main(int argc, const char *argv[]) {
   main_menu.borderStyle('o', 'o', 'o', 'o', 'o', 'o', 'o', 'o');
   main_menu.addTitle("TEST_MENU with " + std::to_string(pagination) +
                      " fields per page.");
-  main_menu.setFieldStyle("!"); // must do this before padding
-  main_menu.addFieldPadding();  // must do this before displaying
+  main_menu.fieldStyle("!"); // must do this before displaying
 
-  main_menu.setFields(test_fields);
+  main_menu.loadFields(test_fields);
   main_menu.paginate(pagination);
 
   main_menu.display();

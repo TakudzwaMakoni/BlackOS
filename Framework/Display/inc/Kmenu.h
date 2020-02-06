@@ -46,12 +46,16 @@ public:
   virtual void pause() const override;
   virtual bool windowSet() const override;
 
-  virtual void setFields(std::vector<Kfield> const &fields);
+  virtual void loadFields(std::vector<Kfield> const &fields);
+  // virtual void addField(Kfield const &field);             // NEW
+  // virtual void removeField(size_t const index);           // NEW
+  // virtual void removeField(std::string const &fieldName); // NEW
+  // virtual void loadPage(size_t cont page);                // NEW
+  // virtual void clearFields(); // NEW
   virtual Kfield selectedField() const;
 
   void alignFields(int const x, int const y);
-  void addFieldPadding();
-  void setFieldStyle(std::string const &style);
+  void fieldStyle(std::string const &style);
   void paginate(size_t const entriesPerPage);
 
   std::vector<Kfield> fields() const;
@@ -69,12 +73,10 @@ private:
   std::vector<size_t> _position;
   std::vector<Kfield> _fields;
   size_t _page;    // current partition to load
-  size_t _pCoeff;  // typical fields per page
-  size_t _pQuot;   // quotient
-  size_t _pRem;    // remainder
-  size_t _p;       // total number of partitions
   size_t _fieldSz; // total number of Fields
-  size_t _f;       // number of fields in current partition
+  size_t _entriesPerPage = 0;
+  size_t _f; // number of fields in current partition
+  size_t _m = 0;
   int _xAlign;
   int _yAlign;
   std::string _fieldStyle;
@@ -83,11 +85,17 @@ private:
   bool _showTitle = 1;
   std::string _title;
 
+  size_t _pCoeff() const; // typical fields per page
+  size_t _pQuot() const;  // quotient
+  size_t _pRem() const;   // remainder
+  size_t _p() const;      // total number of partitions
   void _delWith(std::vector<WINDOW *> windows);
   std::vector<BlackOS::Display::Kfield> _loadPage();
+  std::string _addFieldPadding(std::string const &fieldName);
   void _addTitle();
-  void _setFields();
+  void _loadFields();
   void _updateF();
+  void _updateM();
   size_t _highlightedMap() const;
 };
 } // namespace Display
