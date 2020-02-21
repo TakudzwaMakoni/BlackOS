@@ -22,6 +22,7 @@ add_library(libKmenu
 
 add_executable(NavigateDir
     NavigateDir/NavigateDir.cpp
+    NavigateDir/src/Navigator.cpp
     )
 
 target_include_directories(NavigateDir
