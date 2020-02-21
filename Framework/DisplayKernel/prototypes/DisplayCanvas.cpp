@@ -15,7 +15,7 @@
 // namespace BlackOS {
 // namespace BlackOSDisplay {
 
-using namespace BlackOS::Display;
+using namespace BlackOS::DisplayKernel;
 
 int main(int argc, const char *argv[]) {
   initscr();

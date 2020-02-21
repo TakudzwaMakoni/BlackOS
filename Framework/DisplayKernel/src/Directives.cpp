@@ -7,7 +7,7 @@
 #include <ncurses.h>
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 namespace Directives {
 void doNothing() {}
 void exitProgram() {
@@ -26,5 +26,5 @@ void writeToFile() {
 }
 void animate(int aniCode) {}
 } // namespace Directives
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS

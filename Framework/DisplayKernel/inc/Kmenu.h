@@ -13,7 +13,7 @@
 #include <vector>
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 
 enum class TitleStyle : size_t { underline, highlight, none };
 
@@ -106,7 +106,7 @@ private:
   size_t _pRem() const;   // remainder
   size_t _p() const;      // total number of partitions
   void _delWith(std::vector<WINDOW *> windows);
-  std::vector<BlackOS::Display::Kfield> _loadPage();
+  std::vector<BlackOS::DisplayKernel::Kfield> _loadPage();
   std::string _addFieldPadding(std::string const &fieldName);
   void _loadFields();
   void _updateF();
@@ -118,7 +118,7 @@ private:
                    size_t const x2) const;
   void _checkRange(size_t const y, size_t const x) const;
 };
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS
 
 #endif // BLACKOS_KMENU_H

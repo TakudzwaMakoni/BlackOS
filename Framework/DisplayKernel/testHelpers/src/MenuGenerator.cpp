@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 namespace TestHelpers {
 
 Kmenu_sptr testMenu() {
@@ -52,8 +52,8 @@ Kmenu_sptr testMenuWithEightPaginatedFields(int pagination) {
   menu->fieldStyle("!TEST!");
   menu->alignFields(0, 0);
   menu->borderStyle('!', '!', '!', '!', '!', '!', '!', '!');
-  menu->addTitle("TEST_MENU with" + std::to_string(pagination) +
-                 "fields per page.");
+  menu->loadTitle("TEST_MENU with" + std::to_string(pagination) +
+                  "fields per page.");
   menu->paginate(pagination);
 
   return menu;
@@ -66,5 +66,5 @@ Kmenu_sptr testMenuInitialisedWithSizeAndPos(int const sizeY, int const sizeX,
   return menu;
 }
 } // namespace TestHelpers
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS

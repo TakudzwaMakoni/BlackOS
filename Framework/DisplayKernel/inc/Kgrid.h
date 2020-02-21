@@ -14,7 +14,7 @@
 #include <string>
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 template <typename dataType, size_t rows, size_t cols>
 class Kgrid : public Kwindow {
 public:
@@ -81,7 +81,7 @@ private:
   std::string attributeString();
   void delWith(std::vector<WINDOW *> windows);
 };
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS
 #include "Kgrid.tpp"
 #endif // BLACKOS_KGRID_H

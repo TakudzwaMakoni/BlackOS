@@ -4,7 +4,7 @@
 #include "../inc/Kfield.h"
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 
 Kfield::Kfield(const std::string &name, const directive script,
                const std::string &message)
@@ -14,5 +14,5 @@ directive Kfield::script() const { return this->_script; }
 std::string Kfield::message() const { return this->_message; }
 void Kfield::setName(const std::string &name) { _name = name; }
 // Kfield::~Kfield(){};
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS

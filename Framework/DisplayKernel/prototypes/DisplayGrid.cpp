@@ -17,9 +17,9 @@
 #define X_CENTRE (COLS - WORLD_WIDTH) / 2
 
 // namespace BlackOS {
-// namespace Display {
+// namespace DisplayKernel {
 
-using namespace BlackOS::Display;
+using namespace BlackOS::DisplayKernel;
 
 int main(int argc, const char *argv[]) {
   initscr();
@@ -63,5 +63,5 @@ int main(int argc, const char *argv[]) {
   endwin();
   return 0;
 }
-//} // namespace Display
+//} // namespace DisplayKernel
 //} // namespace BlackOS

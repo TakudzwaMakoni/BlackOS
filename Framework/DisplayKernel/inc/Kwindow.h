@@ -17,7 +17,7 @@
 #define WORLD_HEIGHT (LINES - 2)
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 class Kwindow {
 public:
   virtual void display() = 0;
@@ -49,6 +49,6 @@ public:
   virtual void pause() const = 0;
   virtual bool windowSet() const = 0;
 };
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS
 #endif // BLACKOS_KWINDOW_H

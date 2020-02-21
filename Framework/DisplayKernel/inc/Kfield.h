@@ -9,7 +9,7 @@
 #include <string>
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 
 /// BlackOS Field Object
 struct Kfield {
@@ -25,9 +25,9 @@ public:
 
 private:
   std::string _name;
-  directive _script = BlackOS::Display::Directives::doNothing;
+  directive _script = BlackOS::DisplayKernel::Directives::doNothing;
   std::string _message;
 };
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS
 #endif // BLACKOS_KFIELD_H

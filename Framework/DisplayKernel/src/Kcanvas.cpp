@@ -37,7 +37,7 @@ bool inBlocks(const size_t xValue, const std::vector<size_t> &blocks,
 } // namespace
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 Kcanvas::Kcanvas(std::string &name, size_t sizeY, size_t sizeX, size_t posY,
                  size_t posX) {
   _size = {sizeY, sizeX};
@@ -211,5 +211,5 @@ void Kcanvas::display() {
   wrefresh(_win);
 }
 Kcanvas::~Kcanvas() { delWith(_subwins); }
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS

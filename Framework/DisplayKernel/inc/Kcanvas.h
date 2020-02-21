@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 class Kcanvas : public Kwindow {
 public:
   Kcanvas(std::string &name, size_t const sizeY, size_t const sizeX,
@@ -57,6 +57,6 @@ private:
   bool _showTitle{false};
   std::string _title;
 };
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS
 #endif

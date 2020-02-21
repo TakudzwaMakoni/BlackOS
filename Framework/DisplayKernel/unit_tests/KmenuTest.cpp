@@ -4,14 +4,13 @@
 #include "../inc/Directives.h"
 #include "../inc/Kfield.h"
 #include "../testHelpers/inc/MenuGenerator.h"
-#include "Eigen/Dense"
 #include "ncurses.h"
 #include <catch2/catch.hpp>
 #include <chrono>
 #include <cstdio>
 #include <thread>
 
-using namespace BlackOS::Display;
+using namespace BlackOS::DisplayKernel;
 
 /*
 TEST_CASE("some test", "[some_tag]") {
@@ -108,7 +107,7 @@ TEST_CASE("test menu is filled excluding title bar", "[window]") {
   // in curses mode.
   auto glambda = [](WINDOW *world) {
     auto const &menu = TestHelpers::testMenu();
-    menu->addTitle("test_menu_title");
+    menu->loadTitle("test_menu_title");
     menu->setWin(world);
     menu->fill('w', true);
 
@@ -146,7 +145,7 @@ TEST_CASE("test menu is filled including title bar", "[window]") {
   // in curses mode.
   auto glambda = [](WINDOW *world) {
     auto const &menu = TestHelpers::testMenu();
-    menu->addTitle("test_menu_title");
+    menu->loadTitle("test_menu_title");
     menu->setWin(world);
     menu->fill('w', false);
 
@@ -180,7 +179,7 @@ TEST_CASE("test erase call erases horizontal block", "[member_functions]") {
   auto glambda = [](WINDOW *world) {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
-    menu->addTitle("test_menu_title");
+    menu->loadTitle("test_menu_title");
     menu->setWin(world);
     menu->fill('w', false);
     // erase from y = 0  and x = (3,5)
@@ -209,7 +208,7 @@ TEST_CASE("test eraseExcept call excepts horizontal block",
   auto glambda = [](WINDOW *world) {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
-    menu->addTitle("test_menu_title");
+    menu->loadTitle("test_menu_title");
     menu->setWin(world);
     menu->fill('w', false);
     // erase from y = 0  and x = (3,5)
@@ -243,7 +242,7 @@ TEST_CASE("test erase call erases vertical block", "[member_functions]") {
   auto glambda = [](WINDOW *world) {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
-    menu->addTitle("test_menu_title");
+    menu->loadTitle("test_menu_title");
     menu->setWin(world);
     menu->fill('w', false);
 
@@ -272,7 +271,7 @@ TEST_CASE("test erase call erases square block", "[member_functions]") {
   auto glambda = [](WINDOW *world) {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 1, 1);
-    menu->addTitle("test_menu_title");
+    menu->loadTitle("test_menu_title");
     menu->setWin(world);
     menu->fill('w', false);
     // erase from y = (0,2) and x = (0,2) i.e 3x3 block
@@ -308,7 +307,7 @@ TEST_CASE("test erase call erases multiple square blocks",
   auto glambda = [](WINDOW *world) {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
-    menu->addTitle("test_menu_title");
+    menu->loadTitle("test_menu_title");
     menu->setWin(world);
     menu->fill('w', false);
     // erase from y = (0,2) and x = (0,5) i.e 3x6 block

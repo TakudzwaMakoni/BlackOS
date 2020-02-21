@@ -10,7 +10,7 @@
 #include <string>
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 typedef void (*directive)();
 namespace Directives {
 void doNothing();
@@ -18,7 +18,7 @@ void writeToFile();
 void animate();
 void exitProgram();
 } // namespace Directives
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS
 
 #endif // BLACKOS_DIRECTIVES_H

@@ -1,8 +1,6 @@
 
 #include "../inc/Directives.h"
-#include "../inc/Kfield.h"
 #include "../inc/Kmenu.h"
-#include "../inc/Kwindow.h"
 
 #include <iostream>
 #include <memory>
@@ -11,9 +9,9 @@
 #include <vector>
 
 // namespace BlackOS {
-// namespace Display {
+// namespace DisplayKernel {
 
-using namespace BlackOS::Display;
+using namespace BlackOS::DisplayKernel;
 
 int main(int argc, const char *argv[]) {
   initscr();
@@ -93,5 +91,5 @@ int main(int argc, const char *argv[]) {
 
   return 0;
 }
-//} // namespace Display
+//} // namespace DisplayKernel
 //} // namespace BlackOS

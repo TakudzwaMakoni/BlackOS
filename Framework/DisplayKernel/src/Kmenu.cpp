@@ -44,7 +44,7 @@ bool inBlocks(size_t const xValue, std::vector<size_t> const &blocks,
 } // namespace
 
 namespace BlackOS {
-namespace Display {
+namespace DisplayKernel {
 
 Kmenu::Kmenu(std::string const &name, size_t const sizeY, size_t const sizeX,
              size_t const posY, size_t const posX) {
@@ -652,5 +652,5 @@ Kmenu::~Kmenu() {
   setWin();           // diisociate with window
 }
 
-} // namespace Display
+} // namespace DisplayKernel
 } // namespace BlackOS
