@@ -10,11 +10,6 @@
 #include <string>
 #include <vector>
 
-#define WORLD_WIDTH (COLS - 2)
-#define WORLD_HEIGHT (LINES - 2)
-#define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
-#define X_CENTRE (COLS - WORLD_WIDTH) / 2
-
 // namespace BlackOS {
 // namespace Display {
 
@@ -57,35 +52,45 @@ int main(int argc, const char *argv[]) {
 
   std::string mainMenuName = "BlackOS version 1.0 ";
 
-  Kmenu main_menu(mainMenuName, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
+  Kmenu main_menu(mainMenuName, LINES, COLS, 0, 0);
+
+  main_menu.loadTitle(mainMenuName, TitleStyle::highlight);
 
   main_menu.setWin(world); // must set the window!
 
-  int pagination = 3;
-  main_menu.alignFields(0, 0);
+  // main_menu.hideBorder();
+  // main_menu.hideTitle();
 
-  main_menu.borderStyle('o', 'o', 'o', 'o', 'o', 'o', 'o', 'o');
-  main_menu.addTitle("TEST_MENU with " + std::to_string(pagination) +
-                     " fields per page.");
-  main_menu.fieldStyle("!"); // must do this before displaying
+  main_menu.borderStyle();
+  main_menu.showTitle();
+
+  int pagination = 3;
+  main_menu.alignFields(-1, 1);
+
+  main_menu.fieldStyle("-"); // must do this before
+  // displaying
 
   main_menu.loadFields(test_fields);
   main_menu.paginate(pagination);
 
   main_menu.display();
+
   auto message = main_menu.selectedField().message();
-  auto winSz = main_menu.size();
+  size_t winSzY = main_menu.winSzY();
+  size_t winSzX = main_menu.winSzX();
 
-  size_t centreY = winSz[0] / 2;
-  size_t centreX = (winSz[1] - message.length()) / 2;
+  size_t centreY = winSzY / 2;
+  size_t centreX = (winSzX - message.length()) / 2;
 
-  main_menu.fill(' ', true);
+  main_menu.clear();
   main_menu.insert(message, centreY, centreX);
+
   main_menu.refresh();
   main_menu.pause();
 
   delwin(world);
   endwin();
+
   return 0;
 }
 //} // namespace Display

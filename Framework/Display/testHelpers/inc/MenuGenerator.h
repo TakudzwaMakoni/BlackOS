@@ -1,5 +1,6 @@
 #ifndef MENUGENERATOR_H
 #define MENUGENERATOR_H
+
 #include "../../inc/Kmenu.h"
 namespace BlackOS {
 namespace Display {

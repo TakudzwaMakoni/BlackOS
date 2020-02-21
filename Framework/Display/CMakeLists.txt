@@ -6,22 +6,22 @@ project (Display LANGUAGES CXX)
 
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(Kmenu
-    src/DisplayMenu.cpp
+    prototypes/DisplayMenu.cpp
     src/Directives.cpp
     src/Kfield.cpp
     src/Kmenu.cpp)
 
 add_executable(Kgrid
-    src/DisplayGrid.cpp)
+    prototypes/DisplayGrid.cpp)
 
 add_executable(Kcanvas
-      src/DisplayCanvas.cpp
-      src/Kcanvas.cpp)
+    prototypes/DisplayCanvas.cpp
+    src/Kcanvas.cpp)
 
 add_executable(KmenuTests
     unit_tests/catch.hpp
@@ -31,10 +31,12 @@ add_executable(KmenuTests
     src/Kfield.cpp
     src/Kmenu.cpp)
 
-set(CMAKE_CXX_FLAGS "-lncurses")
+#add_executable(NavigateChildren)
 
-target_link_libraries (Kmenu Eigen3::Eigen)
-target_link_libraries (Kmenu ${CURSES_LIBRARIES})
+#set(CMAKE_CXX_FLAGS "-lncurses")
+
+#target_link_libraries (Kmenu Eigen3::Eigen)
+#target_link_libraries (Kmenu ${CURSES_LIBRARIES})
 
 target_link_libraries (Kgrid Eigen3::Eigen)
 target_link_libraries (Kgrid ${CURSES_LIBRARIES})

@@ -1,9 +1,10 @@
 #include "../inc/Kcanvas.h"
+#include <chrono>
 #include <iostream>
 #include <memory>
 #include <ncurses.h>
 #include <string>
-#include <unistd.h>
+#include <thread>
 #include <vector>
 
 #define WORLD_WIDTH (COLS - 2)
@@ -39,7 +40,7 @@ int main(int argc, const char *argv[]) {
   for (int i = 1; i < WORLD_HEIGHT - 1; i++) {
     for (int j = 1; j < WORLD_WIDTH - 1; j++) {
       canvas.erase(i, j, i, j + 1);
-      usleep(9000);
+      std::this_thread::sleep_for(std::chrono::seconds(1));
       canvas.refresh();
     }
   }

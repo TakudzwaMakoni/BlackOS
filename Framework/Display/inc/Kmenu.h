@@ -5,7 +5,6 @@
 #ifndef BLACKOS_KMENU_H
 #define BLACKOS_KMENU_H
 
-#include "Eigen/Dense"
 #include "Kfield.h"
 #include "Kwindow.h"
 #include "ncurses.h"
@@ -15,6 +14,9 @@
 
 namespace BlackOS {
 namespace Display {
+
+enum class TitleStyle : size_t { underline, highlight, none };
+
 class Kmenu : public Kwindow {
 public:
   Kmenu(std::string const &name, size_t const sizeY, size_t const sizeX,
@@ -32,17 +34,20 @@ public:
   virtual void setWin(WINDOW *window = nullptr) override;
   virtual void erase(size_t const y1, size_t const x1, size_t const y2,
                      size_t const x2) override;
+  virtual void erase(bool titleBar) override;
   virtual void eraseExcept(size_t const y1, size_t const x1, size_t const y2,
                            size_t const x2) override;
   virtual void erase(std::vector<size_t> const &elements) override;
+  virtual void clear() override;
   virtual void eraseExcept(std::vector<size_t> const &elements) override;
   virtual void refresh() override;
-  virtual int getChrfromW(size_t const y, size_t const x,
-                          bool const save_cursor = true) const override;
+  virtual char getCharFromWin(size_t const y, size_t const x,
+                              bool const save_cursor = true) const override;
   virtual void fill(char const ch, bool const titleBar = false) override;
   virtual void insert(std::string const &str, size_t const y,
                       size_t const x) override;
   virtual void insert(char const *ch, size_t const y, size_t const x) override;
+  virtual void insert(char const ch, size_t const y, size_t const x) override;
   virtual void pause() const override;
   virtual bool windowSet() const override;
 
@@ -59,18 +64,27 @@ public:
   void paginate(size_t const entriesPerPage);
 
   std::vector<Kfield> fields() const;
-  std::vector<size_t> size() const;
+  size_t winSzY() const;
+  size_t winSzX() const;
+  size_t winPosY() const;
+  size_t winPosX() const;
   std::vector<size_t> position() const;
+  void hideBorder();
   void hideTitle();
-  void addTitle(std::string const &title);
+  void loadTitle(std::string const &title,
+                 TitleStyle const titleStyle = TitleStyle::none);
+  void loadTitleStyle(TitleStyle style);
+  void showTitle();
 
   ~Kmenu();
 
 private:
   WINDOW *_win = nullptr;
   std::vector<WINDOW *> _subwins;
-  std::vector<size_t> _size;
-  std::vector<size_t> _position;
+  size_t _winSzY;
+  size_t _winSzX;
+  size_t _winPosY;
+  size_t _winPosX;
   std::vector<Kfield> _fields;
   size_t _page;    // current partition to load
   size_t _fieldSz; // total number of Fields
@@ -81,9 +95,11 @@ private:
   int _yAlign;
   std::string _fieldStyle;
   std::string _name;
+  std::string _title;
   size_t _highlighted;
   bool _showTitle = 1;
-  std::string _title;
+  bool _showBorder = 1;
+  TitleStyle _titleStyle;
 
   size_t _pCoeff() const; // typical fields per page
   size_t _pQuot() const;  // quotient
@@ -92,11 +108,15 @@ private:
   void _delWith(std::vector<WINDOW *> windows);
   std::vector<BlackOS::Display::Kfield> _loadPage();
   std::string _addFieldPadding(std::string const &fieldName);
-  void _addTitle();
   void _loadFields();
   void _updateF();
+  void _addToTitleHeader(std::string const &title);
+  void addTitleStyle(TitleStyle style = TitleStyle::none);
   void _updateM();
   size_t _highlightedMap() const;
+  void _checkRange(size_t const y1, size_t const x1, size_t const y2,
+                   size_t const x2) const;
+  void _checkRange(size_t const y, size_t const x) const;
 };
 } // namespace Display
 } // namespace BlackOS

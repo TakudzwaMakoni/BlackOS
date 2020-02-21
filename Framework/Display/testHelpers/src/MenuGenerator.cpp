@@ -5,11 +5,6 @@
 #include <memory>
 #include <vector>
 
-#define WORLD_WIDTH (COLS - 2)
-#define WORLD_HEIGHT (LINES - 2)
-#define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
-#define X_CENTRE (COLS - WORLD_WIDTH) / 2
-
 namespace BlackOS {
 namespace Display {
 namespace TestHelpers {
