@@ -1,33 +1,34 @@
 // navigate-dir 2020 by takudzwa Makoni (c)
-#include "Directives.h"
-#include "Kfield.h"
-#include "Kmenu.h"
+
+#include "inc/NavigationHelpers.h"
 #include "inc/Navigator.h"
 
+#include "ncurses.h"
 #include <iostream>
+#include <stdio.h>
 #include <string>
+#include <vector>
 
 using namespace BlackOS::Trinkets;
-
-void eraseAllSubStr(std::string &mainStr, std::string const &toErase) {
-  size_t pos = std::string::npos;
-
-  // Search for the substring in string in a loop untill nothing is found
-  while ((pos = mainStr.find(toErase)) != std::string::npos) {
-    // If found then erase it from string
-    mainStr.erase(pos, toErase.length());
-  }
-}
 
 int main(int argc, char const *argv[]) {
   std::string test;
   bool showHidden = 0;
   BlackOS::DisplayKernel::Kmenu menu(test, 1, 1, 1, 1);
-  std::string path = "/home/takudzwa";
+  std::string parentPath = "/home/takudzwa";
 
-  Navigator testNav(path);
-  std::cout << testNav.pathPermissions(path) << std::endl;
-  std::cout << testNav.pathLastModifiedDate(path) << std::endl;
+  Navigator testNav(parentPath, 0);
 
+  auto children = testNav.children();
+  auto fields = loadFields(children, parentPath);
+
+  // enter curses mode
+  initscr();
+  cbreak();
+  cursor(0);
+
+  // get current cursor position from system call
+
+  endwin();
   return 0;
 }

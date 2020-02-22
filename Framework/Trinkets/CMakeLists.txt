@@ -2,12 +2,14 @@ project (Trinkets LANGUAGES CXX)
 
 find_package (Boost 1.72 REQUIRED)
 
+set(CMAKE_CXX_COMPILER  "/usr/bin/clang++")
+
 set(CMAKE_CXX_FLAGS "-lncurses")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_COMPILER  "/usr/bin/clang++")
+
 
 add_library(libKmenu
     STATIC
@@ -23,6 +25,7 @@ add_library(libKmenu
 add_executable(NavigateDir
     NavigateDir/NavigateDir.cpp
     NavigateDir/src/Navigator.cpp
+    NavigateDir/src/NavigationHelpers.cpp
     )
 
 target_include_directories(NavigateDir
