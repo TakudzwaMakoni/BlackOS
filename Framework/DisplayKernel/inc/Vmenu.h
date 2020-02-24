@@ -1,12 +1,8 @@
-//
-// Created by Takudzwa Makoni on 2019-07-27.
-//
+#ifndef BLACKOS_VMENU_H
+#define BLACKOS_VMENU_H
 
-#ifndef BLACKOS_KMENU_H
-#define BLACKOS_KMENU_H
-
-#include "Kfield.h"
-#include "Kwindow.h"
+#include "Vfield.h"
+#include "Vwindow.h"
 #include "ncurses.h"
 #include <memory>
 #include <string>
@@ -17,9 +13,9 @@ namespace DisplayKernel {
 
 enum class TitleStyle : size_t { underline, highlight, none };
 
-class Kmenu : public Kwindow {
+class Vmenu : public Vwindow {
 public:
-  Kmenu(std::string const &name, size_t const sizeY, size_t const sizeX,
+  Vmenu(std::string const &name, size_t const sizeY, size_t const sizeX,
         size_t const posY, size_t const posX);
 
   virtual void display() override;
@@ -31,7 +27,6 @@ public:
   virtual std::vector<size_t> maxSize() const override;
   virtual std::string winType() const override;
   virtual std::string name() const override;
-  virtual void setWin(bool const initWin) override;
   virtual void erase(size_t const y1, size_t const x1, size_t const y2,
                      size_t const x2) override;
   virtual void erase(bool titleBar) override;
@@ -51,20 +46,14 @@ public:
   virtual void pause() const override;
   virtual bool windowSet() const override;
 
-  virtual void loadFields(std::vector<Kfield> const &fields);
-  // virtual void addField(Kfield const &field);             // NEW
-  // virtual void removeField(size_t const index);           // NEW
-  // virtual void removeField(std::string const &fieldName); // NEW
-  // virtual void loadPage(size_t cont page);                // NEW
-  // virtual void clearFields(); // NEW
-  virtual Kfield selectedField() const;
-  size_t selectedFieldIndex() const;
+  virtual void loadFields(std::vector<Vfield> const &fields);
+  virtual Vfield selectedField() const;
 
   void loadFieldAlignment(int const x, int const y);
   void fieldStyle(std::string const &style);
   void paginate(size_t const entriesPerPage);
 
-  std::vector<Kfield> fields() const;
+  std::vector<Vfield> fields() const;
   size_t winSzY() const;
   size_t winSzX() const;
   size_t winPosY() const;
@@ -77,16 +66,14 @@ public:
   void loadTitleStyle(TitleStyle style);
   void showTitle();
 
-  ~Kmenu();
+  ~Vmenu();
 
 private:
-  WINDOW *_win = nullptr;
-  std::vector<WINDOW *> _subwins;
   size_t _winSzY;
   size_t _winSzX;
   size_t _winPosY;
   size_t _winPosX;
-  std::vector<Kfield> _fields;
+  std::vector<Vfield> _fields;
   size_t _page;    // current partition to load
   size_t _fieldSz; // total number of Fields
   size_t _entriesPerPage = 0;
@@ -107,7 +94,7 @@ private:
   size_t _pRem() const;   // remainder
   size_t _p() const;      // total number of partitions
   void _delWith(std::vector<WINDOW *> windows);
-  std::vector<BlackOS::DisplayKernel::Kfield> _loadPage();
+  std::vector<Vfield> _loadPage();
   std::string _addFieldPadding(std::string const &fieldName);
   void _loadFields();
   void _updateF();
@@ -122,4 +109,4 @@ private:
 } // namespace DisplayKernel
 } // namespace BlackOS
 
-#endif // BLACKOS_KMENU_H
+#endif // BLACKOS_VMENU_H

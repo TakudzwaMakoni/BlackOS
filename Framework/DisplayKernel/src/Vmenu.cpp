@@ -2,7 +2,7 @@
 // Created by Takudzwa Makoni on 2019-07-27.
 //
 
-#include "../inc/Kmenu.h"
+#include "../inc/Vmenu.h"
 #include "../inc/Directives.h"
 #include <algorithm>
 #include <memory>
@@ -46,7 +46,7 @@ bool inBlocks(size_t const xValue, std::vector<size_t> const &blocks,
 namespace BlackOS {
 namespace DisplayKernel {
 
-Kmenu::Kmenu(std::string const &name, size_t const sizeY, size_t const sizeX,
+Vmenu::Vmenu(std::string const &name, size_t const sizeY, size_t const sizeX,
              size_t const posY, size_t const posX) {
   _name = name;
   _winSzY = sizeY;
@@ -55,37 +55,36 @@ Kmenu::Kmenu(std::string const &name, size_t const sizeY, size_t const sizeX,
   _winPosX = posX;
 }
 
-size_t Kmenu::_highlightedMap() const {
+size_t Vmenu::_highlightedMap() const {
   size_t const map = (_pCoeff() * _page) + _highlighted;
   return map;
 }
 
 /// ACCESSOR
-std::vector<Kfield> Kmenu::fields() const { return _fields; }
+std::vector<Vfield> Vmenu::fields() const { return _fields; }
 
-size_t Kmenu::winSzY() const { return _winSzY; }
+size_t Vmenu::winSzY() const { return _winSzY; }
 
-size_t Kmenu::winSzX() const { return _winSzX; }
+size_t Vmenu::winSzX() const { return _winSzX; }
 
-size_t Kmenu::winPosY() const { return _winPosY; }
+size_t Vmenu::winPosY() const { return _winPosY; }
 
-size_t Kmenu::winPosX() const { return _winPosX; }
-
-/// ACCESSOR
-std::string Kmenu::winType() const { return "Kmenu"; }
+size_t Vmenu::winPosX() const { return _winPosX; }
 
 /// ACCESSOR
-std::string Kmenu::name() const { return _name; }
+std::string Vmenu::winType() const { return "Vmenu"; }
 
 /// ACCESSOR
-Kfield Kmenu::selectedField() const {
+std::string Vmenu::name() const { return _name; }
+
+/// ACCESSOR
+Vfield Vmenu::selectedField() const {
   size_t map = _highlightedMap();
   return this->_fields[map];
 }
-size_t Kmenu::selectedFieldIndex() const { return _highlightedMap(); }
 
 /// ACCESSOR
-std::vector<size_t> Kmenu::maxSize() const {
+std::vector<size_t> Vmenu::maxSize() const {
   // supposed to be size of COLS and ROWS
   size_t rows, cols;
   getmaxyx(_win, rows, cols);
@@ -93,35 +92,35 @@ std::vector<size_t> Kmenu::maxSize() const {
   return termSz;
 }
 
-void Kmenu::insert(std::string const &str, size_t const y, size_t const x) {
+void Vmenu::insert(std::string const &str, size_t const y, size_t const x) {
   mvwprintw(_win, y, x, str.c_str());
 }
-void Kmenu::insert(char const *ch, size_t const y, size_t const x) {
+void Vmenu::insert(char const *ch, size_t const y, size_t const x) {
   mvwprintw(_win, y, x, ch);
 }
-void Kmenu::insert(char const ch, size_t const y, size_t const x) {
+void Vmenu::insert(char const ch, size_t const y, size_t const x) {
   char const *chstr = &ch;
   mvwprintw(_win, y, x, chstr);
 }
 /// MUTATOR RETROACTIVE
-void Kmenu::borderStyle(int const ch) {
+void Vmenu::borderStyle(int const ch) {
   _showBorder = 1;
   wborder(_win, ch, ch, ch, ch, ch, ch, ch, ch);
 }
 
-void Kmenu::pause() const { wgetch(_win); }
+void Vmenu::pause() const { wgetch(_win); }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::borderStyle(int const L, int const R, int const T, int const B,
+void Vmenu::borderStyle(int const L, int const R, int const T, int const B,
                         int const TL, int const TR, int const BL,
                         int const BR) {
   _showBorder = 1;
   wborder(_win, L, R, T, B, TL, TR, BL, BR);
 }
 
-bool Kmenu::windowSet() const { return _win != nullptr; }
+bool Vmenu::windowSet() const { return _win != nullptr; }
 
-void Kmenu::_updateF() {
+void Vmenu::_updateF() {
   size_t p = _p();
   size_t pRem = _pRem();
   size_t pCoeff = _pCoeff();
@@ -132,7 +131,7 @@ void Kmenu::_updateF() {
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::loadFields(std::vector<Kfield> const &fields) {
+void Vmenu::loadFields(std::vector<Vfield> const &fields) {
   _fields = fields;
   _fieldSz = fields.size();
 
@@ -143,7 +142,7 @@ void Kmenu::loadFields(std::vector<Kfield> const &fields) {
   _updateF();
 }
 
-void Kmenu::_checkRange(size_t const y1, size_t const x1, size_t const y2,
+void Vmenu::_checkRange(size_t const y1, size_t const x1, size_t const y2,
                         size_t const x2) const {
 
   bool lowerLimitY1 = 0;
@@ -218,7 +217,7 @@ void Kmenu::_checkRange(size_t const y1, size_t const x1, size_t const y2,
   }
 }
 
-void Kmenu::_checkRange(size_t const y, size_t const x) const {
+void Vmenu::_checkRange(size_t const y, size_t const x) const {
   bool lowerLimitY = _showBorder ? (y < 0) : (y == 0);
   bool upperLimitY = _showBorder ? (y > _winSzY - 1) : (y >= _winSzY - 1);
   if (lowerLimitY) {
@@ -242,10 +241,10 @@ void Kmenu::_checkRange(size_t const y, size_t const x) const {
   }
 }
 
-void Kmenu::_loadFields() {
+void Vmenu::_loadFields() {
 
   _updateF();
-  std::vector<Kfield> subFields = _loadPage();
+  std::vector<Vfield> subFields = _loadPage();
   size_t xCorrect;
   size_t yCorrect;
 
@@ -299,16 +298,16 @@ void Kmenu::_loadFields() {
 }
 
 /// MUTATOR RETRO1ACTIVE
-void Kmenu::loadFieldAlignment(int const x, int const y) {
+void Vmenu::loadFieldAlignment(int const x, int const y) {
   _xAlign = x;
   _yAlign = y;
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::fieldStyle(std::string const &style) { _fieldStyle = style; }
+void Vmenu::fieldStyle(std::string const &style) { _fieldStyle = style; }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::paginate(size_t const entriesPerPage) {
+void Vmenu::paginate(size_t const entriesPerPage) {
   if (entriesPerPage < 0)
     throw std::runtime_error(
         "Cannot have negative value number of entries per page.");
@@ -318,37 +317,37 @@ void Kmenu::paginate(size_t const entriesPerPage) {
   _entriesPerPage = entriesPerPage;
 }
 
-size_t Kmenu::_pCoeff() const {
+size_t Vmenu::_pCoeff() const {
   size_t pCoeff = _entriesPerPage == 0 ? _fieldSz : _entriesPerPage;
   return pCoeff;
 }
-size_t Kmenu::_pQuot() const {
+size_t Vmenu::_pQuot() const {
   size_t pQuot = _fieldSz / _pCoeff();
   return pQuot;
 }
-size_t Kmenu::_pRem() const {
+size_t Vmenu::_pRem() const {
   size_t pRem = (size_t)(_fieldSz % _pCoeff() != 0);
   return pRem;
 }
-size_t Kmenu::_p() const {
+size_t Vmenu::_p() const {
   size_t p = _pQuot() + _pRem();
   return p;
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::hideTitle() {
+void Vmenu::hideTitle() {
   std::string tPadding(_winSzX, ' ');
   mvwprintw(_win, _winPosY, _winPosX, tPadding.c_str());
   // metadata tells other functions to now disregard title space
   _showTitle = 0;
 }
 
-void Kmenu::hideBorder() {
+void Vmenu::hideBorder() {
   borderStyle(' ');
   _showBorder = 0;
 }
 
-void Kmenu::_addToTitleHeader(std::string const &title) {
+void Vmenu::_addToTitleHeader(std::string const &title) {
 
   size_t y;
   size_t x;
@@ -377,14 +376,14 @@ void Kmenu::_addToTitleHeader(std::string const &title) {
 /// sets the title for the window with an optional style option (default none).
 /// This will not show the title to screen on window refresh if the the tite is
 /// hidden.
-void Kmenu::loadTitle(std::string const &title, TitleStyle const style) {
+void Vmenu::loadTitle(std::string const &title, TitleStyle const style) {
   _title = title;
   _titleStyle = style;
 }
 
-void Kmenu::loadTitleStyle(TitleStyle style) { _titleStyle = style; }
+void Vmenu::loadTitleStyle(TitleStyle style) { _titleStyle = style; }
 
-void Kmenu::showTitle() {
+void Vmenu::showTitle() {
 
   _showTitle = 1; // make title attributes visible again
 
@@ -402,15 +401,15 @@ void Kmenu::showTitle() {
   }
 };
 
-void Kmenu::_updateM() {
-  for (const Kfield field : _fields) {
+void Vmenu::_updateM() {
+  for (const Vfield field : _fields) {
     size_t len = field.name().size();
     if (len > _m)
       _m = len;
   }
 }
 
-std::string Kmenu::_addFieldPadding(std::string const &fieldName) {
+std::string Vmenu::_addFieldPadding(std::string const &fieldName) {
   const size_t newStrLen = _m % 2 == 0 ? _m : _m + 1;
   const size_t oldStrLen = fieldName.size(); // retrieve size of field name
   std::string newStr(newStrLen, ' ');        // make empty new field
@@ -424,7 +423,7 @@ std::string Kmenu::_addFieldPadding(std::string const &fieldName) {
 }
 
 /// MF
-char Kmenu::getCharFromWin(size_t const y, size_t const x,
+char Vmenu::getCharFromWin(size_t const y, size_t const x,
                            bool const save_cursor) const {
   _checkRange(y, x);
   size_t curr_y, curr_x;
@@ -436,7 +435,7 @@ char Kmenu::getCharFromWin(size_t const y, size_t const x,
 }
 
 /// MF ACTIVE
-void Kmenu::erase(size_t const y1, size_t const x1, size_t const y2,
+void Vmenu::erase(size_t const y1, size_t const x1, size_t const y2,
                   size_t const x2) {
 
   _checkRange(y1, x1, y2, x2);
@@ -448,12 +447,13 @@ void Kmenu::erase(size_t const y1, size_t const x1, size_t const y2,
   wrefresh(_win);
 }
 
-void Kmenu::erase(bool titleBar) { fill(' ', titleBar); }
+void Vmenu::erase(bool titleBar) { fill(' ', titleBar); }
 
-void Kmenu::clear() { wclear(_win); }
+void Vmenu::clear() { wclear(_win); }
 
 /// MF RETROACTIVE
-void Kmenu::fill(char const ch, bool const titleBar) {
+void Vmenu::fill(char const ch, bool const titleBar) {
+  size_t correction = (size_t)(!_showBorder);
   size_t start = titleBar ? 2 : 1;
   size_t end = _winSzY - 2;
   size_t width = _winSzX - 2;
@@ -465,7 +465,7 @@ void Kmenu::fill(char const ch, bool const titleBar) {
 }
 
 /// MF ACTIVE
-void Kmenu::eraseExcept(size_t const y1, size_t const x1, size_t const y2,
+void Vmenu::eraseExcept(size_t const y1, size_t const x1, size_t const y2,
                         size_t const x2) {
 
   _checkRange(y1, x1, y2, x2);
@@ -490,7 +490,7 @@ void Kmenu::eraseExcept(size_t const y1, size_t const x1, size_t const y2,
 }
 
 /// MF ACTIVE
-void Kmenu::erase(std::vector<size_t> const &elements) {
+void Vmenu::erase(std::vector<size_t> const &elements) {
   size_t numOfAreas = elements.size() / 4; /*two coordinates per block*/
   for (size_t areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
 
@@ -504,7 +504,7 @@ void Kmenu::erase(std::vector<size_t> const &elements) {
 }
 
 /// MF ACTIVE
-void Kmenu::eraseExcept(std::vector<size_t> const &elements) {
+void Vmenu::eraseExcept(std::vector<size_t> const &elements) {
   size_t width = _winSzX - 2;
   size_t height = _winSzY - 2;
   std::string fill(width, ' ');
@@ -525,17 +525,17 @@ void Kmenu::eraseExcept(std::vector<size_t> const &elements) {
   wrefresh(_win);
 }
 
-void Kmenu::refresh() { wrefresh(_win); }
+void Vmenu::refresh() { wrefresh(_win); }
 
 /// MF ACTIVE
-void Kmenu::label(std::string const &label) const {
+void Vmenu::label(std::string const &label) const {
   size_t labellocy = _winSzY - 1;
   size_t labellocx = _winSzX - (3 + (size_t)label.length());
   mvwaddstr(_win, labellocy, labellocx, label.c_str());
 }
 
 /// MF ACTIVE
-void Kmenu::setWin(bool const initWin) {
+void Vmenu::setWin(bool const initWin) {
   if (initWin == 1) {
     _win = newwin(0, 0, 0, 0);
     wresize(_win, _winSzY, _winSzX);
@@ -547,7 +547,7 @@ void Kmenu::setWin(bool const initWin) {
 }
 
 /// MF ACTIVE
-void Kmenu::display() {
+void Vmenu::display() {
   keypad(_win, true);
   size_t selection;
 
@@ -601,7 +601,7 @@ void Kmenu::display() {
 }
 
 /// MF ACTIVE PRIVATE
-void Kmenu::_delWith(std::vector<WINDOW *> windows) {
+void Vmenu::_delWith(std::vector<WINDOW *> windows) {
   if (!windows.empty())
     for (std::vector<WINDOW *>::iterator it = windows.begin();
          it != windows.end(); ++it) {
@@ -610,15 +610,15 @@ void Kmenu::_delWith(std::vector<WINDOW *> windows) {
 }
 
 /// MF RETROACTIVE PRIVATE
-std::vector<Kfield> Kmenu::_loadPage() {
+std::vector<Vfield> Vmenu::_loadPage() {
 
   if (_fieldSz == 0)
     throw std::runtime_error("No fields were set.");
   if (_p() == 1)
     return _fields;
 
-  std::vector<Kfield>::const_iterator first_iterator;
-  std::vector<Kfield>::const_iterator last_iterator;
+  std::vector<Vfield>::const_iterator first_iterator;
+  std::vector<Vfield>::const_iterator last_iterator;
 
   size_t first = _pCoeff() * _page;
   first_iterator = _fields.begin() + first;
@@ -646,12 +646,12 @@ std::vector<Kfield> Kmenu::_loadPage() {
   // extract subvector. TODO: workaround O(N) for large data?
   // extracts up to but not including last selected.
 
-  std::vector<Kfield> subFields(first_iterator, last_iterator);
+  std::vector<Vfield> subFields(first_iterator, last_iterator);
   return subFields;
 }
 
-Kmenu::~Kmenu() {
-  _delWith(_subwins); // delete windows created by Kmenu
+Vmenu::~Vmenu() {
+  _delWith(_subwins); // delete windows created by Vmenu
   // TODO: maybe warn that window should be unset before calling destructor
   // if (!windowSet())
   setWin(0);

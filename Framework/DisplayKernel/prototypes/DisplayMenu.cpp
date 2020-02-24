@@ -18,8 +18,6 @@ int main(int argc, const char *argv[]) {
   cbreak();
   cursor(0);
 
-  WINDOW *world = newwin(0, 0, 0, 0);
-
   std::string const fname0 = "FIELD 1";
   std::string const fmessage0 = "you selected 'FIELD 1'.";
   std::string const fname1 = "FIELD 2";
@@ -53,8 +51,9 @@ int main(int argc, const char *argv[]) {
   Kmenu main_menu(mainMenuName, LINES, COLS, 0, 0);
 
   main_menu.loadTitle(mainMenuName, TitleStyle::highlight);
+  main_menu.loadFieldAlignment(-1, 1);
 
-  main_menu.setWin(world); // must set the window!
+  main_menu.setWin(1); // must set the window!
 
   // main_menu.hideBorder();
   // main_menu.hideTitle();
@@ -63,7 +62,6 @@ int main(int argc, const char *argv[]) {
   main_menu.showTitle();
 
   int pagination = 3;
-  main_menu.alignFields(-1, 1);
 
   main_menu.fieldStyle("-"); // must do this before
   // displaying
@@ -86,7 +84,7 @@ int main(int argc, const char *argv[]) {
   main_menu.refresh();
   main_menu.pause();
 
-  delwin(world);
+  main_menu.setWin(0);
   endwin();
 
   return 0;

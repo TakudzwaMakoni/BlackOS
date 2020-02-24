@@ -1,24 +1,16 @@
-//
-// Created by Takudzwa Makoni on 2019-07-27.
-//
+// virses (c) 2020 Takudzwa Makoni
+// virtual window Interface
 
-#ifndef BLACKOS_KWINDOW_H
-#define BLACKOS_KWINDOW_H
+#ifndef BLACKOS_VWINDOW_H
+#define BLACKOS_VWINDOW_H
 
-#include "ncurses.h"
-#include <memory>
+#include <iostream>
 #include <vector>
-
-#define cursor(x) curs_set(x)
-
-#define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
-#define X_CENTRE (COLS - WORLD_WIDTH) / 2
-#define WORLD_WIDTH (COLS - 2)
-#define WORLD_HEIGHT (LINES - 2)
 
 namespace BlackOS {
 namespace DisplayKernel {
-class Kwindow {
+
+class Vwindow {
 public:
   virtual void display() = 0;
   virtual void borderStyle(int const ch) = 0;
@@ -29,7 +21,6 @@ public:
   virtual std::vector<size_t> maxSize() const = 0;
   virtual std::string winType() const = 0;
   virtual std::string name() const = 0;
-  virtual void setWin(bool const initWin) = 0;
   virtual void erase(size_t const y1, size_t const x1, size_t const y2,
                      size_t const x2) = 0;
   virtual void eraseExcept(size_t const y1, size_t const x1, size_t const y2,
@@ -49,6 +40,7 @@ public:
   virtual void pause() const = 0;
   virtual bool windowSet() const = 0;
 };
+
 } // namespace DisplayKernel
 } // namespace BlackOS
-#endif // BLACKOS_KWINDOW_H
+#endif // BLACKOS_VWINDOW_H

@@ -14,7 +14,8 @@ namespace DisplayKernel {
 typedef void (*directive)();
 namespace Directives {
 void doNothing();
-void writeToFile();
+void writeToFile(std::string const &fullPath, std::string const &buffer);
+void changeDirectory(std::string const &fullPath);
 void animate();
 void exitProgram();
 } // namespace Directives

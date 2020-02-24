@@ -1,3 +1,6 @@
+// KmenuTests 2020, by Takudzwa Makoni,
+// Using catch2 headers
+
 #define CATCH_CONFIG_RUNNER
 
 #include "../inc/Kmenu.h"
@@ -29,23 +32,19 @@ TEST_CASE("test window is resized to initialised menu size after call setWin",
           "[window]") {
   // generic lambda forces destructor of class Object to be called while still
   // in curses mode.
-  auto glambda = [](WINDOW *world) {
-    int winSzX, winSzY;
-
+  auto glambda = []() {
     auto const &menu = TestHelpers::testMenu();
-    menu->setWin(world);
-    getmaxyx(world, winSzY, winSzX);
-
-    return winSzY == WORLD_HEIGHT && winSzX == WORLD_WIDTH;
+    menu->setWin(1);
+    size_t y = menu->winSzY();
+    size_t x = menu->winSzX();
+    menu->setWin(0);
+    return y == WORLD_HEIGHT && x == WORLD_WIDTH;
   };
 
   initscr(); // initialise curses data
   cbreak();  // allow screen to echo
-  WINDOW *world = newwin(0, 0, 0, 0);
 
-  bool resize_success = glambda(world);
-
-  delwin(world);
+  bool resize_success = glambda();
   endwin(); // exit curses mode
 
   REQUIRE(resize_success);
@@ -56,24 +55,20 @@ TEST_CASE("test window is repositioned to initialised menu position after call "
           "[window]") {
   // generic lambda forces destructor of class Object to be called while still
   // in curses mode.
-  auto glambda = [](WINDOW *world) {
-    int winPosX, winPosY;
-
+  auto glambda = []() {
     auto const &menu = TestHelpers::testMenu();
+    menu->setWin(1);
+    size_t y = menu->winPosY();
+    size_t x = menu->winPosX();
+    menu->setWin(0);
 
-    menu->setWin(world);
-    getbegyx(world, winPosY, winPosX);
-
-    return winPosY == Y_CENTRE && winPosX == X_CENTRE;
+    return y == Y_CENTRE && x == X_CENTRE;
   };
 
   initscr(); // initialise curses data
   cbreak();  // allow screen to echo
-  WINDOW *world = newwin(0, 0, 0, 0);
 
-  bool reposition_success = glambda(world);
-
-  delwin(world);
+  bool reposition_success = glambda();
   endwin(); // exit curses mode
 
   REQUIRE(reposition_success);
@@ -83,20 +78,17 @@ TEST_CASE("test window is unset on call setWin with empty parameters",
           "[window]") {
   // generic lambda forces destructor of class Object to be called while still
   // in curses mode.
-  auto glambda = [](WINDOW *world) {
+  auto glambda = []() {
     auto const &menu = TestHelpers::testMenu();
-    menu->setWin(world);
-    menu->setWin();
+    menu->setWin(1);
+    menu->setWin(0);
     return !menu->windowSet();
   };
 
   initscr(); // initialise curses data
   cbreak();  // allow screen to echo
-  WINDOW *world = newwin(0, 0, 0, 0);
 
-  bool window_is_null = glambda(world);
-
-  delwin(world);
+  bool window_is_null = glambda();
   endwin(); // exit curses mode
 
   REQUIRE(window_is_null);
@@ -105,10 +97,10 @@ TEST_CASE("test window is unset on call setWin with empty parameters",
 TEST_CASE("test menu is filled excluding title bar", "[window]") {
   // generic lambda forces destructor of class Object to be called while still
   // in curses mode.
-  auto glambda = [](WINDOW *world) {
+  auto glambda = []() {
     auto const &menu = TestHelpers::testMenu();
     menu->loadTitle("test_menu_title");
-    menu->setWin(world);
+    menu->setWin(1);
     menu->fill('w', true);
 
     bool filled = true;
@@ -125,16 +117,14 @@ TEST_CASE("test menu is filled excluding title bar", "[window]") {
       if (menu->getCharFromWin(1, j, false) == 'w')
         titleBar_preserved = false;
     }
+    menu->setWin(0);
     return filled && titleBar_preserved;
   };
 
   initscr(); // initialise curses data
   cbreak();  // prevent input buffer
-  WINDOW *world = newwin(0, 0, 0, 0);
 
-  bool fill_successful = glambda(world);
-
-  delwin(world);
+  bool fill_successful = glambda();
   endwin(); // exit curses mode
 
   REQUIRE(fill_successful);
@@ -143,10 +133,10 @@ TEST_CASE("test menu is filled excluding title bar", "[window]") {
 TEST_CASE("test menu is filled including title bar", "[window]") {
   // generic lambda forces destructor of class Object to be called while still
   // in curses mode.
-  auto glambda = [](WINDOW *world) {
+  auto glambda = []() {
     auto const &menu = TestHelpers::testMenu();
     menu->loadTitle("test_menu_title");
-    menu->setWin(world);
+    menu->setWin(1);
     menu->fill('w', false);
 
     bool filled = true;
@@ -158,16 +148,14 @@ TEST_CASE("test menu is filled including title bar", "[window]") {
           filled = false;
       }
     }
+    menu->setWin(0);
     return filled;
   };
 
   initscr(); // initialise curses data
   cbreak();  // prevent input buffer
-  WINDOW *world = newwin(0, 0, 0, 0);
 
-  bool fill_successful = glambda(world);
-
-  delwin(world);
+  bool fill_successful = glambda();
   endwin(); // exit curses mode
 
   REQUIRE(fill_successful);
@@ -176,11 +164,11 @@ TEST_CASE("test menu is filled including title bar", "[window]") {
 TEST_CASE("test erase call erases horizontal block", "[member_functions]") {
 
   // horizontal block
-  auto glambda = [](WINDOW *world) {
+  auto glambda = []() {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
     menu->loadTitle("test_menu_title");
-    menu->setWin(world);
+    menu->setWin(1);
     menu->fill('w', false);
     // erase from y = 0  and x = (3,5)
     menu->erase(1, 3, 1, 5);
@@ -189,15 +177,16 @@ TEST_CASE("test erase call erases horizontal block", "[member_functions]") {
     bool isBlank2 = menu->getCharFromWin(1, 4) == ' ';
     bool isBlank3 = menu->getCharFromWin(1, 5) == ' ';
 
+    menu->setWin(0);
     return isBlank1 && isBlank2 && isBlank3;
   };
 
   initscr();
   cbreak();
-  WINDOW *world = newwin(0, 0, 0, 0);
-  bool exit_success = glambda(world);
-  delwin(world);
+
+  bool exit_success = glambda();
   endwin();
+
   REQUIRE(exit_success);
 }
 
@@ -205,11 +194,11 @@ TEST_CASE("test eraseExcept call excepts horizontal block",
           "[member_functions]") {
 
   // horizontal block
-  auto glambda = [](WINDOW *world) {
+  auto glambda = []() {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
     menu->loadTitle("test_menu_title");
-    menu->setWin(world);
+    menu->setWin(1);
     menu->fill('w', false);
     // erase from y = 0  and x = (3,5)
     menu->eraseExcept(1, 3, 1, 5);
@@ -223,27 +212,28 @@ TEST_CASE("test eraseExcept call excepts horizontal block",
     bool isBlank2 = menu->getCharFromWin(1, 7) == ' ';
     bool isBlank3 = menu->getCharFromWin(1, 8) == ' ';
 
+    menu->setWin(0);
     return notBlank1 && notBlank2 && notBlank3 && isBlank1 && isBlank2 &&
            isBlank3;
   };
 
   initscr();
   cbreak();
-  WINDOW *world = newwin(0, 0, 0, 0);
-  bool exit_success = glambda(world);
-  delwin(world);
+
+  bool exit_success = glambda();
   endwin();
+
   REQUIRE(exit_success);
 }
 
 TEST_CASE("test erase call erases vertical block", "[member_functions]") {
 
   // vertical block
-  auto glambda = [](WINDOW *world) {
+  auto glambda = []() {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
     menu->loadTitle("test_menu_title");
-    menu->setWin(world);
+    menu->setWin(1);
     menu->fill('w', false);
 
     // erase from y = (3,5) and x = 0
@@ -253,26 +243,27 @@ TEST_CASE("test erase call erases vertical block", "[member_functions]") {
     bool isBlank2 = menu->getCharFromWin(4, 1) == ' ';
     bool isBlank3 = menu->getCharFromWin(5, 1) == ' ';
 
+    menu->setWin(0);
     return isBlank1 && isBlank2 && isBlank3;
   };
 
   initscr();
   cbreak();
-  WINDOW *world = newwin(0, 0, 0, 0);
-  bool exit_success = glambda(world);
-  delwin(world);
+
+  bool exit_success = glambda();
   endwin();
+
   REQUIRE(exit_success);
 }
 
 TEST_CASE("test erase call erases square block", "[member_functions]") {
 
   // square block
-  auto glambda = [](WINDOW *world) {
+  auto glambda = []() {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 1, 1);
     menu->loadTitle("test_menu_title");
-    menu->setWin(world);
+    menu->setWin(1);
     menu->fill('w', false);
     // erase from y = (0,2) and x = (0,2) i.e 3x3 block
     menu->erase(1, 1, 2, 2);
@@ -287,16 +278,17 @@ TEST_CASE("test erase call erases square block", "[member_functions]") {
     bool isBlank8 = menu->getCharFromWin(2, 1) == ' ';
     bool isBlank9 = menu->getCharFromWin(2, 2) == ' ';
 
+    menu->setWin(0);
     return isBlank1 && isBlank2 && isBlank3 && isBlank4 && isBlank5 &&
            isBlank6 && isBlank7 && isBlank8 && isBlank9;
   };
 
   initscr();
   cbreak();
-  WINDOW *world = newwin(0, 0, 0, 0);
-  bool exit_success = glambda(world);
-  delwin(world);
+
+  bool exit_success = glambda();
   endwin();
+
   REQUIRE(exit_success);
 }
 
@@ -304,11 +296,11 @@ TEST_CASE("test erase call erases multiple square blocks",
           "[member_functions]") {
 
   // square block
-  auto glambda = [](WINDOW *world) {
+  auto glambda = []() {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
     menu->loadTitle("test_menu_title");
-    menu->setWin(world);
+    menu->setWin(1);
     menu->fill('w', false);
     // erase from y = (0,2) and x = (0,5) i.e 3x6 block
     menu->erase({1, 1, 2, 2, 1, 3, 2, 5});
@@ -333,6 +325,7 @@ TEST_CASE("test erase call erases multiple square blocks",
     bool isBlank17 = menu->getCharFromWin(2, 4) == ' ';
     bool isBlank18 = menu->getCharFromWin(2, 5) == ' ';
 
+    menu->setWin(0);
     return isBlank1 && isBlank2 && isBlank3 && isBlank4 && isBlank5 &&
            isBlank6 && isBlank7 && isBlank8 && isBlank9 && isBlank10 &&
            isBlank11 && isBlank12 && isBlank13 && isBlank14 && isBlank15 &&
@@ -341,10 +334,10 @@ TEST_CASE("test erase call erases multiple square blocks",
 
   initscr();
   cbreak();
-  WINDOW *world = newwin(0, 0, 0, 0);
-  bool exit_success = glambda(world);
-  delwin(world);
+
+  bool exit_success = glambda();
   endwin();
+
   REQUIRE(exit_success);
 }
 

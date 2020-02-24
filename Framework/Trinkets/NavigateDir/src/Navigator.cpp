@@ -4,8 +4,11 @@
 #include <algorithm>
 #include <cctype>
 #include <filesystem>
+#include <fmt/format.h>
+#include <iomanip>
 #include <iostream>
 #include <list>
+#include <sstream>
 #include <string>
 
 namespace BlackOS {
@@ -14,20 +17,23 @@ namespace Trinkets {
 Navigator::Navigator(std::string const &path, bool const showHiddenFiles)
     : _parentPath(path), _showHiddenFiles(showHiddenFiles) {
   _loadChildren();
+  _loadMax();
 }
 
 size_t Navigator::childrenSize() const { return _children.size(); }
 
-std::list<std::string> Navigator::children() const { return _children; }
+std::vector<std::string> Navigator::children() const { return _children; }
 
+// use list for case insensitive sort
+std::list<std::string> childrenList;
 void Navigator::_loadChildren() {
   for (const auto &entry : std::filesystem::directory_iterator(_parentPath)) {
     std::string entryString = entry.path();
     if (_showHiddenFiles) {
-      _children.push_back(entryString);
+      childrenList.push_back(entryString);
     } else if (!_showHiddenFiles) {
       if (stripSubstring(entryString, _parentPath + "/")[0] != '.')
-        _children.push_back(entryString);
+        childrenList.push_back(entryString);
     }
   }
 
@@ -43,7 +49,43 @@ void Navigator::_loadChildren() {
     return (first.length() < second.length());
   };
 
-  _children.sort(_nocase);
+  childrenList.sort(_nocase);
+  _children = {std::make_move_iterator(std::begin(childrenList)),
+               std::make_move_iterator(std::end(childrenList))};
+}
+
+std::vector<DisplayKernel::Kfield> Navigator::generateFields() {
+  // generate fields
+  std::vector<DisplayKernel::Kfield> fields;
+  for (std::string const &entry : _children) {
+    std::string entityPad = std::to_string(_max + 3);
+    std::string formatString = "{0:<" + entityPad + "}{1:<12}{2:<12}{3:<20}";
+    std::string fieldName = fmt::format(
+        formatString, stripSubstring(entry, _parentPath + "/"), pathType(entry),
+        pathPermissions(entry), pathLastModifiedDate(entry));
+
+    DisplayKernel::Kfield fieldEntry(fieldName,
+                                     DisplayKernel::Directives::doNothing);
+    fields.push_back(fieldEntry);
+  }
+  return fields;
+}
+
+void Navigator::_loadMax() {
+  for (std::string const &entry : _children) {
+    std::string name = stripSubstring(entry, _parentPath + "/");
+    if (name.size() > _max) {
+      _max = name.size();
+    }
+  }
+}
+
+std::string Navigator::generateTitle() const {
+  std::string entityPad = std::to_string(_max + 3);
+  std::string formatString = "{0:<" + entityPad + "}{1:<12}{2:<12}{3:<20}";
+  std::string title =
+      fmt::format(formatString, "entity", "type", "access", "modified");
+  return title;
 }
 
 } // namespace Trinkets

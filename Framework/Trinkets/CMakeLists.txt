@@ -1,6 +1,7 @@
 project (Trinkets LANGUAGES CXX)
 
 find_package (Boost 1.72 REQUIRED)
+find_package(fmt)
 
 set(CMAKE_CXX_COMPILER  "/usr/bin/clang++")
 
@@ -33,5 +34,7 @@ target_include_directories(NavigateDir
     ${DISPLAY_KERNEL_PATH}/inc
     )
 
+
+target_link_libraries(NavigateDir fmt::fmt)
 target_link_libraries(NavigateDir ${Boost_LIBRARIES})
 target_link_libraries(NavigateDir libKmenu)

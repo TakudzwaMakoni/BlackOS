@@ -4,7 +4,7 @@
 
 // test
 #include "../inc/Directives.h"
-#include <ncurses.h>
+#include <unistd.h>
 
 namespace BlackOS {
 namespace DisplayKernel {
@@ -14,16 +14,14 @@ void exitProgram() {
   endwin();
   exit(0);
 }
-void writeToFile() {
-  std::string buf, fullPath;
+void writeToFile(std::string const &fullPath, std::string const &buffer) {
 
-  fullPath = "testexample.txt";
-  buf = "this is a test!";
   std::ofstream file;
   file.open(fullPath);
-  file << buf;
+  file << buffer;
   file.close();
 }
+void changeDirectory(std::string const &fullPath) { chdir(fullPath.c_str()); }
 void animate(int aniCode) {}
 } // namespace Directives
 } // namespace DisplayKernel
