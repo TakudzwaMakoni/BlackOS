@@ -14,13 +14,17 @@ using namespace BlackOS::Trinkets;
 
 int main(int argc, char const *argv[]) {
 
-  long const cursor_start = strtol(argv[1], NULL, 10);
+  std::string trueVal = "True";
+  bool const showHidden = argv[1] == trueVal ? 1 : 0;
+  long cursor_start = strtol(argv[2], NULL, 10);
+  std::string parentPath = argv[3];
 
-  bool const showHidden = 0;
-  std::string const parentPath = "/home/takudzwa";
+  // remove trailing '/' if any
+  if (parentPath.back() == '/') {
+    parentPath.pop_back();
+  }
 
-  Navigator testNav(parentPath, 0);
-
+  Navigator testNav(parentPath, showHidden);
   auto fields = testNav.generateFields();
 
   // enter curses mode
@@ -28,17 +32,29 @@ int main(int argc, char const *argv[]) {
   cbreak();
   cursor(0);
 
-  size_t const width = fields[0].name().length(); // same length for all fields
-  size_t const height = fields.size() + 1;
+  std::string title = testNav.generateTitle();
+  size_t fieldSz = fields.size();
+
+  size_t width = title.length() + 1;
+  size_t height = fieldSz + 2;
 
   std::string const menuID = "Navigator";
-  BlackOS::DisplayKernel::Kmenu NavigationMenu(menuID, height, width + 1,
+  size_t pagination = fieldSz;
+
+  if (height > LINES) {
+    cursor_start = 0;
+    pagination = LINES - 2;
+    height = LINES;
+  }
+
+  BlackOS::DisplayKernel::Kmenu NavigationMenu(menuID, height, width,
                                                cursor_start, 0);
 
-  NavigationMenu.loadTitle(testNav.generateTitle(),
+  NavigationMenu.loadTitle(title,
                            BlackOS::DisplayKernel::TitleStyle::underline);
   NavigationMenu.loadFields(fields);
   NavigationMenu.loadFieldAlignment(-1, 1);
+  NavigationMenu.paginate(pagination);
 
   NavigationMenu.setWin(1);
   NavigationMenu.hideBorder();
@@ -53,6 +69,5 @@ int main(int argc, char const *argv[]) {
   navigationDir << chosenPath;
   NavigationMenu.setWin(0);
   endwin();
-
   return 0;
 }

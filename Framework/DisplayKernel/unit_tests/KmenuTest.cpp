@@ -5,7 +5,6 @@
 
 #include "../inc/Kmenu.h"
 #include "../inc/Directives.h"
-#include "../inc/Kfield.h"
 #include "../testHelpers/inc/MenuGenerator.h"
 #include "ncurses.h"
 #include <catch2/catch.hpp>

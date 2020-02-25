@@ -2,7 +2,6 @@
 #define NAVIGATOR_H
 
 #include "Directives.h"
-#include "Kfield.h"
 
 #include <list>
 #include <string>
@@ -16,7 +15,7 @@ public:
 
   size_t childrenSize() const;
   std::vector<std::string> children() const;
-  std::vector<DisplayKernel::Kfield> generateFields();
+  std::vector<std::string> generateFields();
   std::string generateTitle() const;
 
 private:

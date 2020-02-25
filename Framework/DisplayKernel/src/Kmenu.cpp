@@ -61,7 +61,7 @@ size_t Kmenu::_highlightedMap() const {
 }
 
 /// ACCESSOR
-std::vector<Kfield> Kmenu::fields() const { return _fields; }
+std::vector<std::string> Kmenu::fields() const { return _fields; }
 
 size_t Kmenu::winSzY() const { return _winSzY; }
 
@@ -78,7 +78,7 @@ std::string Kmenu::winType() const { return "Kmenu"; }
 std::string Kmenu::name() const { return _name; }
 
 /// ACCESSOR
-Kfield Kmenu::selectedField() const {
+std::string Kmenu::selectedField() const {
   size_t map = _highlightedMap();
   return this->_fields[map];
 }
@@ -132,11 +132,11 @@ void Kmenu::_updateF() {
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::loadFields(std::vector<Kfield> const &fields) {
+void Kmenu::loadFields(std::vector<std::string> const &fields) {
   _fields = fields;
   _fieldSz = fields.size();
 
-  // load defaults on new kFields
+  // load defaults on new std::strings
   _page = 0;
 
   _updateM();
@@ -245,21 +245,22 @@ void Kmenu::_checkRange(size_t const y, size_t const x) const {
 void Kmenu::_loadFields() {
 
   _updateF();
-  std::vector<Kfield> subFields = _loadPage();
+  std::vector<std::string> subFields = _loadPage();
+
   size_t xCorrect;
   size_t yCorrect;
+  size_t correction = _showBorder ? 1 : 0;
 
-  if (_showTitle && _pCoeff() != _fieldSz) {
-    std::string pageInfo = "page: " + std::to_string(_page + 1) + " of " +
-                           std::to_string(_p()) + " * ";
-    _addToTitleHeader(pageInfo);
+  if (_showTitle && _entriesPerPage != _fieldSz) {
+    std::string pageInfo =
+        " page: " + std::to_string(_page + 1) + " of " + std::to_string(_p());
+    _addToTitleHeader(pageInfo, _winSzY - 1 - correction,
+                      _winSzX - correction - pageInfo.length());
   }
 
   for (size_t i = 0; i < _f; ++i) {
 
-    std::string fieldName = subFields[i].name();
-
-    size_t correction = _showBorder ? 1 : 0;
+    std::string fieldName = subFields[i];
 
     if (_showBorder == 0) {
       correction = 0;
@@ -272,7 +273,7 @@ void Kmenu::_loadFields() {
       size_t right = _winSzX - correction - fieldName.length();
       xCorrect = right;
     } else if (_xAlign == 0) {
-      // is to be subtracted by ( fields[i].name().length() ) / 2
+      // is to be subtracted by ( fields[i].length() ) / 2
       size_t h_centre = (_winSzX - fieldName.length()) / 2;
       xCorrect = h_centre;
     } else if (_xAlign == -1)
@@ -312,9 +313,6 @@ void Kmenu::paginate(size_t const entriesPerPage) {
   if (entriesPerPage < 0)
     throw std::runtime_error(
         "Cannot have negative value number of entries per page.");
-  if (_fieldSz == 0)
-    throw std::runtime_error("field size is zero.");
-  // set entriesPerPage member variable
   _entriesPerPage = entriesPerPage;
 }
 
@@ -327,11 +325,11 @@ size_t Kmenu::_pQuot() const {
   return pQuot;
 }
 size_t Kmenu::_pRem() const {
-  size_t pRem = (size_t)(_fieldSz % _pCoeff() != 0);
+  size_t pRem = (size_t)(_fieldSz % _pCoeff());
   return pRem;
 }
 size_t Kmenu::_p() const {
-  size_t p = _pQuot() + _pRem();
+  size_t p = _pQuot() + (_pRem() != 0);
   return p;
 }
 
@@ -348,18 +346,7 @@ void Kmenu::hideBorder() {
   _showBorder = 0;
 }
 
-void Kmenu::_addToTitleHeader(std::string const &title) {
-
-  size_t y;
-  size_t x;
-
-  if (_showBorder == 0) {
-    y = 0;
-    x = 0;
-  } else if (_showBorder == 1) {
-    y = 1;
-    x = 1;
-  }
+void Kmenu::_addToTitleHeader(std::string const &title, size_t y, size_t x) {
 
   if (_titleStyle == TitleStyle::highlight) {
     wattron(_win, A_REVERSE);
@@ -388,23 +375,40 @@ void Kmenu::showTitle() {
 
   _showTitle = 1; // make title attributes visible again
 
+  std::string headerTitle = _title;
+  size_t y, x;
+
+  size_t paddingCorrection;
+  size_t headerTitleLen = headerTitle.length();
+
   // add title to window
+
   if (_showBorder) {
-    size_t correction = _winSzX - _title.length() - 3;
-    std::string tPadding(_winSzX, ' ');
-    tPadding.replace(correction, _winSzX, _title + " ");
-    _addToTitleHeader(tPadding);
+    y = 1;
+    x = 1;
+    if (headerTitleLen + 1 < _winSzX) {
+      paddingCorrection = _winSzX - headerTitleLen - 2;
+    } else {
+      throw std::runtime_error("title header is longer than window width.");
+    }
   } else {
-    size_t correction = _winSzX - _title.length() - 1;
-    std::string tPadding(_winSzX, ' ');
-    tPadding.replace(correction, _winSzX, _title + " ");
-    _addToTitleHeader(tPadding);
+    y = 0;
+    x = 0;
+    if (headerTitleLen - 1 < _winSzX) {
+      paddingCorrection = _winSzX - headerTitleLen;
+    } else {
+      throw std::runtime_error("title header is longer than window width.");
+    }
   }
+
+  std::string header(paddingCorrection, ' ');
+  header.insert(0, headerTitle);
+  _addToTitleHeader(header, y, x);
 };
 
 void Kmenu::_updateM() {
-  for (const Kfield field : _fields) {
-    size_t len = field.name().size();
+  for (const std::string field : _fields) {
+    size_t len = field.length();
     if (len > _m)
       _m = len;
   }
@@ -416,10 +420,8 @@ std::string Kmenu::_addFieldPadding(std::string const &fieldName) {
   std::string newStr(newStrLen, ' ');        // make empty new field
   size_t correction = (newStrLen - oldStrLen) / 2;
   newStr.replace(correction, oldStrLen, fieldName);
-  std::string front = _fieldStyle + " ";
-  std::string back = " " + _fieldStyle;
-  newStr.insert(0, front);
-  newStr.append(back);
+  newStr.insert(0, _fieldStyle);
+  newStr.append(_fieldStyle);
   return newStr;
 }
 
@@ -549,7 +551,7 @@ void Kmenu::setWin(bool const initWin) {
 /// MF ACTIVE
 void Kmenu::display() {
   keypad(_win, true);
-  size_t selection;
+  size_t selection; // can be member variable
 
   _highlighted = 0;
 
@@ -596,6 +598,10 @@ void Kmenu::display() {
     }
     if (selection == 10) {
       break;
+    } else if (selection == int('q') || selection == 27 /*ESC*/) {
+      setWin(0);
+      endwin();
+      exit(0);
     }
   }
 }
@@ -610,19 +616,21 @@ void Kmenu::_delWith(std::vector<WINDOW *> windows) {
 }
 
 /// MF RETROACTIVE PRIVATE
-std::vector<Kfield> Kmenu::_loadPage() {
+std::vector<std::string> Kmenu::_loadPage() {
 
   if (_fieldSz == 0)
     throw std::runtime_error("No fields were set.");
   if (_p() == 1)
     return _fields;
 
-  std::vector<Kfield>::const_iterator first_iterator;
-  std::vector<Kfield>::const_iterator last_iterator;
+  std::vector<std::string>::const_iterator first_iterator;
+  std::vector<std::string>::const_iterator last_iterator;
+
+  size_t remainder = _pRem();
 
   size_t first = _pCoeff() * _page;
   first_iterator = _fields.begin() + first;
-  if (_f != _pRem()) {
+  if (_f != remainder) {
     size_t last = first + _f;
     last_iterator = _fields.begin() + last;
   } else {
@@ -646,7 +654,7 @@ std::vector<Kfield> Kmenu::_loadPage() {
   // extract subvector. TODO: workaround O(N) for large data?
   // extracts up to but not including last selected.
 
-  std::vector<Kfield> subFields(first_iterator, last_iterator);
+  std::vector<std::string> subFields(first_iterator, last_iterator);
   return subFields;
 }
 

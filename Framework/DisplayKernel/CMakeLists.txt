@@ -22,7 +22,6 @@ add_library(libVirses
 add_executable(Kmenu
     prototypes/DisplayMenu.cpp
     src/Directives.cpp
-    src/Kfield.cpp
     src/Kmenu.cpp)
 
 #add_executable(Kgrid
@@ -37,7 +36,6 @@ add_executable(KmenuTests
     unit_tests/KmenuTest.cpp
     testHelpers/src/MenuGenerator.cpp
     src/Directives.cpp
-    src/Kfield.cpp
     src/Kmenu.cpp)
 
 

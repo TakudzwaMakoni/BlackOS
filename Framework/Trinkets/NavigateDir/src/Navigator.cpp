@@ -54,19 +54,16 @@ void Navigator::_loadChildren() {
                std::make_move_iterator(std::end(childrenList))};
 }
 
-std::vector<DisplayKernel::Kfield> Navigator::generateFields() {
+std::vector<std::string> Navigator::generateFields() {
   // generate fields
-  std::vector<DisplayKernel::Kfield> fields;
+  std::vector<std::string> fields;
   for (std::string const &entry : _children) {
     std::string entityPad = std::to_string(_max + 3);
-    std::string formatString = "{0:<" + entityPad + "}{1:<12}{2:<12}{3:<20}";
+    std::string formatString = "{0:<" + entityPad + "}{1:<12}{2:<12}{3:<21}";
     std::string fieldName = fmt::format(
         formatString, stripSubstring(entry, _parentPath + "/"), pathType(entry),
         pathPermissions(entry), pathLastModifiedDate(entry));
-
-    DisplayKernel::Kfield fieldEntry(fieldName,
-                                     DisplayKernel::Directives::doNothing);
-    fields.push_back(fieldEntry);
+    fields.push_back(fieldName);
   }
   return fields;
 }
@@ -82,7 +79,7 @@ void Navigator::_loadMax() {
 
 std::string Navigator::generateTitle() const {
   std::string entityPad = std::to_string(_max + 3);
-  std::string formatString = "{0:<" + entityPad + "}{1:<12}{2:<12}{3:<20}";
+  std::string formatString = "{0:<" + entityPad + "}{1:<12}{2:<12}{3:<21}";
   std::string title =
       fmt::format(formatString, "entity", "type", "access", "modified");
   return title;

@@ -5,7 +5,6 @@
 #ifndef BLACKOS_KMENU_H
 #define BLACKOS_KMENU_H
 
-#include "Kfield.h"
 #include "Kwindow.h"
 #include "ncurses.h"
 #include <memory>
@@ -51,20 +50,15 @@ public:
   virtual void pause() const override;
   virtual bool windowSet() const override;
 
-  virtual void loadFields(std::vector<Kfield> const &fields);
-  // virtual void addField(Kfield const &field);             // NEW
-  // virtual void removeField(size_t const index);           // NEW
-  // virtual void removeField(std::string const &fieldName); // NEW
-  // virtual void loadPage(size_t cont page);                // NEW
-  // virtual void clearFields(); // NEW
-  virtual Kfield selectedField() const;
+  virtual void loadFields(std::vector<std::string> const &fields);
+  virtual std::string selectedField() const;
   size_t selectedFieldIndex() const;
 
   void loadFieldAlignment(int const x, int const y);
   void fieldStyle(std::string const &style);
   void paginate(size_t const entriesPerPage);
 
-  std::vector<Kfield> fields() const;
+  std::vector<std::string> fields() const;
   size_t winSzY() const;
   size_t winSzX() const;
   size_t winPosY() const;
@@ -86,7 +80,7 @@ private:
   size_t _winSzX;
   size_t _winPosY;
   size_t _winPosX;
-  std::vector<Kfield> _fields;
+  std::vector<std::string> _fields;
   size_t _page;    // current partition to load
   size_t _fieldSz; // total number of Fields
   size_t _entriesPerPage = 0;
@@ -107,11 +101,11 @@ private:
   size_t _pRem() const;   // remainder
   size_t _p() const;      // total number of partitions
   void _delWith(std::vector<WINDOW *> windows);
-  std::vector<BlackOS::DisplayKernel::Kfield> _loadPage();
+  std::vector<std::string> _loadPage();
   std::string _addFieldPadding(std::string const &fieldName);
   void _loadFields();
   void _updateF();
-  void _addToTitleHeader(std::string const &title);
+  void _addToTitleHeader(std::string const &title, size_t y, size_t x);
   void addTitleStyle(TitleStyle style = TitleStyle::none);
   void _updateM();
   size_t _highlightedMap() const;
