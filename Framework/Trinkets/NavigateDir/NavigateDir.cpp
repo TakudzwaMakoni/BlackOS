@@ -2,11 +2,12 @@
 
 #include "inc/NavigationHelpers.h"
 #include "inc/Navigator.h"
-
 #include "ncurses.h"
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <vector>
@@ -17,8 +18,13 @@ int main(int argc, char const *argv[]) {
 
   std::string trueVal = "True";
   bool showHidden = argv[1] == trueVal ? 1 : 0;
-  long cursor_start = strtol(argv[2], NULL, 10);
+  size_t cursor_start;
+  if (1 != sscanf(argv[2], "%zu", &cursor_start)) {
+    cursor_start = 0;
+  }
   std::string initPath = argv[3];
+
+  // TODO: check path permissions before navigating.
 
   // remove trailing '/' if any
   if (initPath.back() == '/') {
@@ -42,21 +48,20 @@ int main(int argc, char const *argv[]) {
     size_t fieldSz = fields.size();
 
     size_t width = title.length() + 1;
-    size_t height = fieldSz + 2;
+    size_t height = fieldSz + 3;
 
     std::string const menuID = "Navigator";
     size_t pagination = fieldSz;
-
-    if (height > LINES) {
-      cursor_start = 0;
-      pagination = LINES - 2;
-      height = LINES;
-    }
 
     // enter curses mode
     initscr();
     cbreak();
     cursor(0);
+
+    if (height > LINES - cursor_start) {
+      height = LINES - cursor_start;
+      pagination = height - 3;
+    }
 
     BlackOS::DisplayKernel::Kmenu NavigationMenu(menuID, height, width,
                                                  cursor_start, 0);
@@ -75,7 +80,6 @@ int main(int argc, char const *argv[]) {
       // go back up a level and skip iteration.
       parentPath = parentPath.parent_path();
       NavigationMenu.clear();
-      cursor_start = 0;
       continue;
     }
 
@@ -107,13 +111,11 @@ int main(int argc, char const *argv[]) {
     } else if (lastKey == (int)'a' /*out of directory*/) {
       parentPath = parentPath.parent_path();
       NavigationMenu.clear();
-      cursor_start = 0;
     } else if (lastKey == (int)'d' /*into dir*/) {
       fieldIdx = NavigationMenu.selectedFieldIndex();
       auto newPath = testNav.children()[fieldIdx];
       if (pathType(newPath) == "directory") {
         parentPath = newPath;
-        cursor_start = 0;
       }
       NavigationMenu.clear();
     } else if (lastKey == (int)'h') {
