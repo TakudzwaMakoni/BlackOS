@@ -20,7 +20,7 @@ namespace BlackOS {
 namespace DisplayKernel {
 class Kwindow {
 public:
-  virtual void display() = 0;
+  virtual void display(std::vector<int> const &breakConditions) = 0;
   virtual void borderStyle(int const ch) = 0;
   virtual void borderStyle(int const L, int const R, int const T, int const B,
                            int const TL, int const TR, int const BL,

@@ -143,6 +143,8 @@ void Kmenu::loadFields(std::vector<std::string> const &fields) {
   _updateF();
 }
 
+int Kmenu::lastKeyPressed() const { return _lastKeyPressed; }
+
 void Kmenu::_checkRange(size_t const y1, size_t const x1, size_t const y2,
                         size_t const x2) const {
 
@@ -452,7 +454,10 @@ void Kmenu::erase(size_t const y1, size_t const x1, size_t const y2,
 
 void Kmenu::erase(bool titleBar) { fill(' ', titleBar); }
 
-void Kmenu::clear() { wclear(_win); }
+void Kmenu::clear() {
+  wclear(_win);
+  wrefresh(_win);
+}
 
 /// MF RETROACTIVE
 void Kmenu::fill(char const ch, bool const titleBar) {
@@ -464,6 +469,7 @@ void Kmenu::fill(char const ch, bool const titleBar) {
   for (size_t i = start; i <= end; ++i) {
     mvwprintw(_win, i, 1, fillString.c_str());
   }
+  wrefresh(_win);
 }
 
 /// MF ACTIVE
@@ -549,10 +555,9 @@ void Kmenu::setWin(bool const initWin) {
 }
 
 /// MF ACTIVE
-void Kmenu::display() {
+void Kmenu::display(std::vector<int> const &breakConditions) {
   keypad(_win, true);
-  size_t selection; // can be member variable
-
+  int selection;
   _highlighted = 0;
 
   while (true) {
@@ -561,6 +566,7 @@ void Kmenu::display() {
     // refresh before getch
     wrefresh(_win);
     selection = wgetch(_win);
+    _lastKeyPressed = selection;
 
     switch (selection) {
     case KEY_LEFT:
@@ -596,14 +602,22 @@ void Kmenu::display() {
     default:
       break;
     }
-    if (selection == 10) {
+
+    bool exitStatus = 0;
+    for (const int i : breakConditions) {
+      if ((int)selection == i) {
+        exitStatus = 1;
+      }
+    }
+    if (exitStatus) {
       break;
-    } else if (selection == int('q') || selection == 27 /*ESC*/) {
-      setWin(0);
-      endwin();
-      exit(0);
     }
   }
+}
+
+void Kmenu::exitWin() {
+  setWin(0);
+  endwin();
 }
 
 /// MF ACTIVE PRIVATE

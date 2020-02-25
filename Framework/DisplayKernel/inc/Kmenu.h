@@ -21,7 +21,9 @@ public:
   Kmenu(std::string const &name, size_t const sizeY, size_t const sizeX,
         size_t const posY, size_t const posX);
 
-  virtual void display() override;
+  virtual void display(std::vector<int> const &breakConditions = {
+                           (int)'q', 10 /*ENTER key*/,
+                           27 /*ESC key*/}) override;
   virtual void borderStyle(int const ch = 0) override;
   virtual void borderStyle(int const L, int const R, int const T, int const B,
                            int const TL, int const TR, int const BL,
@@ -57,6 +59,7 @@ public:
   void loadFieldAlignment(int const x, int const y);
   void fieldStyle(std::string const &style);
   void paginate(size_t const entriesPerPage);
+  void exitWin();
 
   std::vector<std::string> fields() const;
   size_t winSzY() const;
@@ -70,6 +73,7 @@ public:
                  TitleStyle const titleStyle = TitleStyle::none);
   void loadTitleStyle(TitleStyle style);
   void showTitle();
+  int lastKeyPressed() const;
 
   ~Kmenu();
 
@@ -94,6 +98,7 @@ private:
   size_t _highlighted;
   bool _showTitle = 1;
   bool _showBorder = 1;
+  int _lastKeyPressed;
   TitleStyle _titleStyle;
 
   size_t _pCoeff() const; // typical fields per page

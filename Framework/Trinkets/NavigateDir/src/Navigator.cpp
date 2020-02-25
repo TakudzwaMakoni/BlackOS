@@ -14,26 +14,32 @@
 namespace BlackOS {
 namespace Trinkets {
 
-Navigator::Navigator(std::string const &path, bool const showHiddenFiles)
+Navigator::Navigator(std::filesystem::path const &path,
+                     bool const showHiddenFiles)
     : _parentPath(path), _showHiddenFiles(showHiddenFiles) {
   _loadChildren();
   _loadMax();
 }
 
+std::filesystem::path Navigator::parentPathObj() const { return _parentPath; }
+
 size_t Navigator::childrenSize() const { return _children.size(); }
 
-std::vector<std::string> Navigator::children() const { return _children; }
+std::vector<std::filesystem::path> Navigator::children() const {
+  return _children;
+}
 
-// use list for case insensitive sort
-std::list<std::string> childrenList;
 void Navigator::_loadChildren() {
+
+  // use list for case insensitive sort
+  std::list<std::filesystem::path> childrenList;
   for (const auto &entry : std::filesystem::directory_iterator(_parentPath)) {
-    std::string entryString = entry.path();
+    std::string entryString = entry.path().filename(); // name of child.
     if (_showHiddenFiles) {
-      childrenList.push_back(entryString);
+      childrenList.push_back(entry.path());
     } else if (!_showHiddenFiles) {
-      if (stripSubstring(entryString, _parentPath + "/")[0] != '.')
-        childrenList.push_back(entryString);
+      if (entryString[0] != '.')
+        childrenList.push_back(entry.path());
     }
   }
 
@@ -61,8 +67,8 @@ std::vector<std::string> Navigator::generateFields() {
     std::string entityPad = std::to_string(_max + 3);
     std::string formatString = "{0:<" + entityPad + "}{1:<12}{2:<12}{3:<21}";
     std::string fieldName = fmt::format(
-        formatString, stripSubstring(entry, _parentPath + "/"), pathType(entry),
-        pathPermissions(entry), pathLastModifiedDate(entry));
+        formatString, stripSubstring(entry, _parentPath.string() + "/"),
+        pathType(entry), pathPermissions(entry), pathLastModifiedDate(entry));
     fields.push_back(fieldName);
   }
   return fields;
@@ -70,7 +76,7 @@ std::vector<std::string> Navigator::generateFields() {
 
 void Navigator::_loadMax() {
   for (std::string const &entry : _children) {
-    std::string name = stripSubstring(entry, _parentPath + "/");
+    std::string name = stripSubstring(entry, _parentPath.string() + "/");
     if (name.size() > _max) {
       _max = name.size();
     }
@@ -80,6 +86,7 @@ void Navigator::_loadMax() {
 std::string Navigator::generateTitle() const {
   std::string entityPad = std::to_string(_max + 3);
   std::string formatString = "{0:<" + entityPad + "}{1:<12}{2:<12}{3:<21}";
+
   std::string title =
       fmt::format(formatString, "entity", "type", "access", "modified");
   return title;

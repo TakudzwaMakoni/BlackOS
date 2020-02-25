@@ -55,9 +55,18 @@ int main(int argc, const char *argv[]) {
 
   main_menu.display();
 
-  std::string message = "you selected: " + main_menu.selectedField();
+  std::string message;
   size_t winSzY = main_menu.winSzY();
   size_t winSzX = main_menu.winSzX();
+
+  int exitStatus = main_menu.lastKeyPressed();
+  if (exitStatus == 27) {
+    message = "you exited with ESC";
+  } else if (exitStatus == (int)'q') {
+    message = "you exited with q";
+  } else {
+    message = "you selected: " + main_menu.selectedField();
+  }
 
   size_t centreY = winSzY / 2;
   size_t centreX = (winSzX - message.length()) / 2;
