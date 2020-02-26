@@ -1,16 +1,14 @@
 #ifndef NAVIGATION_HELPERS_H
 #define NAVIGATION_HELPERS_H
 
-#include "Directives.h"
-#include "Kmenu.h"
-
 #include <filesystem>
-#include <iomanip>
-#include <iostream>
+//#include <iomanip>
+//#include <iostream>
 #include <list>
-#include <sstream>
+//#include <sstream>
 #include <string>
 #include <time.h>
+#include <vector>
 
 namespace BlackOS {
 namespace Trinkets {
@@ -22,9 +20,6 @@ std::string pathLastModifiedDate(std::string const &path);
 std::vector<std::string> loadFields(std::list<std::string> const &children,
                                     std::string const &parentPath);
 std::string pathType(std::filesystem::path const &path);
-
-// copyright 2008 Sarah Vessels
-void run_cmd(int argc, char **argv);
 } // namespace Trinkets
 } // namespace BlackOS
 

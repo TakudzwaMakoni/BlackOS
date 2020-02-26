@@ -1,5 +1,5 @@
 
-#include "../inc/Directives.h"
+#include "../inc/DisplayHelpers.h"
 #include "../inc/Kmenu.h"
 
 #include <iostream>
@@ -14,9 +14,9 @@
 using namespace BlackOS::DisplayKernel;
 
 int main(int argc, const char *argv[]) {
-  initscr();
-  cbreak();
-  cursor(0);
+
+  // get terminal screen dimensions
+  auto termSz = TERMINAL_SIZE();
 
   std::string const fname0 = "FIELD 1";
   std::string const fname1 = "FIELD 2";
@@ -31,8 +31,7 @@ int main(int argc, const char *argv[]) {
                                           fname4, fname5, fname6, fname7};
 
   std::string mainMenuName = "BlackOS version 1.0 ";
-
-  Kmenu main_menu(mainMenuName, LINES, COLS, 0, 0);
+  Kmenu main_menu(mainMenuName, termSz[0], termSz[1], 0, 0);
 
   main_menu.loadTitle(mainMenuName, TitleStyle::highlight);
   main_menu.loadFieldAlignment(-1, 1);
@@ -42,7 +41,6 @@ int main(int argc, const char *argv[]) {
 
   main_menu.hideBorder();
   // main_menu.hideTitle();
-
   // main_menu.borderStyle();
   main_menu.showTitle();
 
@@ -73,13 +71,10 @@ int main(int argc, const char *argv[]) {
 
   main_menu.clear();
   main_menu.insert(message, centreY, centreX);
-
   main_menu.refresh();
   main_menu.pause();
 
   main_menu.setWin(0);
-  endwin();
-
   return 0;
 }
 //} // namespace DisplayKernel

@@ -9,13 +9,6 @@
 #include <memory>
 #include <vector>
 
-#define cursor(x) curs_set(x)
-
-#define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
-#define X_CENTRE (COLS - WORLD_WIDTH) / 2
-#define WORLD_WIDTH (COLS - 2)
-#define WORLD_HEIGHT (LINES - 2)
-
 namespace BlackOS {
 namespace DisplayKernel {
 class Kwindow {
@@ -48,6 +41,8 @@ public:
   virtual void insert(char const ch, size_t const y, size_t const x) = 0;
   virtual void pause() const = 0;
   virtual bool windowSet() const = 0;
+  virtual int resize(size_t const y, size_t const x) = 0;
+  virtual int reposition(size_t const y, size_t const x) = 0;
 };
 } // namespace DisplayKernel
 } // namespace BlackOS

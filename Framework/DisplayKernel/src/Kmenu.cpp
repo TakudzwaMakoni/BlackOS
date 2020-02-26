@@ -3,7 +3,7 @@
 //
 
 #include "../inc/Kmenu.h"
-#include "../inc/Directives.h"
+#include "../inc/DisplayHelpers.h"
 #include <algorithm>
 #include <memory>
 #include <numeric>
@@ -545,13 +545,34 @@ void Kmenu::label(std::string const &label) const {
 /// MF ACTIVE
 void Kmenu::setWin(bool const initWin) {
   if (initWin == 1) {
+
+    initscr();
+    cbreak();
+    noecho();
+    curs_set(0);
+
     _win = newwin(0, 0, 0, 0);
     wresize(_win, _winSzY, _winSzX);
     mvwin(_win, _winPosY, _winPosX);
   } else if (initWin == 0) {
     delwin(_win);
+    endwin();
     _win = nullptr;
   }
+}
+
+int Kmenu::resize(size_t const y, size_t const x) {
+  _winSzY = y;
+  _winSzX = x;
+  wresize(_win, _winSzY, _winSzX);
+  return 1;
+}
+
+int Kmenu::reposition(size_t const y, size_t const x) {
+  _winPosY = y;
+  _winPosX = x;
+  mvwin(_win, _winPosY, _winPosX);
+  return 1;
 }
 
 /// MF ACTIVE
@@ -615,20 +636,6 @@ void Kmenu::display(std::vector<int> const &breakConditions) {
   }
 }
 
-void Kmenu::exitWin() {
-  setWin(0);
-  endwin();
-}
-
-/// MF ACTIVE PRIVATE
-void Kmenu::_delWith(std::vector<WINDOW *> windows) {
-  if (!windows.empty())
-    for (std::vector<WINDOW *>::iterator it = windows.begin();
-         it != windows.end(); ++it) {
-      delwin(*it);
-    }
-}
-
 /// MF RETROACTIVE PRIVATE
 std::vector<std::string> Kmenu::_loadPage() {
 
@@ -673,10 +680,8 @@ std::vector<std::string> Kmenu::_loadPage() {
 }
 
 Kmenu::~Kmenu() {
-  _delWith(_subwins); // delete windows created by Kmenu
-  // TODO: maybe warn that window should be unset before calling destructor
-  // if (!windowSet())
-  setWin(0);
+  if (!windowSet())
+    setWin(0);
 }
 
 } // namespace DisplayKernel

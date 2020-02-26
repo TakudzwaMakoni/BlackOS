@@ -51,6 +51,8 @@ public:
   virtual void insert(char const ch, size_t const y, size_t const x) override;
   virtual void pause() const override;
   virtual bool windowSet() const override;
+  virtual int resize(size_t const y, size_t const x) override;
+  virtual int reposition(size_t const y, size_t const x) override;
 
   virtual void loadFields(std::vector<std::string> const &fields);
   virtual std::string selectedField() const;
@@ -59,7 +61,6 @@ public:
   void loadFieldAlignment(int const x, int const y);
   void fieldStyle(std::string const &style);
   void paginate(size_t const entriesPerPage);
-  void exitWin();
 
   std::vector<std::string> fields() const;
   size_t winSzY() const;
@@ -79,7 +80,6 @@ public:
 
 private:
   WINDOW *_win = nullptr;
-  std::vector<WINDOW *> _subwins;
   size_t _winSzY;
   size_t _winSzX;
   size_t _winPosY;
@@ -105,7 +105,6 @@ private:
   size_t _pQuot() const;  // quotient
   size_t _pRem() const;   // remainder
   size_t _p() const;      // total number of partitions
-  void _delWith(std::vector<WINDOW *> windows);
   std::vector<std::string> _loadPage();
   std::string _addFieldPadding(std::string const &fieldName);
   void _loadFields();

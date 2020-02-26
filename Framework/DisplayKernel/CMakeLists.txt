@@ -12,16 +12,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_library(libVirses
-    STATIC
-    inc/Virses.h
-    src/Virses.cpp
-    )
-
-
 add_executable(Kmenu
     prototypes/DisplayMenu.cpp
-    src/Directives.cpp
+    src/DisplayHelpers.cpp
     src/Kmenu.cpp)
 
 #add_executable(Kgrid
@@ -35,7 +28,7 @@ add_executable(KmenuTests
     unit_tests/catch.hpp
     unit_tests/KmenuTest.cpp
     testHelpers/src/MenuGenerator.cpp
-    src/Directives.cpp
+    src/DisplayHelpers.cpp
     src/Kmenu.cpp)
 
 

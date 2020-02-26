@@ -12,19 +12,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-add_library(libKmenu
+add_library(DisplayKernel
     STATIC
     ${DISPLAY_KERNEL_PATH}/inc/Kmenu.h
     ${DISPLAY_KERNEL_PATH}/src/Kmenu.cpp
-    ${DISPLAY_KERNEL_PATH}/inc/Kfield.h
-    ${DISPLAY_KERNEL_PATH}/src/Kfield.cpp
-    ${DISPLAY_KERNEL_PATH}/inc/Directives.h
-    ${DISPLAY_KERNEL_PATH}/src/Directives.cpp
+    ${DISPLAY_KERNEL_PATH}/inc/DisplayHelpers.h
+    ${DISPLAY_KERNEL_PATH}/src/DisplayHelpers.cpp
     )
 
 
 add_executable(NavigateDir
-    NavigateDir/NavigateDir.cpp
+    NavigateDir/src/NavigateDir.cpp
     NavigateDir/src/Navigator.cpp
     NavigateDir/src/NavigationHelpers.cpp
     )
@@ -37,4 +35,4 @@ target_include_directories(NavigateDir
 
 target_link_libraries(NavigateDir fmt::fmt)
 target_link_libraries(NavigateDir ${Boost_LIBRARIES})
-target_link_libraries(NavigateDir libKmenu)
+target_link_libraries(NavigateDir DisplayKernel)

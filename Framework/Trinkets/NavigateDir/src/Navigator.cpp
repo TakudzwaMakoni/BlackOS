@@ -14,13 +14,6 @@
 namespace BlackOS {
 namespace Trinkets {
 
-Navigator::Navigator(std::filesystem::path const &path,
-                     bool const showHiddenFiles)
-    : _parentPath(path), _showHiddenFiles(showHiddenFiles) {
-  _loadChildren();
-  _loadMax();
-}
-
 std::filesystem::path Navigator::parentPathObj() const { return _parentPath; }
 
 size_t Navigator::childrenSize() const { return _children.size(); }
@@ -29,10 +22,15 @@ std::vector<std::filesystem::path> Navigator::children() const {
   return _children;
 }
 
-void Navigator::_loadChildren() {
+void Navigator::showHidden(bool const showHiddenFiles) {
+  _showHiddenFiles = showHiddenFiles;
+}
 
+void Navigator::loadParent(std::filesystem::path const &path) {
+  _parentPath = path;
   // use list for case insensitive sort
   std::list<std::filesystem::path> childrenList;
+
   for (const auto &entry : std::filesystem::directory_iterator(_parentPath)) {
     std::string entryString = entry.path().filename(); // name of child.
     if (_showHiddenFiles) {
@@ -58,6 +56,15 @@ void Navigator::_loadChildren() {
   childrenList.sort(_nocase);
   _children = {std::make_move_iterator(std::begin(childrenList)),
                std::make_move_iterator(std::end(childrenList))};
+
+  // get max length of loaded children.
+  for (std::string const &entry : _children) {
+    std::string entryName = stripSubstring(entry, _parentPath.string() + "/");
+    size_t nameLen = entryName.length();
+    if (nameLen > _max) {
+      _max = nameLen;
+    }
+  }
 }
 
 std::vector<std::string> Navigator::generateFields() {
@@ -72,15 +79,6 @@ std::vector<std::string> Navigator::generateFields() {
     fields.push_back(fieldName);
   }
   return fields;
-}
-
-void Navigator::_loadMax() {
-  for (std::string const &entry : _children) {
-    std::string name = stripSubstring(entry, _parentPath.string() + "/");
-    if (name.size() > _max) {
-      _max = name.size();
-    }
-  }
 }
 
 std::string Navigator::generateTitle() const {
