@@ -23,7 +23,7 @@ add_library(DisplayKernel
 
 add_executable(NavigateDir
     NavigateDir/src/NavigateDir.cpp
-    NavigateDir/src/Navigator.cpp
+    NavigateDir/src/PathController.cpp
     NavigateDir/src/NavigationHelpers.cpp
     )
 

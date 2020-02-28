@@ -1,4 +1,4 @@
-#include "../inc/Navigator.h"
+#include "../inc/PathController.h"
 #include "../inc/NavigationHelpers.h"
 
 #include <algorithm>
@@ -14,19 +14,21 @@
 namespace BlackOS {
 namespace Trinkets {
 
-std::filesystem::path Navigator::parentPathObj() const { return _parentPath; }
+std::filesystem::path PathController::parentPathObj() const {
+  return _parentPath;
+}
 
-size_t Navigator::childrenSize() const { return _children.size(); }
+size_t PathController::childrenSize() const { return _children.size(); }
 
-std::vector<std::filesystem::path> Navigator::children() const {
+std::vector<std::filesystem::path> PathController::children() const {
   return _children;
 }
 
-void Navigator::showHidden(bool const showHiddenFiles) {
+void PathController::showHidden(bool const showHiddenFiles) {
   _showHiddenFiles = showHiddenFiles;
 }
 
-void Navigator::loadParent(std::filesystem::path const &path) {
+void PathController::loadParent(std::filesystem::path const &path) {
   _parentPath = path;
   // use list for case insensitive sort
   std::list<std::filesystem::path> childrenList;
@@ -67,7 +69,7 @@ void Navigator::loadParent(std::filesystem::path const &path) {
   }
 }
 
-std::vector<std::string> Navigator::generateFields() {
+std::vector<std::string> PathController::generateFields() {
   // generate fields
   std::vector<std::string> fields;
   for (std::string const &entry : _children) {
@@ -81,7 +83,7 @@ std::vector<std::string> Navigator::generateFields() {
   return fields;
 }
 
-std::string Navigator::generateTitle() const {
+std::string PathController::generateTitle() const {
   std::string entityPad = std::to_string(_max + 3);
   std::string formatString = "{0:<" + entityPad + "}{1:<12}{2:<12}{3:<21}";
 

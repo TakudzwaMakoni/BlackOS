@@ -1,5 +1,5 @@
-#ifndef NAVIGATOR_H
-#define NAVIGATOR_H
+#ifndef PATH_CONTROLLER_H
+#define PATH_CONTROLLER_H
 
 #include <filesystem>
 #include <string>
@@ -7,7 +7,7 @@
 
 namespace BlackOS {
 namespace Trinkets {
-struct Navigator {
+struct PathController {
 public:
   size_t childrenSize() const;
   std::vector<std::filesystem::path> children() const;

@@ -1,7 +1,7 @@
 // navigate-dir 2020 by takudzwa Makoni (c)
 
 #include "../inc/NavigationHelpers.h"
-#include "../inc/Navigator.h"
+#include "../inc/PathController.h"
 #include "DisplayHelpers.h" // TERMINAL_SIZE()
 #include "Kmenu.h"
 #include "ncurses.h"
@@ -69,7 +69,7 @@ int main(int argc, char const *argv[]) {
   ====================================================================
   */
 
-  std::string const menuID = "Navigator";
+  std::string const menuID = "NavigationMenu";
   std::string title;
   size_t menuWidth;
   size_t menuHeight;
@@ -90,7 +90,7 @@ int main(int argc, char const *argv[]) {
       menuID, ROWS - cursor_pos_y, COLS, cursor_pos_y, cursor_pos_x);
 
   // create path navigator object;
-  Navigator pathController;
+  PathController pathController;
 
   NavigationMenu.setWin(1);
   while (1) {
