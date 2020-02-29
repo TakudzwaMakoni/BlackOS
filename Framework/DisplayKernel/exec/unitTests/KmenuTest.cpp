@@ -3,10 +3,9 @@
 
 #define CATCH_CONFIG_RUNNER
 
-#include "../inc/Kmenu.h"
-#include "../inc/DisplayHelpers.h"
+#include "Kmenu.h"
 #include "../testHelpers/inc/MenuGenerator.h"
-#include "ncurses.h"
+#include "DisplayHelpers.h"
 #include <catch2/catch.hpp>
 #include <chrono>
 #include <cstdio>

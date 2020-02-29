@@ -1,38 +1,8 @@
+##############
+#  TRINKETS  #
+##############
+
 project (Trinkets LANGUAGES CXX)
 
-find_package (Boost 1.72 REQUIRED)
-find_package(fmt)
-
-set(CMAKE_CXX_COMPILER  "/usr/bin/clang++")
-
-set(CMAKE_CXX_FLAGS "-lncurses")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-
-add_library(DisplayKernel
-    STATIC
-    ${DISPLAY_KERNEL_PATH}/inc/Kmenu.h
-    ${DISPLAY_KERNEL_PATH}/src/Kmenu.cpp
-    ${DISPLAY_KERNEL_PATH}/inc/DisplayHelpers.h
-    ${DISPLAY_KERNEL_PATH}/src/DisplayHelpers.cpp
-    )
-
-
-add_executable(NavigateDir
-    NavigateDir/src/NavigateDir.cpp
-    NavigateDir/src/PathController.cpp
-    NavigateDir/src/NavigationHelpers.cpp
-    )
-
-target_include_directories(NavigateDir
-    PRIVATE
-    ${DISPLAY_KERNEL_PATH}/inc
-    )
-
-
-target_link_libraries(NavigateDir fmt::fmt)
-target_link_libraries(NavigateDir ${Boost_LIBRARIES})
-target_link_libraries(NavigateDir DisplayKernel)
+add_subdirectory(exec)
+add_subdirectory(libraries)

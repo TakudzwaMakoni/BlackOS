@@ -1,9 +1,9 @@
-// navigate-dir 2020 by takudzwa Makoni (c)
+// NavigateDir 2020 by takudzwa Makoni (c)
 
-#include "../inc/NavigationHelpers.h"
-#include "../inc/PathController.h"
 #include "DisplayHelpers.h" // TERMINAL_SIZE()
 #include "Kmenu.h"
+#include "NavigationHelpers.h"
+#include "PathController.h"
 #include "ncurses.h"
 
 #include <filesystem>

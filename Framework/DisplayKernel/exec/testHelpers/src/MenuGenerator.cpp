@@ -1,6 +1,6 @@
 #include "../inc/MenuGenerator.h"
-#include "../../inc/DisplayHelpers.h"
-#include "../../inc/Kmenu.h"
+#include "DisplayHelpers.h"
+#include "Kmenu.h"
 #include <memory>
 #include <vector>
 

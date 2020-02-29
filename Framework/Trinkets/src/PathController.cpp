@@ -20,7 +20,8 @@ std::filesystem::path PathController::parentPathObj() const {
 
 size_t PathController::childrenSize() const { return _children.size(); }
 
-std::vector<std::filesystem::path> PathController::children() const {
+std::vector<std::filesystem::path>
+PathController::children() const {
   return _children;
 }
 
@@ -28,7 +29,8 @@ void PathController::showHidden(bool const showHiddenFiles) {
   _showHiddenFiles = showHiddenFiles;
 }
 
-void PathController::loadParent(std::filesystem::path const &path) {
+void PathController::loadParent(
+    std::filesystem::path const &path) {
   _parentPath = path;
   // use list for case insensitive sort
   std::list<std::filesystem::path> childrenList;

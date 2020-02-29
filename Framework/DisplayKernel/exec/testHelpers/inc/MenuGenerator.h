@@ -1,7 +1,7 @@
 #ifndef MENUGENERATOR_H
 #define MENUGENERATOR_H
 
-#include "../../inc/Kmenu.h"
+#include "Kmenu.h"
 namespace BlackOS {
 namespace DisplayKernel {
 namespace TestHelpers {
