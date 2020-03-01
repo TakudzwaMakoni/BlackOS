@@ -13,8 +13,8 @@ set(DISPLAY_KERNEL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/DisplayKernel")
 set(TRINKETS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Trinkets")
 
 # MAKE libraries available for all Framework Projects
-set(DISPLAY_KERNEL_LINK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${DISPLAY_KERNEL_PATH}/libraries")
-set(TRINKETS_LINK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${TRINKETS_PATH}/libraries")
+set(DISPLAY_KERNEL_LINK_DIR "${DISPLAY_KERNEL_PATH}/libraries")
+set(TRINKETS_LINK_DIR "${TRINKETS_PATH}/libraries")
 
 add_subdirectory(DisplayKernel)
 add_subdirectory(Trinkets)

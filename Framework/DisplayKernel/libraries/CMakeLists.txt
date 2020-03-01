@@ -2,13 +2,7 @@
 #  LIB_DISPLAY_KERNERL  #
 #########################
 
-# add DisplayKernel Library
-
 find_package(Curses REQUIRED)
-set(CMAKE_CXX_COMPILER  "/usr/bin/clang++")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(DisplayKernel
     STATIC
@@ -24,5 +18,5 @@ add_library(DisplayKernel
     )
 
 # DisplayKernel Library depends on Ncurses
-#target_include_directories(DisplayKernel ${CURSES_INCLUDE_DIR})
+target_include_directories(DisplayKernel  PRIVATE ${CURSES_INCLUDE_DIR})
 target_link_libraries(DisplayKernel ${CURSES_LIBRARIES})

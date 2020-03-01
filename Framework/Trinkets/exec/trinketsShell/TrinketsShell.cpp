@@ -5,6 +5,8 @@
 
 // Takes user input until they quit the shell, and passes that input as
 // arguments to be run.
+using namespace BlackOS::Trinkets;
+
 int main() {
 
   char *argv[MAX_ARGS], *cmd1[MAX_ARGS], *cmd2[MAX_ARGS];

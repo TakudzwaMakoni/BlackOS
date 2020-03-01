@@ -22,6 +22,11 @@ find_package(fmt) # ListChildren, NavigateDir
         add_executable(ListChildren
             listChildren/ListChildren.cpp
             )
+        target_link_directories(ListChildren
+            PRIVATE
+            ${TRINKETS_LINK_DIR}
+            ${DISPLAY_KERNEL_LINK_DIR}
+            )
         target_include_directories(ListChildren
             PRIVATE
             ${DISPLAY_KERNEL_PATH}/inc
@@ -52,13 +57,16 @@ find_package(fmt) # ListChildren, NavigateDir
         add_executable(NavigateDir
             navigateDir/NavigateDir.cpp
             )
-
+        target_link_directories(NavigateDir
+            PRIVATE
+            ${TRINKETS_LINK_DIR}
+            ${DISPLAY_KERNEL_LINK_DIR}
+            )
         target_include_directories(NavigateDir
             PRIVATE
             ${DISPLAY_KERNEL_PATH}/inc
             ${TRINKETS_PATH}/inc
             )
-
         target_link_libraries(NavigateDir fmt::fmt)
         target_link_libraries(NavigateDir DisplayKernel)
         target_link_libraries(NavigateDir Trinkets)
@@ -80,11 +88,12 @@ find_package(fmt) # ListChildren, NavigateDir
             )
         target_link_directories(Tr
             PRIVATE
-            ${TRINKETS_LINK_DIR}/Trinkets
+            ${TRINKETS_LINK_DIR}
             )
         target_include_directories(Tr
             PRIVATE
             ${TRINKETS_PATH}/inc
+            ${DISPLAY_KERNEL_PATH}/inc
             )
         target_link_libraries(Tr Trinkets)
 

@@ -8,6 +8,61 @@
 // into arrays cmd1 and cmd2.  It will return a PipeRedirect enum representing
 // whether there was a pipe in the command, a redirect to a file, or neither.
 // cmd1 and cmd2 will only be populated if there was a pipe or a redirect.
+
+namespace BlackOS {
+namespace Trinkets {
+
+int execute(int argc, char **argv) {
+
+  char cmd[100];
+
+  std::string command = argv[0];
+
+  if (command == "cd") {
+    int cdResult = chdir(argv[1]);
+    if (cdResult == EACCES) {
+      std::cout << "cd: error: permission denied." << std::endl;
+    } else if (cdResult == ENOTDIR) {
+      std::cout << "cd: error: no such directory." << std::endl;
+    }
+    return 0;
+    // command ls
+    //
+    //
+    //
+  } else if (command == "ls") {
+    return ListChildren(argc, argv);
+    return 0;
+    // command ndir
+    //
+    //
+    //
+  } else if (command == "ndir" || command == "nd") {
+    return NavigateDir(argc, argv);
+  }
+
+  char *termEnv = new char[TERMENV.length() + 1];
+  strcpy(termEnv, TERMENV.c_str());
+
+  char *pathEnv = new char[PATHENV.length() + 1];
+  strcpy(pathEnv, PATHENV.c_str());
+
+  char *shellEnv = new char[SHELLENV.length() + 1];
+  strcpy(termEnv, TERMENV.c_str());
+
+  char *editorEnv = new char[EDITORENV.length() + 1];
+  strcpy(termEnv, TERMENV.c_str());
+
+  char *envp[] = {termEnv, pathEnv, shellEnv, editorEnv, NULL};
+
+  strcpy(cmd, "/usr/bin/");
+  strcat(cmd, argv[0]);
+  execve(cmd, argv, envp);
+  perror("execve error");
+
+  return 1;
+}
+
 PipeRedirect parse_command(int argc, char **argv, char **cmd1, char **cmd2) {
   // Assume no pipe or redirect will be found.
   PipeRedirect result = PipeRedirect::NEITHER;
@@ -215,24 +270,11 @@ void run_cmd(int argc, char **argv) {
       argc--;
     }
 
-    char cmd[100];
     //{(char *)"TERM=xterm-256color", (char *)"PATH=/bin", NULL};
 
-    char *termEnv = new char[TERMENV.length() + 1];
-    std::strcpy(termEnv, TERMENV.c_str());
+    execute(argc, argv);
 
-    char *pathEnv = new char[PATHENV.length() + 1];
-    std::strcpy(pathEnv, PATHENV.c_str());
-
-    char *shellEnv = new char[SHELLENV.length() + 1];
-    std::strcpy(termEnv, TERMENV.c_str());
-
-    char *editorEnv = new char[EDITORENV.length() + 1];
-    std::strcpy(termEnv, TERMENV.c_str());
-
-    //{(char *)"TERM=xterm-256color", (char *)"PATH=/bin", NULL};
-
-    char *envp[] = {termEnv, pathEnv, shellEnv, editorEnv, NULL};
+    /*
     strcpy(cmd, "/usr/bin/");
     strcat(cmd, argv[0]);
     printf("[%s]\n", argv[0]);
@@ -241,6 +283,7 @@ void run_cmd(int argc, char **argv) {
 
     execve(cmd, argv, envp);
     perror("execve error");
+    */
 
     // parent process
   } else if (!found_amp)
@@ -253,81 +296,8 @@ bool want_to_quit(std::string choice) {
   // Lowercase the user input
   for (unsigned int i = 0; i < choice.length(); i++)
     choice[i] = tolower(choice[i]);
-
   return (choice == "quit" || choice == "exit");
 }
 
-/*
-
-void read_command(char cmd[], char *par[]) {
-  char line[1024];
-  int count = 0, i = 0, j = 0;
-  char *array[100], *pch;
-
-  // read one line
-  for (;;) {
-    int c = fgetc(stdin);
-    line[count++] = (char)c;
-    if (c == '\n')
-      break;
-  }
-  if (count == 1)
-    return;
-  pch = strtok(line, " \n");
-
-  // parse the line into words
-  while (pch != NULL) {
-    array[i++] = strdup(pch);
-    pch = strtok(NULL, " \n");
-  }
-
-  // first word is the command
-  strcpy(cmd, array[0]);
-
-  // other parameters
-  for (int j = 0; j < i; j++) {
-    par[j] = array[j];
-  }
-  par[i] = NULL;
-}
-
-void display_prompt() {
-  static int first_time = 1;
-  if (first_time) {
-    char *const CLEAR_SCREEN_ANSI = " \e[1;1H\e[2J";
-    write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
-    first_time = 0;
-  }
-  std::string dir = getenv("PWD");
-  dir = dir + "> ";
-  printf("%s", dir.c_str());
-}
-
-int main() {
-  char cmd[100], command[100], *parameters[20];
-
-  // ENVS
-  char *path =
-      "PATH=/home/takudzwa/.conda/envs/tr/bin:/opt/miniconda3/condabin:/"
-      "usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/"
-      "bin/vendor_perl:/usr/bin/core_perl";
-
-  char *envp[] = {(char *)"PATH=/bin", 0};
-  while (1) {
-    display_prompt();
-    read_command(command, parameters);
-    if (fork() != 0) {
-      wait(NULL);
-    } else {
-      strcpy(cmd, "/usr/bin/");
-      strcat(cmd, command);
-      execve(cmd, parameters, envp);
-    }
-    if (strcmp(command, "exit") == 0) {
-      return 0;
-    }
-  }
-  return 0;
-}
-
-*/
+} // namespace Trinkets
+} // namespace BlackOS

@@ -1,21 +1,26 @@
-// NavigateDir 2020 by takudzwa Makoni (c)
+// Natives (c), By Takudzwa Makoni 2020
 
-#include "DisplayHelpers.h" // TERMINAL_SIZE()
-#include "Kmenu.h"
-#include "NavigationHelpers.h"
-#include "PathController.h"
+#include "../inc/Natives.h"
 
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <vector>
+namespace BlackOS {
+namespace Trinkets {
 
-using namespace BlackOS::Trinkets;
+namespace {
+void usageNavigateDir() {
+  std::cout << "Usage:\n"
+            << "ndir [options] <path>\n"
+            << "options:\n'-a' : show hidden\n";
+}
 
-int main(int argc, char const **argv) {
+void usageListChildren() {
+  std::cout << "Usage:\n"
+            << "ls [options] <path>\n"
+            << "options:\n'-a' : show hidden\n";
+}
+
+} // namespace
+
+int NavigateDir(int argc, char **argv) {
 
   /*
   ====================================================================
@@ -27,8 +32,6 @@ int main(int argc, char const **argv) {
   size_t cursor_pos_y;
   size_t cursor_pos_x;
   std::string initPath;
-
-  withHidden = strtol(argv[1], nullptr, 10);
 
   // uncomment to allow externally specified window position
   // cursor_pos_y = strtol(argv[2], nullptr, 10);
@@ -42,7 +45,43 @@ int main(int argc, char const **argv) {
   // uncomment if using externally specified window position
   cursor_pos_y = ROWS / 2;
   cursor_pos_x = 0;
-  initPath = argv[2];
+
+  if (argc == 1) {
+    withHidden = 0;
+    initPath = std::filesystem::current_path();
+  } else if (argc == 2) {
+    // argv1 is either hide or path
+    std::string argv1 = argv[1];
+
+    if (argv1[0] == '-') {
+      // is an option
+
+      // is a recognised option
+      if (argv1 == "-a") {
+        withHidden = 1;
+        initPath = std::filesystem::current_path();
+      } else {
+        usageNavigateDir();
+        return 2;
+      }
+    } else {
+      // is a path
+      initPath = argv1;
+    }
+  } else if (argc == 3) {
+    // total options under current implementation is 1 (-a), then additional
+    // argument must be a path
+    std::string argv1 = argv[1];
+    if (argv1 != "-a") {
+      usageNavigateDir();
+      return 2;
+    }
+    withHidden = argv[1];
+    initPath = argv[2];
+  } else {
+    usageNavigateDir();
+    return 2;
+  }
 
   // remove trailing '/' if any
   if (initPath.back() == '/') {
@@ -159,8 +198,8 @@ int main(int argc, char const **argv) {
 
     std::string showingHidden = withHidden ? "t" : "f";
 
-    // TODO: duplicate inserting is a hack, better to implement KCanvas and have
-    // separate window as attribute panel on bottom of screen
+    // TODO: duplicate inserting is a hack, better to implement KCanvas and
+    // have separate window as attribute panel on bottom of screen
     NavigationMenu.insert("showing hidden paths: " + showingHidden,
                           menuHeight - 1, 0);
     NavigationMenu.display(breakConditions);
@@ -173,6 +212,7 @@ int main(int argc, char const **argv) {
 
     if (lastKey == (int)'q' || lastKey == 27 /*ESC*/) {
       // user exited program
+      NavigationMenu.clear();
       NavigationMenu.setWin(0);
       exit(1); // leave here
     } else if (lastKey == (int)'a' /*out of directory*/) {
@@ -208,14 +248,119 @@ int main(int argc, char const **argv) {
       // last key pressed is enter
       fieldIdx = NavigationMenu.selectedFieldIndex();
       chosenPath = children[fieldIdx];
+      NavigationMenu.clear();
       NavigationMenu.setWin(0);
       break; // break from while loop
     }
   }
 
-  // write to tmp file for shell access
-  std::ofstream navigationDir("/tmp/navigationDirectory.txt");
-  navigationDir << chosenPath;
+  // TODO: chdir to chosenPath
 
   return 0;
 }
+
+int ListChildren(int argc, char **argv) {
+
+  /*
+  ====================================================================
+  SYSTEM ARGUMENTS
+  ====================================================================
+  */
+
+  bool withHidden;
+  size_t cursor_pos_y;
+  size_t cursor_pos_x;
+  std::string initPath;
+
+  // uncomment to allow externally specified window position
+  // cursor_pos_y = strtol(argv[2], nullptr, 10);
+  // cursor_pos_x = strtol(argv[3], nullptr, 10);
+  // initPath = argv[4];
+
+  auto const termSz = BlackOS::DisplayKernel::TERMINAL_SIZE();
+  size_t const ROWS = termSz[0];
+  size_t const COLS = termSz[1];
+
+  // uncomment if using externally specified window position
+  cursor_pos_y = ROWS / 2;
+  cursor_pos_x = 0;
+
+  if (argc == 1) {
+    withHidden = 0;
+    initPath = std::filesystem::current_path();
+  } else if (argc == 2) {
+    // argv1 is either hide or path
+    std::string argv1 = argv[1];
+
+    if (argv1[0] == '-') {
+      // is an option
+
+      // is a recognised option
+      if (argv1 == "-a") {
+        withHidden = 1;
+        initPath = std::filesystem::current_path();
+      } else {
+        usageListChildren();
+        return 2;
+      }
+    } else {
+      // is a path
+      initPath = argv1;
+    }
+  } else if (argc == 3) {
+    // total options under current implementation is 1 (-a), then additional
+    // argument must be a path
+    std::string argv1 = argv[1];
+    if (argv1 != "-a") {
+      usageListChildren();
+      return 2;
+    }
+    withHidden = argv[1];
+    initPath = argv[2];
+  } else {
+    usageListChildren();
+    return 2;
+  }
+
+  // remove trailing '/' if any
+  if (initPath.back() == '/') {
+    initPath.pop_back();
+  }
+
+  /*
+  ====================================================================
+  PATH CONTROLLER VARIABLES
+  ====================================================================
+  */
+
+  std::filesystem::path parentPath(initPath);
+  std::string title;
+  size_t fieldIdx;
+  size_t fieldSz;
+  std::vector<std::string> fields;
+  std::vector<std::filesystem::path> children;
+
+  // create path navigator object;
+  BlackOS::Trinkets::PathController pathController;
+  pathController.showHidden(withHidden);
+
+  try {
+    pathController.loadParent(parentPath);
+  } catch (std::filesystem::filesystem_error &e) {
+    std::cout << e.what() << std::endl;
+    exit(2);
+  }
+
+  title = pathController.generateTitle();
+  fields = pathController.generateFields();
+  std::cout << "\n\033[4m" << title << "\033[0m"
+            << "\n";
+  for (std::string const &field : fields) {
+    std::cout << field << "\n";
+  }
+  std::cout << std::endl;
+  return 0;
+}
+
+} // namespace Trinkets
+} // namespace BlackOS
