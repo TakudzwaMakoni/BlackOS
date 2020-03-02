@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  * Copyright 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -17,10 +16,6 @@
  *
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
-=======
-// Tr(inkets) shell (c), Takudzwa 2020
-// Thanks to Sarah Vessels for pipe/redirect and Dr Tong Lai Yu.
->>>>>>> 6f9c07145595a5dd68afc1194c198d1d573b2e50
 
 #include "../inc/Shell.h"
 

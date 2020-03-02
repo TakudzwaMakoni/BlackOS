@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  * Copyright 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -17,9 +16,6 @@
  *
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
-=======
-// Natives (c), By Takudzwa Makoni 2020
->>>>>>> 6f9c07145595a5dd68afc1194c198d1d573b2e50
 
 #include "../inc/Natives.h"
 

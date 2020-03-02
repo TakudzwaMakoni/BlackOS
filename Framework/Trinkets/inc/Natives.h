@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 /**
  * Copyright 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -17,9 +17,7 @@
  *
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
-=======
-// Natives (c), Takudzwa 2020
->>>>>>> 6f9c07145595a5dd68afc1194c198d1d573b2e50
+
 
 #ifndef NATIVES_H
 #define NATIVES_H
@@ -29,36 +27,22 @@
 #include "Kmenu.h"                 //(libDisplayKernel) NavigateDir
 #include "NavigationHelpers.h"     //(libDisplayKernel) NavigateDir
 
-<<<<<<< HEAD
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-=======
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <cstring>
->>>>>>> 6f9c07145595a5dd68afc1194c198d1d573b2e50
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <vector>
 
-<<<<<<< HEAD
 namespace BlackOS {
 namespace Trinkets {
 int NavigateDir(int, char **);
 int ListChildren(int, char **);
 } // namespace Trinkets
 } // namespace BlackOS
-=======
-namespace BlackOS{
-namespace Trinkets{
-int NavigateDir(int , char **);
-int ListChildren(int, char **);
-}
-}
->>>>>>> 6f9c07145595a5dd68afc1194c198d1d573b2e50
+
 
 #endif
