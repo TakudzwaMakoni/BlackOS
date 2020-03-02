@@ -38,6 +38,9 @@
 namespace BlackOS {
 namespace Trinkets {
 
+// thanks to Sarah Vessels for Pipe/Redirect:
+// https://www.3till7.net/2008/11/29/c-shell-with-forks-and-pipes/index.html
+
 // Will be used to create an array to hold individual arguments passed by
 // the user on the command line.
 int const MAX_ARGS = 256;

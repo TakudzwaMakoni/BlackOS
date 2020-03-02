@@ -19,6 +19,9 @@
 
 #include "../inc/Shell.h"
 
+// thanks to Sarah Vessels for Pipe/Redirect:
+// https://www.3till7.net/2008/11/29/c-shell-with-forks-and-pipes/index.html
+
 // Given the number of arguments (argc) in an array of arguments (argv), this
 // will go through those arguments and, if necessary, bifurcate the arguments
 // into arrays cmd1 and cmd2.  It will return a PipeRedirect enum representing
