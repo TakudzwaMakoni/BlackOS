@@ -1,6 +1,10 @@
+#ifndef NATIVES_H
+#define NATIVES_H
 
 /**
- * Copyright 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
+ * Natives
+ *
+ * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
  * This Program is free software: you can redistribute
  * it and/or modify it under the terms of the GNU General Public
@@ -17,10 +21,6 @@
  *
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
-
-
-#ifndef NATIVES_H
-#define NATIVES_H
 
 #include "../inc/PathController.h" // NavigateDir, ListChildren
 #include "DisplayHelpers.h"        //(libDisplayKernel) NavigateDir

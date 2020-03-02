@@ -1,5 +1,10 @@
+#ifndef SHELL_H
+#define SHELL_H
+
 /**
- * Copyright 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
+ * Shell
+ *
+ * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
  * This Program is free software: you can redistribute
  * it and/or modify it under the terms of the GNU General Public
@@ -16,9 +21,6 @@
  *
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
-
-#ifndef SHELL_H
-#define SHELL_H
 
 #include "../inc/Natives.h"
 

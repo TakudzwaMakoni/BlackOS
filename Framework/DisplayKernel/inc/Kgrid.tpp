@@ -2,7 +2,9 @@
 #define BLACKOS_KGRID_TPP
 
 /**
- *  Copyright 2019-11-22 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
+ * Kgrid
+ *
+ * Copyright (C) 2019-11-22, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
  * This Program is free software: you can redistribute
  * it and/or modify it under the terms of the GNU General Public
