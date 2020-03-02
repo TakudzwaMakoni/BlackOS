@@ -1,5 +1,5 @@
 /**
- *  Copyright 2019 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
+ * Copyright 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
  * This Program is free software: you can redistribute
  * it and/or modify it under the terms of the GNU General Public
@@ -17,18 +17,28 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef MENUGENERATOR_H
-#define MENUGENERATOR_H
-#include "../../inc/Kmenu.h"
+#ifndef NATIVES_H
+#define NATIVES_H
+
+#include "../inc/PathController.h" // NavigateDir, ListChildren
+#include "DisplayHelpers.h"        //(libDisplayKernel) NavigateDir
+#include "Kmenu.h"                 //(libDisplayKernel) NavigateDir
+#include "NavigationHelpers.h"     //(libDisplayKernel) NavigateDir
+
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+
 namespace BlackOS {
-namespace Display {
-namespace TestHelpers {
-using Kmenu_sptr = std::shared_ptr<Kmenu>;
-Kmenu_sptr testMenu();
-Kmenu_sptr testMenuWithEightPaginatedFields(int pagination);
-Kmenu_sptr testMenuInitialisedWithSizeAndPos(int const sizeY, int const sizeX,
-                                             int const posY, int const posX);
-} // namespace TestHelpers
-} // namespace Display
+namespace Trinkets {
+int NavigateDir(int, char **);
+int ListChildren(int, char **);
+} // namespace Trinkets
 } // namespace BlackOS
+
 #endif
