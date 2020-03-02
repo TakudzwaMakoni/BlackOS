@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  *  Tr(inkets) Shell
  *
@@ -21,6 +22,15 @@
 
 #include "Shell.h"
 
+=======
+// Tr(inkets) shell (c), Takudzwa 2020
+// Thanks to Sarah Vessels for pipe/redirect and Dr Tong Lai Yu.
+
+#include "Shell.h"
+
+// Takes user input until they quit the shell, and passes that input as
+// arguments to be run.
+>>>>>>> 6f9c07145595a5dd68afc1194c198d1d573b2e50
 using namespace BlackOS::Trinkets;
 
 int main() {
