@@ -99,7 +99,7 @@ find_package(fmt) # ListChildren, NavigateDir
 
 
         #############################
-        #  SPLASHSCRIIN EXECUTABLE  #
+        #  SPLASHSCREEN EXECUTABLE  #
         #############################
 
         set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
@@ -108,5 +108,15 @@ find_package(fmt) # ListChildren, NavigateDir
         set(CMAKE_CXX_EXTENSIONS OFF)
 
         add_executable(Splash
-            splashscriin/Splashscriin.cpp
+            splashScreen/Splash.cpp
             )
+        target_link_directories(Splash
+            PRIVATE
+            ${TRINKETS_LINK_DIR}
+            )
+        target_include_directories(Splash
+            PRIVATE
+            ${TRINKETS_PATH}/inc
+            ${DISPLAY_KERNEL_PATH}/inc
+            )
+        target_link_libraries(Splash Trinkets)

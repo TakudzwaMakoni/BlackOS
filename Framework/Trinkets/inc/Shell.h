@@ -23,6 +23,7 @@
  */
 
 #include "../inc/Natives.h"
+#include "../inc/SplashScreen.h"
 
 #include <cerrno>
 #include <cstring>

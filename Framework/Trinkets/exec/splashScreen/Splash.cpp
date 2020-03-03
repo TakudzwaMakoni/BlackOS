@@ -1,8 +1,5 @@
-#ifndef NATIVES_H
-#define NATIVES_H
-
 /**
- * Natives
+ * SplashScreen
  *
  * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -22,28 +19,24 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../inc/PathController.h" // NavigateDir, ListChildren
-#include "DisplayHelpers.h"        //(libDisplayKernel) NavigateDir
-#include "Kmenu.h"                 //(libDisplayKernel) NavigateDir
-#include "NavigationHelpers.h"     //(libDisplayKernel) NavigateDir
+#include "SplashScreen.h"
 
-#include <cstring>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <vector>
+using namespace BlackOS::Trinkets;
+int main(int argc, char **argv) {
 
-namespace BlackOS {
-namespace Trinkets {
-int navigateDir(int, char **);
-int listChildren(int, char **);
-int changeDir(char const *path = nullptr);
-} // namespace Trinkets
-} // namespace BlackOS
+  std::string title = "someTitle";
+  std::string version = "someVersion";
+  std::string repo = "someRepo";
+  std::string license = "someLicense";
+  std::string year = "someYear";
+  std::string language = "someLanguage";
+  std::string author = "someAuthor";
+  std::string git = "someGitHubLink";
 
+  std::vector<std::string> v{title, version,  repo,   license,
+                             year,  language, author, git};
 
-#endif
+  splashScreen(v);
+
+  return 0;
+}

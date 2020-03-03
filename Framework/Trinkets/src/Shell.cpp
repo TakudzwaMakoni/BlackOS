@@ -30,58 +30,25 @@
 // whether there was a pipe in the command, a redirect to a file, or neither.
 // cmd1 and cmd2 will only be populated if there was a pipe or a redirect.
 
+//
+
 namespace BlackOS {
 namespace Trinkets {
 
 int execute(int argc, char **argv) {
 
   char cmd[100];
-
   std::string command = argv[0];
-
   if (command == "cd") {
-    int cdResult = chdir(argv[1]);
-    if (cdResult == EACCES) {
-      std::cout << "cd: error: permission denied." << std::endl;
-    } else if (cdResult == ENOTDIR) {
-      std::cout << "cd: error: no such directory." << std::endl;
-    }
-    return 0;
-    // command ls
-    //
-    //
-    //
+    changeDir(argv[1]);
   } else if (command == "ls") {
-    return ListChildren(argc, argv);
-    return 0;
-    // command ndir
-    //
-    //
-    //
+    listChildren(argc, argv);
   } else if (command == "ndir" || command == "nd") {
-    return NavigateDir(argc, argv);
+    navigateDir(argc, argv);
+  } else {
+    return 1;
   }
-
-  char *termEnv = new char[TERMENV.length() + 1];
-  strcpy(termEnv, TERMENV.c_str());
-
-  char *pathEnv = new char[PATHENV.length() + 1];
-  strcpy(pathEnv, PATHENV.c_str());
-
-  char *shellEnv = new char[SHELLENV.length() + 1];
-  strcpy(termEnv, TERMENV.c_str());
-
-  char *editorEnv = new char[EDITORENV.length() + 1];
-  strcpy(termEnv, TERMENV.c_str());
-
-  char *envp[] = {termEnv, pathEnv, shellEnv, editorEnv, NULL};
-
-  strcpy(cmd, "/usr/bin/");
-  strcat(cmd, argv[0]);
-  execve(cmd, argv, envp);
-  perror("execve error");
-
-  return 1;
+  return 0;
 }
 
 PipeRedirect parse_command(int argc, char **argv, char **cmd1, char **cmd2) {
@@ -161,7 +128,6 @@ void pipe_cmd(char **cmd1, char **cmd2) {
     // Execute the first command.
     execvp(cmd1[0], cmd1);
     perror("execvp failed");
-
     // parent process
   } else
     waitpid(pid, NULL, 0);
@@ -187,7 +153,6 @@ int read_args(char **argv) {
     cstr = new char[arg.size() + 1];
     strcpy(cstr, arg.c_str());
     argv[argc] = cstr;
-
     // Increment our counter of where we're at in the array of arguments.
     argc++;
 
@@ -274,41 +239,37 @@ void run_cmd(int argc, char **argv) {
   if (strcmp(argv[argc - 1], amp) == 0)
     found_amp = true;
 
-  // Fork our process
-  pid = fork();
+  // TODO: no ampersand support for parent processes?
+  if (/*run builtin comands with parent*/ execute(argc, argv) != 0) {
 
-  // error
-  if (pid < 0)
-    perror("Error (pid < 0)");
+    // Fork our process
+    pid = fork();
 
-  // child process
-  else if (pid == 0) {
-    // If the last argument is an ampersand, that's a special flag that we
-    // don't want to pass on as one of the arguments.  Catch it and remove
-    // it here.
-    if (found_amp) {
-      argv[argc - 1] = NULL;
-      argc--;
-    }
+    // error
+    if (pid < 0)
+      perror("Error (pid < 0)");
 
-    //{(char *)"TERM=xterm-256color", (char *)"PATH=/bin", NULL};
-
-    execute(argc, argv);
-
-    /*
-    strcpy(cmd, "/usr/bin/");
-    strcat(cmd, argv[0]);
-    printf("[%s]\n", argv[0]);
-
-    // check if builtin commands here. e.g cd
-
-    execve(cmd, argv, envp);
-    perror("execve error");
-    */
-
-    // parent process
-  } else if (!found_amp)
-    waitpid(pid, NULL, 0); // only wait if no ampersand
+    // child process
+    else if (pid == 0) {
+      // If the last argument is an ampersand, that's a special flag that we
+      // don't want to pass on as one of the arguments.  Catch it and remove
+      // it here.
+      if (found_amp) {
+        argv[argc - 1] = NULL;
+        argc--;
+      }
+      char cmd[100];
+      strcpy(cmd, "/usr/bin/");
+      strcat(cmd, argv[0]);
+      int result = execvp(cmd, argv); //, environ);
+      perror("execve error");
+      if (result != 0) {
+        exit(3); // duplicate child process is created.
+      }
+      // parent process
+    } else if (!found_amp)
+      waitpid(pid, NULL, 0); // only wait if no ampersand
+  }
 }
 
 // Given a string of user input, this determines whether or not the user

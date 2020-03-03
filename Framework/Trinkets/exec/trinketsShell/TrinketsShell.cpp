@@ -35,9 +35,20 @@ int main() {
   if (first_time) {
     const char *CLEAR_SCREEN_ANSI = "\e[0;0H\e[2J";
     std::cout << CLEAR_SCREEN_ANSI;
-  }
 
-  std::cout << "Tr(inkets) Shell(c), Takudzwa Makoni 2020\n" << std::endl;
+    std::string title = "Tr(inkets) Shell (C)";
+    std::string version = "1.0";
+    std::string repo = "Dark Horse (C)";
+    std::string license = "GPL v3.0 licensed";
+    std::string year = "2020";
+    std::string language = "C++";
+    std::string author = "Takudzwa Makoni";
+    std::string git = "https://github.com/TakudzwaMakoni";
+
+    std::vector<std::string> v{title, version,  repo,   license,
+                               year,  language, author, git};
+    splashScreen(v);
+  }
 
   // Keep returning the user to the prompt ad infinitum unless they enter
   // 'quit' or 'exit' (without quotes).

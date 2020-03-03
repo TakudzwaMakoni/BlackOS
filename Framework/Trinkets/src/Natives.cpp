@@ -39,7 +39,7 @@ void usageListChildren() {
 
 } // namespace
 
-int NavigateDir(int argc, char **argv) {
+int navigateDir(int argc, char **argv) {
 
   /*
   ====================================================================
@@ -164,7 +164,7 @@ int NavigateDir(int argc, char **argv) {
       if (parentPath == initPath) {
         // user initialised parent directory without access
         NavigationMenu.setWin(0);
-        exit(2); // leave here
+        return -1; // leave here TODO: exit codes
       } else {
         // user navigated into directory without permissions
         // return to parent directory.
@@ -233,7 +233,7 @@ int NavigateDir(int argc, char **argv) {
       // user exited program
       NavigationMenu.clear();
       NavigationMenu.setWin(0);
-      exit(1); // leave here
+      return 0; // leave here
     } else if (lastKey == (int)'a' /*out of directory*/) {
       // user navigated up a directory
       parentPath = parentPath.parent_path();
@@ -272,13 +272,11 @@ int NavigateDir(int argc, char **argv) {
       break; // break from while loop
     }
   }
-
-  // TODO: chdir to chosenPath
-
+  changeDir(chosenPath.c_str());
   return 0;
 }
 
-int ListChildren(int argc, char **argv) {
+int listChildren(int argc, char **argv) {
 
   /*
   ====================================================================
@@ -367,7 +365,7 @@ int ListChildren(int argc, char **argv) {
     pathController.loadParent(parentPath);
   } catch (std::filesystem::filesystem_error &e) {
     std::cout << e.what() << std::endl;
-    exit(2);
+    return -1;
   }
 
   title = pathController.generateTitle();
@@ -378,6 +376,20 @@ int ListChildren(int argc, char **argv) {
     std::cout << field << "\n";
   }
   std::cout << std::endl;
+  return 0;
+}
+
+int changeDir(char const *path) {
+  if (path == nullptr) {
+    char const *homeDir = getenv("HOME");
+    chdir(homeDir);
+  } else {
+    if (chdir(path) != 0) {
+      char errStr[256] = "cd: ";
+      perror(strcat(errStr, path));
+      return 1;
+    }
+  }
   return 0;
 }
 

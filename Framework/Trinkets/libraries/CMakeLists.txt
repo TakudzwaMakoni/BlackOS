@@ -18,6 +18,8 @@ find_package(fmt REQUIRED) # Natives
             ${TRINKETS_PATH}/src/Shell.cpp
             ${TRINKETS_PATH}/inc/Natives.h
             ${TRINKETS_PATH}/src/Natives.cpp
+            ${TRINKETS_PATH}/inc/SplashScreen.h
+            ${TRINKETS_PATH}/src/SplashScreen.cpp
             )
         target_link_directories(Trinkets PRIVATE
             ${DISPLAY_KERNEL_LINK_DIR}
