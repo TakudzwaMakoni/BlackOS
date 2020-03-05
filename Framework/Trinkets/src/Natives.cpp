@@ -426,7 +426,7 @@ int parseUserInput(char **argv) {
       return userInput::up;
     }
     line += ch;
-  } while (ch != '\[A');
+  } while (ch != '\n');
 
   // tokenize the string
   std::stringstream ss(line);
@@ -438,6 +438,7 @@ int parseUserInput(char **argv) {
     argv[argc] = cstr;
     argc++;
   }
+  return 0;
 }
 
 } // namespace Trinkets

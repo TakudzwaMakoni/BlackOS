@@ -58,7 +58,7 @@ int main() {
     char buf[1024];
     std::cout << "Tr " << getcwd(buf, sizeof buf) << "> ";
 
-    parseUserInput(argv);
+    // parseUserInput(argv);
     // Read in a command from the user.
     argc = read_args(argv);
     if (argc == userInput::up) {
