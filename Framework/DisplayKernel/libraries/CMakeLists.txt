@@ -8,13 +8,15 @@ add_library(DisplayKernel
     STATIC
     ${DISPLAY_KERNEL_PATH}/inc/DisplayHelpers.h
     ${DISPLAY_KERNEL_PATH}/src/DisplayHelpers.cpp
-    #${DISPLAY_KERNEL_PATH}/inc/Kcanvas.h
-    #${DISPLAY_KERNEL_PATH}/src/Kcanvas.cpp
-    #${DISPLAY_KERNEL_PATH}/inc/Kgrid.h
-    #${DISPLAY_KERNEL_PATH}/inc/Kgrid.tpp
-    ${DISPLAY_KERNEL_PATH}/inc/Kmenu.h
-    ${DISPLAY_KERNEL_PATH}/src/Kmenu.cpp
-    ${DISPLAY_KERNEL_PATH}/inc/Kwindow.h
+    ${DISPLAY_KERNEL_PATH}/inc/Screen.h
+    ${DISPLAY_KERNEL_PATH}/src/Screen.cpp
+    ${DISPLAY_KERNEL_PATH}/inc/Window.h
+    ${DISPLAY_KERNEL_PATH}/src/Window.cpp
+    #${DISPLAY_KERNEL_PATH}/inc/Grid.h
+    #${DISPLAY_KERNEL_PATH}/inc/Grid.tpp
+    ${DISPLAY_KERNEL_PATH}/inc/Menu.h
+    ${DISPLAY_KERNEL_PATH}/src/Menu.cpp
+    ${DISPLAY_KERNEL_PATH}/inc/DisplayObject.h
     )
 
 # DisplayKernel Library depends on Ncurses

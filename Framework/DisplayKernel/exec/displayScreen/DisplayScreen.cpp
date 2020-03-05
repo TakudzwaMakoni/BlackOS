@@ -1,5 +1,5 @@
 /**
- * DisplayCanvas
+ * DisplayScreen
  *
  * Copyright (C) 2019, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,58 +19,44 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../inc/Kcanvas.h"
+#include "Screen.h"
+
 #include <chrono>
 #include <iostream>
 #include <memory>
-#include <ncurses.h>
 #include <string>
 #include <thread>
 #include <vector>
 
-#define WORLD_WIDTH (COLS - 2)
-#define WORLD_HEIGHT (LINES - 2)
-#define Y_CENTRE (LINES - WORLD_HEIGHT) / 2
-#define X_CENTRE (COLS - WORLD_WIDTH) / 2
-
-// namespace BlackOS {
-// namespace BlackOSDisplay {
-
 using namespace BlackOS::DisplayKernel;
 
 int main(int argc, const char *argv[]) {
-  initscr();
-  cbreak();
-  cursor(0);
 
-  WINDOW *world = newwin(0, 0, 0, 0);
+  Screen screen;
 
-  std::string canvasName = "BlackOS canvas version 1.0 ";
+  auto termSz = TERMINAL_SIZE();
+  size_t termSzY = termSz[0];
+  size_t termSzX = termSz[1];
 
-  Kcanvas canvas(canvasName, WORLD_HEIGHT, WORLD_WIDTH, Y_CENTRE, X_CENTRE);
+  screen.setWin(1);
+  screen.loadTitle("test screen", TextStyle::highlight);
 
-  canvas.setWin(world);
-  canvas.setTitle("test canvas");
-  canvas.showTitle(true);
-  canvas.borderStyle(0);
-  canvas.display();
+  screen.hideBorder();
+  screen.showTitle();
 
-  canvas.fill('x', true);
-  canvas.refresh();
+  screen.fill('x', 1);
+  refresh();
 
-  for (int i = 1; i < WORLD_HEIGHT - 1; i++) {
-    for (int j = 1; j < WORLD_WIDTH - 1; j++) {
-      canvas.erase(i, j, i, j + 1);
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-      canvas.refresh();
+  for (int i = 0; i < termSzY; i++) {
+    for (int j = 0; j < termSzX - 1; j++) {
+      screen.erase(i, j, i, j + 1);
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      refresh();
     }
   }
 
-  wgetch(world);
-  delwin(world);
-  endwin();
+  screen.pause();
+  screen.setWin(0);
 
   return 0;
 }
-//} // namespace BlackOSDisplay
-//} // namespace BlackOS

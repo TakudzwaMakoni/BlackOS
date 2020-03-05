@@ -58,8 +58,13 @@ int main() {
     char buf[1024];
     std::cout << "Tr " << getcwd(buf, sizeof buf) << "> ";
 
+    parseUserInput(argv);
     // Read in a command from the user.
     argc = read_args(argv);
+    if (argc == userInput::up) {
+      std::cout << "hahsdasda" << std::endl;
+      continue;
+    }
 
     // Decipher the command we just read in and split it, if necessary, into
     // cmd1 and cmd2 arrays.  Set pipe_redirect to a PipeRedirect enum value to
@@ -78,6 +83,5 @@ int main() {
     for (int i = 0; i < argc; i++)
       argv[i] = NULL;
   }
-
   return 0;
 }

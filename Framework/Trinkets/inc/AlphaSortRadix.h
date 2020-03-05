@@ -1,8 +1,8 @@
-#ifndef TRINKETS_PATH_CONTROLLER_H
-#define TRINKETS_PATH_CONTROLLER_H
+#ifndef TRINKETS_ALPHA_SORT_RADIX_H
+#define TRINKETS_ALPHA_SORT_RADIX_H
 
 /**
- * PathController
+ * AlphaSortRadix
  *
  * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -22,29 +22,67 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include <filesystem>
+#include <iostream>
 #include <string>
 #include <vector>
 
 namespace BlackOS {
 namespace Trinkets {
-struct PathController {
-public:
-  size_t childrenSize() const;
-  std::vector<std::filesystem::path> children() const;
-  std::vector<std::string> generateFields();
-  std::string generateTitle() const;
-  std::filesystem::path parentPathObj() const;
-  void loadChildren();
-  void loadParent(std::filesystem::path const &path);
-  void showHidden(bool const showHiddenFiles = 0);
-
-private:
-  std::vector<std::filesystem::path> _children;
-  std::filesystem::path _parentPath;
-  bool _showHiddenFiles;
-  size_t _max = 0;
+/// case insensitive weights
+enum weightsCI : char {
+  a = 'a',
+  A = 'a',
+  b = 'b',
+  B = 'b',
+  c = 'c',
+  C = 'c',
+  d = 'd',
+  D = 'd',
+  e = 'e',
+  E = 'e',
+  f = 'f',
+  F = 'f',
+  g = 'g',
+  G = 'g',
+  h = 'h',
+  H = 'h',
+  i = 'i',
+  I = 'i',
+  j = 'j',
+  J = 'j',
+  k = 'k',
+  K = 'k',
+  l = 'l',
+  L = 'l',
+  m = 'm',
+  M = 'm',
+  n = 'n',
+  N = 'n',
+  o = 'o',
+  O = 'o',
+  p = 'p',
+  P = 'p',
+  q = 'q',
+  Q = 'q',
+  r = 'r',
+  R = 'r',
+  s = 's',
+  S = 's',
+  t = 't',
+  T = 't',
+  u = 'u',
+  U = 'u',
+  v = 'v',
+  V = 'v',
+  w = 'w',
+  W = 'w',
+  x = 'x',
+  X = 'x',
+  y = 'y',
+  z = 'z',
+  Z = 'z'
 };
+int alphaSortRadix(std::vector<std::string> const &items);
 } // namespace Trinkets
 } // namespace BlackOS
 #endif

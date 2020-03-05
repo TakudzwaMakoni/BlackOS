@@ -1,5 +1,5 @@
 /**
- * KmenuTests
+ * MenuTests
  *
  * Copyright (C) 2019, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,12 +19,11 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-// KmenuTests 2020, by Takudzwa Makoni,
 // Using catch2 headers
 
 #define CATCH_CONFIG_RUNNER
 
-#include "Kmenu.h"
+#include "Menu.h"
 #include "../testHelpers/inc/MenuGenerator.h"
 #include "DisplayHelpers.h"
 #include <catch2/catch.hpp>

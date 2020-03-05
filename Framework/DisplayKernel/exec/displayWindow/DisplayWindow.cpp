@@ -1,5 +1,5 @@
 /**
- * MenuGenerator
+ * DisplayWindow
  *
  * Copyright (C) 2019, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,20 +19,43 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef MENUGENERATOR_H
-#define MENUGENERATOR_H
+#include "Window.h"
 
-#include "Menu.h"
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 
-namespace BlackOS {
-namespace DisplayKernel {
-namespace TestHelpers {
-using Menu_sptr = std::shared_ptr<Menu>;
-Menu_sptr testMenu();
-Menu_sptr testMenuWithEightPaginatedFields(int pagination);
-Menu_sptr testMenuInitialisedWithSizeAndPos(int const sizeY, int const sizeX,
-                                            int const posY, int const posX);
-} // namespace TestHelpers
-} // namespace DisplayKernel
-} // namespace BlackOS
-#endif
+using namespace BlackOS::DisplayKernel;
+
+int main(int argc, const char *argv[]) {
+
+  Window window(1, 100, 0, 0);
+
+  size_t winSzY = window.winSzY();
+  size_t winSzX = window.winSzX();
+  size_t winPosY = window.winSzY();
+  size_t winPosX = window.winSzX();
+
+  window.hideTitle();
+  window.hideBorder();
+  window.setWin(1);
+
+  window.fill('x', 0);
+  window.refresh();
+
+  for (int i = 0; i < winSzY; i++) {
+    for (int j = 0; j < winSzX - 1; j++) {
+      window.erase(i, j, i, j + 1);
+      std::this_thread::sleep_for(std::chrono::milliseconds(2));
+      window.refresh();
+    }
+  }
+
+  window.pause();
+  window.setWin(0);
+
+  return 0;
+}

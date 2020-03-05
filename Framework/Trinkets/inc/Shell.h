@@ -1,5 +1,5 @@
-#ifndef SHELL_H
-#define SHELL_H
+#ifndef TRINKETS_SHELL_H
+#define TRINKETS_SHELL_H
 
 /**
  * Shell
@@ -77,7 +77,7 @@ void run_cmd(int, char **);
 bool want_to_quit(std::string);
 
 // execute native and bash commands
-int execute(int, char **);
+int execute(int, char  **);
 
 } // namespace Trinkets
 } // namespace BlackOS

@@ -1,5 +1,5 @@
-#ifndef SPLASH_SCREEN_H
-#define SPLASH_SCREEN_H
+#ifndef TRINKETS_SPLASH_SCREEN_H
+#define TRINKETS_SPLASH_SCREEN_H
 
 #include <cmath>
 #include <cstdlib>

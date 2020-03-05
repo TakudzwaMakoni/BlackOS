@@ -21,7 +21,8 @@
 
 #include "../inc/MenuGenerator.h"
 #include "DisplayHelpers.h"
-#include "Kmenu.h"
+#include "Menu.h"
+
 #include <memory>
 #include <vector>
 
@@ -29,23 +30,21 @@ namespace BlackOS {
 namespace DisplayKernel {
 namespace TestHelpers {
 
-Kmenu_sptr testMenu() {
+Menu_sptr testMenu() {
   auto const termSz = TERMINAL_SIZE();
   size_t ROWS = termSz[0];
   size_t COLS = termSz[1];
 
-  std::string const menuName = "test_menu";
-  auto menu = std::make_shared<Kmenu>(menuName, ROWS, COLS, 0, 0);
+  auto menu = std::make_shared<Menu>(ROWS, COLS, 0, 0);
   return menu;
 }
 
-Kmenu_sptr testMenuWithEightPaginatedFields(int pagination) {
+Menu_sptr testMenuWithEightPaginatedFields(int pagination) {
   auto const termSz = TERMINAL_SIZE();
   size_t ROWS = termSz[0];
   size_t COLS = termSz[1];
 
-  std::string const menuName = "test_menu";
-  auto menu = std::make_shared<Kmenu>(menuName, ROWS, COLS, 0, 0);
+  auto menu = std::make_shared<Menu>(ROWS, COLS, 0, 0);
 
   std::string const fname0 = "FIELD 1";
   std::string const fname1 = "FIELD 2";
@@ -70,10 +69,10 @@ Kmenu_sptr testMenuWithEightPaginatedFields(int pagination) {
   return menu;
 }
 
-Kmenu_sptr testMenuInitialisedWithSizeAndPos(int const sizeY, int const sizeX,
-                                             int const posY, int const posX) {
-  std::string const menuName = "test_menu";
-  auto menu = std::make_shared<Kmenu>(menuName, sizeY, sizeX, posY, posX);
+Menu_sptr testMenuInitialisedWithSizeAndPos(int const sizeY, int const sizeX,
+                                            int const posY, int const posX) {
+
+  auto menu = std::make_shared<Menu>(sizeY, sizeX, posY, posX);
   return menu;
 }
 } // namespace TestHelpers

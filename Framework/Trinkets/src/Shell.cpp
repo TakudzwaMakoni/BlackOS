@@ -45,6 +45,8 @@ int execute(int argc, char **argv) {
     listChildren(argc, argv);
   } else if (command == "ndir" || command == "nd") {
     navigateDir(argc, argv);
+  } else if (command == "set") {
+    setenv(argv[1], argv[2], 1);
   } else {
     return 1;
   }
@@ -142,8 +144,13 @@ int read_args(char **argv) {
   int argc = 0;
 
   // Read in arguments till the user hits enter
-  while (std::cin >> arg) {
+  do {
+    std::cin >> arg;
+
     // Let the user exit out if their input suggests they want to.
+    if (arg[0] == 27) {
+      std::cout << "hahahahahhaha" << std::endl;
+    }
     if (want_to_quit(arg)) {
       std::cout << "Goodbye!\n";
       exit(0);
@@ -159,7 +166,7 @@ int read_args(char **argv) {
     // If the user hit enter, stop reading input.
     if (std::cin.get() == '\n')
       break;
-  }
+  } while (std::cin >> arg);
 
   // Have to have the last argument be NULL so that execvp works.
   argv[argc] = NULL;
@@ -261,7 +268,7 @@ void run_cmd(int argc, char **argv) {
       char cmd[100];
       strcpy(cmd, "/usr/bin/");
       strcat(cmd, argv[0]);
-      int result = execvp(cmd, argv); //, environ);
+      int result = execve(cmd, argv, environ); //, environ);
       perror("execve error");
       if (result != 0) {
         exit(3); // duplicate child process is created.

@@ -1,8 +1,8 @@
-#ifndef BLACKOS_KGRID_TPP
-#define BLACKOS_KGRID_TPP
+#ifndef DISPLAY_KERNEL_GRID_TPP
+#define DISPLAY_KERNEL_GRID_TPP
 
 /**
- * Kgrid
+ * Grid
  *
  * Copyright (C) 2019-11-22, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -22,9 +22,9 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+#include "DisplayObject.h"
 #include "Eigen/Dense"
-#include "Kgrid.h"
-#include "Kwindow.h"
+#include "Grid.h"
 #include <iomanip>
 #include <memory>
 #include <ncurses.h>

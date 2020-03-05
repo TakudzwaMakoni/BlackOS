@@ -1,5 +1,5 @@
-#ifndef NATIVES_H
-#define NATIVES_H
+#ifndef TRINKETS_NATIVES_H
+#define TRINKETS_NATIVES_H
 
 /**
  * Natives
@@ -24,24 +24,30 @@
 
 #include "../inc/PathController.h" // NavigateDir, ListChildren
 #include "DisplayHelpers.h"        //(libDisplayKernel) NavigateDir
-#include "Kmenu.h"                 //(libDisplayKernel) NavigateDir
+#include "Menu.h"                 //(libDisplayKernel) NavigateDir
 #include "NavigationHelpers.h"     //(libDisplayKernel) NavigateDir
+#include "Window.h"
 
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
+#include <sstream>
+#include <termios.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <termios.h>
 #include <vector>
 
 namespace BlackOS {
 namespace Trinkets {
-int navigateDir(int, char **);
-int listChildren(int, char **);
+enum userInput {up = -5, down, left, right, backspace};
+int parseUserInput(char **argv);
 int changeDir(char const *path = nullptr);
+int listChildren(int, char  **);
+int navigateDir(int, char  **);
 } // namespace Trinkets
 } // namespace BlackOS
 

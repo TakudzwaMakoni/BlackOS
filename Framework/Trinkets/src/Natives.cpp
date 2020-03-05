@@ -37,6 +37,32 @@ void usageListChildren() {
             << "options:\n'-a' : show hidden\n";
 }
 
+static struct termios old, current;
+
+/* Initialize new terminal i/o settings */
+void initTermios(int echo) {
+  tcgetattr(0, &old);         /* grab old terminal i/o settings */
+  current = old;              /* make new settings same as old settings */
+  current.c_lflag &= ~ICANON; /* disable buffered i/o */
+  if (echo) {
+    current.c_lflag |= ECHO; /* set echo mode */
+  } else {
+    current.c_lflag &= ~ECHO; /* set no echo mode */
+  }
+  tcsetattr(0, TCSANOW, &current); /* use these new terminal i/o settings now */
+}
+
+/* Restore old terminal i/o settings */
+void resetTermios(void) { tcsetattr(0, TCSANOW, &old); }
+
+/* Read 1 character - echo defines echo mode */
+char getch_(int echo) {
+  char ch;
+  initTermios(echo);
+  ch = getchar();
+  resetTermios();
+  return ch;
+}
 } // namespace
 
 int navigateDir(int argc, char **argv) {
@@ -107,12 +133,6 @@ int navigateDir(int argc, char **argv) {
     initPath.pop_back();
   }
 
-  /*
-  ====================================================================
-  NAVIGATION CONTROLLER VARIABLES
-  ====================================================================
-  */
-
   std::filesystem::path parentPath(initPath);
   std::string chosenPath;
   size_t fieldIdx;
@@ -120,13 +140,6 @@ int navigateDir(int argc, char **argv) {
   std::vector<std::string> fields;
   std::vector<std::filesystem::path> children;
 
-  /*
-  ====================================================================
-  NAVIGATION MENU VARIABLES
-  ====================================================================
-  */
-
-  std::string const menuID = "NavigationMenu";
   std::string title;
   size_t menuWidth;
   size_t menuHeight;
@@ -142,14 +155,19 @@ int navigateDir(int argc, char **argv) {
   std::vector<int> breakConditions = {(int)'a', (int)'d',     (int)'q',
                                       (int)'h', 10 /*ENTER*/, 27 /*ESC*/};
 
+  std::string hiddenAttribute = "showing hidden paths: ";
+
   // create menu object
-  BlackOS::DisplayKernel::Kmenu NavigationMenu(
-      menuID, ROWS - cursor_pos_y, COLS, cursor_pos_y, cursor_pos_x);
+  BlackOS::DisplayKernel::Menu NavigationMenu(ROWS - cursor_pos_y, COLS,
+                                              cursor_pos_y, cursor_pos_x);
+
+  BlackOS::DisplayKernel::Window AttributeWindow(1, COLS, ROWS - 1, 0);
 
   // create path navigator object;
   PathController pathController;
 
   NavigationMenu.setWin(1);
+  AttributeWindow.setWin(1);
   while (1) {
 
     pathController.showHidden(withHidden);
@@ -164,11 +182,11 @@ int navigateDir(int argc, char **argv) {
       if (parentPath == initPath) {
         // user initialised parent directory without access
         NavigationMenu.setWin(0);
+        AttributeWindow.setWin(0);
         return -1; // leave here TODO: exit codes
       } else {
         // user navigated into directory without permissions
         // return to parent directory.
-        // user is in curses mode.
         parentPath = parentPath.parent_path();
       }
       continue;
@@ -207,24 +225,23 @@ int navigateDir(int argc, char **argv) {
 
     // load all menu attributes first
     NavigationMenu.loadTitle(title,
-                             BlackOS::DisplayKernel::TitleStyle::underline);
+                             BlackOS::DisplayKernel::TextStyle::underline);
     NavigationMenu.loadFields(fields);
     NavigationMenu.loadFieldAlignment(-1, 1); // top left of window
-    NavigationMenu.paginate(pagination);
+    NavigationMenu.paginate(pagination, pagination <= fieldSz);
 
     NavigationMenu.hideBorder();
     NavigationMenu.showTitle();
 
     std::string showingHidden = withHidden ? "t" : "f";
+    std::string hiddenInfo = hiddenAttribute + showingHidden;
+    size_t attributePosition = menuHeight - 1;
+    std::vector<size_t> ignoreBlocks = {attributePosition, 0, attributePosition,
+                                        hiddenInfo.length()};
+    NavigationMenu.insert(hiddenInfo, attributePosition, 0);
+    NavigationMenu.refresh();
 
-    // TODO: duplicate inserting is a hack, better to implement KCanvas and
-    // have separate window as attribute panel on bottom of screen
-    NavigationMenu.insert("showing hidden paths: " + showingHidden,
-                          menuHeight - 1, 0);
-    NavigationMenu.display(breakConditions);
-
-    NavigationMenu.insert("showing hidden paths: " + showingHidden,
-                          menuHeight - 1, 0);
+    NavigationMenu.display(breakConditions, ignoreBlocks);
 
     // retrieve last key entered by user on exit display call
     int lastKey = NavigationMenu.lastKeyPressed();
@@ -233,6 +250,8 @@ int navigateDir(int argc, char **argv) {
       // user exited program
       NavigationMenu.clear();
       NavigationMenu.setWin(0);
+      AttributeWindow.setWin(0);
+
       return 0; // leave here
     } else if (lastKey == (int)'a' /*out of directory*/) {
       // user navigated up a directory
@@ -269,6 +288,8 @@ int navigateDir(int argc, char **argv) {
       chosenPath = children[fieldIdx];
       NavigationMenu.clear();
       NavigationMenu.setWin(0);
+      AttributeWindow.setWin(0);
+
       break; // break from while loop
     }
   }
@@ -391,6 +412,32 @@ int changeDir(char const *path) {
     }
   }
   return 0;
+}
+
+int parseUserInput(char **argv) {
+  std::string line;
+  char *cstr;
+  char ch;
+  int argc = 0;
+  do {
+    ch = getch_(1);
+    std::cout << ch;
+    if (ch == 27) {
+      return userInput::up;
+    }
+    line += ch;
+  } while (ch != '\[A');
+
+  // tokenize the string
+  std::stringstream ss(line);
+  std::string item;
+
+  while (std::getline(ss, item, ' ')) {
+    cstr = new char[item.size() + 1];
+    strcpy(cstr, item.c_str());
+    argv[argc] = cstr;
+    argc++;
+  }
 }
 
 } // namespace Trinkets

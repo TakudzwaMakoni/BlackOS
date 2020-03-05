@@ -1,5 +1,5 @@
 /**
- * NavigateDir
+ * AlphaSortRadix
  *
  * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,10 +19,16 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "Natives.h"
+#include "../inc/AlphaSortRadix.h"
 
-using namespace BlackOS::Trinkets;
-int main(int argc, char **argv) {
-  navigateDir(argc, argv);
+namespace BlackOS {
+namespace Trinkets {
+int alphaSortRadix(std::vector<std::string> const &items) { return 0; }
+
+} // namespace Trinkets
+} // namespace BlackOS
+int main(int argc, char const *argv[]) {
+  std::vector<std::string> v;
+  BlackOS::Trinkets::alphaSortRadix(v);
   return 0;
 }

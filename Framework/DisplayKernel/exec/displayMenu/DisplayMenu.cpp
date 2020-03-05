@@ -19,8 +19,7 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../inc/DisplayHelpers.h"
-#include "../inc/Kmenu.h"
+#include "Menu.h"
 
 #include <iostream>
 #include <memory>
@@ -51,9 +50,9 @@ int main(int argc, const char *argv[]) {
                                           fname4, fname5, fname6, fname7};
 
   std::string mainMenuName = "BlackOS version 1.0 ";
-  Kmenu main_menu(mainMenuName, termSz[0], termSz[1], 0, 0);
+  Menu main_menu(termSz[0], termSz[1], 0, 0);
 
-  main_menu.loadTitle(mainMenuName, TitleStyle::highlight);
+  main_menu.loadTitle(mainMenuName, TextStyle::highlight);
   main_menu.loadFieldAlignment(-1, 1);
   main_menu.loadFields(test_fields);
 
@@ -69,7 +68,7 @@ int main(int argc, const char *argv[]) {
   main_menu.fieldStyle("-"); // must do this before
   // displaying
 
-  main_menu.paginate(pagination);
+  main_menu.paginate(pagination, 1);
 
   main_menu.display();
 

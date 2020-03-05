@@ -1,5 +1,5 @@
 /**
- * Kmenu
+ * Menu
  *
  * Copyright (C) 2019-07-27, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,14 +19,7 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../inc/Kmenu.h"
-#include "../inc/DisplayHelpers.h"
-#include <algorithm>
-#include <memory>
-#include <numeric>
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include "../inc/Menu.h"
 
 namespace {
 
@@ -63,46 +56,47 @@ bool inBlocks(size_t const xValue, std::vector<size_t> const &blocks,
 namespace BlackOS {
 namespace DisplayKernel {
 
-Kmenu::Kmenu(std::string const &name, size_t const sizeY, size_t const sizeX,
-             size_t const posY, size_t const posX) {
-  _name = name;
+Menu::Menu(size_t const sizeY, size_t const sizeX, size_t const posY,
+           size_t const posX) {
   _winSzY = sizeY;
   _winSzX = sizeX;
   _winPosY = posY;
   _winPosX = posX;
 }
 
-size_t Kmenu::_highlightedMap() const {
+size_t Menu::_highlightedMap() const {
   size_t const map = (_pCoeff() * _page) + _highlighted;
   return map;
 }
 
 /// ACCESSOR
-std::vector<std::string> Kmenu::fields() const { return _fields; }
+std::vector<std::string> Menu::fields() const { return _fields; }
 
-size_t Kmenu::winSzY() const { return _winSzY; }
+size_t Menu::winSzY() const { return _winSzY; }
 
-size_t Kmenu::winSzX() const { return _winSzX; }
+size_t Menu::winSzX() const { return _winSzX; }
 
-size_t Kmenu::winPosY() const { return _winPosY; }
+size_t Menu::page() const { return _page; }
 
-size_t Kmenu::winPosX() const { return _winPosX; }
+size_t Menu::pages() const { return _p(); }
 
-/// ACCESSOR
-std::string Kmenu::winType() const { return "Kmenu"; }
+size_t Menu::winPosY() const { return _winPosY; }
 
-/// ACCESSOR
-std::string Kmenu::name() const { return _name; }
+size_t Menu::winPosX() const { return _winPosX; }
 
 /// ACCESSOR
-std::string Kmenu::selectedField() const {
+std::string Menu::winType() const { return "Menu"; }
+
+/// ACCESSOR
+std::string Menu::selectedField() const {
   size_t map = _highlightedMap();
   return this->_fields[map];
 }
-size_t Kmenu::selectedFieldIndex() const { return _highlightedMap(); }
+
+size_t Menu::selectedFieldIndex() const { return _highlightedMap(); }
 
 /// ACCESSOR
-std::vector<size_t> Kmenu::maxSize() const {
+std::vector<size_t> Menu::maxSize() const {
   // supposed to be size of COLS and ROWS
   size_t rows, cols;
   getmaxyx(_win, rows, cols);
@@ -110,35 +104,70 @@ std::vector<size_t> Kmenu::maxSize() const {
   return termSz;
 }
 
-void Kmenu::insert(std::string const &str, size_t const y, size_t const x) {
-  mvwprintw(_win, y, x, str.c_str());
+void Menu::insert(std::string const &str, size_t const y, size_t const x,
+                  TextStyle style) {
+  if (style == TextStyle::highlight) {
+    wattron(_win, A_REVERSE);
+    mvwprintw(_win, y, x, str.c_str());
+    wattroff(_win, A_REVERSE);
+  } else if (style == TextStyle::underline) {
+    wattron(_win, A_UNDERLINE);
+    mvwprintw(_win, y, x, str.c_str());
+    wattroff(_win, A_UNDERLINE);
+  } else /*none*/ {
+    mvwprintw(_win, y, x, str.c_str());
+  }
 }
-void Kmenu::insert(char const *ch, size_t const y, size_t const x) {
-  mvwprintw(_win, y, x, ch);
+
+void Menu::insert(char const *ch, size_t const y, size_t const x,
+                  TextStyle style) {
+  if (style == TextStyle::highlight) {
+    wattron(_win, A_REVERSE);
+    mvwprintw(_win, y, x, ch);
+    wattroff(_win, A_REVERSE);
+  } else if (style == TextStyle::underline) {
+    wattron(_win, A_UNDERLINE);
+    mvwprintw(_win, y, x, ch);
+    wattroff(_win, A_UNDERLINE);
+  } else /*none*/ {
+    mvwprintw(_win, y, x, ch);
+  }
 }
-void Kmenu::insert(char const ch, size_t const y, size_t const x) {
+
+void Menu::insert(char const ch, size_t const y, size_t const x,
+                  TextStyle style) {
   char const *chstr = &ch;
-  mvwprintw(_win, y, x, chstr);
+  if (style == TextStyle::highlight) {
+    wattron(_win, A_REVERSE);
+    mvwprintw(_win, y, x, chstr);
+    wattroff(_win, A_REVERSE);
+  } else if (style == TextStyle::underline) {
+    wattron(_win, A_UNDERLINE);
+    mvwprintw(_win, y, x, chstr);
+    wattroff(_win, A_UNDERLINE);
+  } else /*none*/ {
+    mvwprintw(_win, y, x, chstr);
+  }
 }
+
 /// MUTATOR RETROACTIVE
-void Kmenu::borderStyle(int const ch) {
+void Menu::borderStyle(int const ch) {
   _showBorder = 1;
   wborder(_win, ch, ch, ch, ch, ch, ch, ch, ch);
 }
 
-void Kmenu::pause() const { wgetch(_win); }
+void Menu::pause() const { wgetch(_win); }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::borderStyle(int const L, int const R, int const T, int const B,
-                        int const TL, int const TR, int const BL,
-                        int const BR) {
+void Menu::borderStyle(int const L, int const R, int const T, int const B,
+                       int const TL, int const TR, int const BL, int const BR) {
   _showBorder = 1;
   wborder(_win, L, R, T, B, TL, TR, BL, BR);
 }
 
-bool Kmenu::windowSet() const { return _win != nullptr; }
+bool Menu::windowSet() const { return _win != nullptr; }
 
-void Kmenu::_updateF() {
+void Menu::_updateF() {
   size_t p = _p();
   size_t pRem = _pRem();
   size_t pCoeff = _pCoeff();
@@ -149,7 +178,7 @@ void Kmenu::_updateF() {
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::loadFields(std::vector<std::string> const &fields) {
+void Menu::loadFields(std::vector<std::string> const &fields) {
   _fields = fields;
   _fieldSz = fields.size();
 
@@ -160,10 +189,10 @@ void Kmenu::loadFields(std::vector<std::string> const &fields) {
   _updateF();
 }
 
-int Kmenu::lastKeyPressed() const { return _lastKeyPressed; }
+int Menu::lastKeyPressed() const { return _lastKeyPressed; }
 
-void Kmenu::_checkRange(size_t const y1, size_t const x1, size_t const y2,
-                        size_t const x2) const {
+void Menu::_checkRange(size_t const y1, size_t const x1, size_t const y2,
+                       size_t const x2) const {
 
   bool lowerLimitY1 = 0;
   bool upperLimitY1 = 0;
@@ -237,7 +266,7 @@ void Kmenu::_checkRange(size_t const y1, size_t const x1, size_t const y2,
   }
 }
 
-void Kmenu::_checkRange(size_t const y, size_t const x) const {
+void Menu::_checkRange(size_t const y, size_t const x) const {
   bool lowerLimitY = _showBorder ? (y < 0) : (y == 0);
   bool upperLimitY = _showBorder ? (y > _winSzY - 1) : (y >= _winSzY - 1);
   if (lowerLimitY) {
@@ -261,24 +290,23 @@ void Kmenu::_checkRange(size_t const y, size_t const x) const {
   }
 }
 
-void Kmenu::_loadFields() {
+void Menu::_loadFields() {
 
   _updateF();
   std::vector<std::string> subFields = _loadPage();
 
   size_t xCorrect;
   size_t yCorrect;
-  size_t correction = _showBorder ? 1 : 0;
+  size_t correction = _showBorder;
 
-  if (_showTitle && _entriesPerPage != _fieldSz) {
+  if (_entriesPerPage <= _fieldSz && _showPages) {
     std::string pageInfo =
         " page: " + std::to_string(_page + 1) + " of " + std::to_string(_p());
-    _addToTitleHeader(pageInfo, _winSzY - 1 - correction,
-                      _winSzX - correction - pageInfo.length());
+    insert(pageInfo, _winSzY - 1 - correction,
+           _winSzX - correction - pageInfo.length(), _titleStyle);
   }
 
   for (size_t i = 0; i < _f; ++i) {
-
     std::string fieldName = subFields[i];
 
     if (_showBorder == 0) {
@@ -319,78 +347,65 @@ void Kmenu::_loadFields() {
 }
 
 /// MUTATOR RETRO1ACTIVE
-void Kmenu::loadFieldAlignment(int const x, int const y) {
+void Menu::loadFieldAlignment(int const x, int const y) {
   _xAlign = x;
   _yAlign = y;
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::fieldStyle(std::string const &style) { _fieldStyle = style; }
+void Menu::fieldStyle(std::string const &style) { _fieldStyle = style; }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::paginate(size_t const entriesPerPage) {
+void Menu::paginate(size_t const entriesPerPage, bool showPages) {
+  _showPages = showPages;
   if (entriesPerPage < 0)
     throw std::runtime_error(
         "Cannot have negative value number of entries per page.");
   _entriesPerPage = entriesPerPage;
 }
 
-size_t Kmenu::_pCoeff() const {
+size_t Menu::_pCoeff() const {
   size_t pCoeff = _entriesPerPage == 0 ? _fieldSz : _entriesPerPage;
   return pCoeff;
 }
-size_t Kmenu::_pQuot() const {
+size_t Menu::_pQuot() const {
   size_t pQuot = _fieldSz / _pCoeff();
   return pQuot;
 }
-size_t Kmenu::_pRem() const {
+size_t Menu::_pRem() const {
   size_t pRem = (size_t)(_fieldSz % _pCoeff());
   return pRem;
 }
-size_t Kmenu::_p() const {
+size_t Menu::_p() const {
   size_t p = _pQuot() + (_pRem() != 0);
   return p;
 }
 
 /// MUTATOR RETROACTIVE
-void Kmenu::hideTitle() {
+void Menu::hideTitle() {
   std::string tPadding(_winSzX, ' ');
   mvwprintw(_win, _winPosY, _winPosX, tPadding.c_str());
   // metadata tells other functions to now disregard title space
   _showTitle = 0;
 }
 
-void Kmenu::hideBorder() {
+void Menu::hideBorder() {
+  // TODO: if title is showing, move the title up one level.
   borderStyle(' ');
   _showBorder = 0;
-}
-
-void Kmenu::_addToTitleHeader(std::string const &title, size_t y, size_t x) {
-
-  if (_titleStyle == TitleStyle::highlight) {
-    wattron(_win, A_REVERSE);
-    mvwprintw(_win, y, x, title.c_str());
-    wattroff(_win, A_REVERSE);
-  } else if (_titleStyle == TitleStyle::underline) {
-    wattron(_win, A_UNDERLINE);
-    mvwprintw(_win, y, x, title.c_str());
-    wattroff(_win, A_UNDERLINE);
-  } else /*none*/ {
-    mvwprintw(_win, y, x, title.c_str());
-  }
 }
 
 /// sets the title for the window with an optional style option (default none).
 /// This will not show the title to screen on window refresh if the the tite is
 /// hidden.
-void Kmenu::loadTitle(std::string const &title, TitleStyle const style) {
+void Menu::loadTitle(std::string const &title, TextStyle const style) {
   _title = title;
   _titleStyle = style;
 }
 
-void Kmenu::loadTitleStyle(TitleStyle style) { _titleStyle = style; }
+void Menu::loadTitleStyle(TextStyle style) { _titleStyle = style; }
 
-void Kmenu::showTitle() {
+void Menu::showTitle() {
 
   _showTitle = 1; // make title attributes visible again
 
@@ -422,10 +437,10 @@ void Kmenu::showTitle() {
 
   std::string header(paddingCorrection, ' ');
   header.insert(0, headerTitle);
-  _addToTitleHeader(header, y, x);
+  insert(header, y, x, _titleStyle);
 };
 
-void Kmenu::_updateM() {
+void Menu::_updateM() {
   for (const std::string field : _fields) {
     size_t len = field.length();
     if (len > _m)
@@ -433,7 +448,7 @@ void Kmenu::_updateM() {
   }
 }
 
-std::string Kmenu::_addFieldPadding(std::string const &fieldName) {
+std::string Menu::_addFieldPadding(std::string const &fieldName) {
   const size_t newStrLen = _m % 2 == 0 ? _m : _m + 1;
   const size_t oldStrLen = fieldName.size(); // retrieve size of field name
   std::string newStr(newStrLen, ' ');        // make empty new field
@@ -445,8 +460,8 @@ std::string Kmenu::_addFieldPadding(std::string const &fieldName) {
 }
 
 /// MF
-char Kmenu::getCharFromWin(size_t const y, size_t const x,
-                           bool const save_cursor) const {
+char Menu::getCharFromWin(size_t const y, size_t const x,
+                          bool const save_cursor) const {
   _checkRange(y, x);
   size_t curr_y, curr_x;
   getyx(_win, curr_y, curr_x);
@@ -457,8 +472,8 @@ char Kmenu::getCharFromWin(size_t const y, size_t const x,
 }
 
 /// MF ACTIVE
-void Kmenu::erase(size_t const y1, size_t const x1, size_t const y2,
-                  size_t const x2) {
+void Menu::erase(size_t const y1, size_t const x1, size_t const y2,
+                 size_t const x2) {
 
   _checkRange(y1, x1, y2, x2);
   size_t width = x2 - x1 + 1;
@@ -469,53 +484,54 @@ void Kmenu::erase(size_t const y1, size_t const x1, size_t const y2,
   wrefresh(_win);
 }
 
-void Kmenu::erase(bool titleBar) { fill(' ', titleBar); }
+void Menu::erase(bool titleBar) { fill(' ', titleBar); }
 
-void Kmenu::clear() {
+void Menu::clear() {
   wclear(_win);
   wrefresh(_win);
 }
 
 /// MF RETROACTIVE
-void Kmenu::fill(char const ch, bool const titleBar) {
-  size_t start = titleBar ? 2 : 1;
-  size_t end = _winSzY - 2;
-  size_t width = _winSzX - 2;
+void Menu::fill(char const ch, bool const titleBar) {
+  size_t start = titleBar + _showBorder;
+  size_t end = _winSzY - (2 * _showBorder) - titleBar;
+  size_t width = _winSzX - (2 * _showBorder);
 
   std::string fillString(width, ch);
   for (size_t i = start; i <= end; ++i) {
-    mvwprintw(_win, i, 1, fillString.c_str());
+    mvwprintw(_win, i, _showBorder, fillString.c_str());
   }
   wrefresh(_win);
 }
 
 /// MF ACTIVE
-void Kmenu::eraseExcept(size_t const y1, size_t const x1, size_t const y2,
-                        size_t const x2) {
+void Menu::eraseExcept(size_t const y1, size_t const x1, size_t const y2,
+                       size_t const x2) {
 
   _checkRange(y1, x1, y2, x2);
 
-  size_t width = _winSzX - 2;
-  size_t height = _winSzY - 2;
+  size_t start = _showTitle + _showBorder;
+  size_t end = _winSzY - (2 * _showBorder) - _showTitle;
+  size_t width = _winSzX - (2 * _showBorder);
 
   std::string fill(width, ' ');
   std::string space = " ";
-  for (size_t i = 1; i <= height; ++i) {
+  for (size_t i = start; i <= end; ++i) {
     if (i <= y2 && i >= y1) {
-      for (size_t j = 1; j <= width; ++j) {
+      for (size_t j = _showBorder; j <= width; ++j) {
         if (!(j <= x2 && j >= x1)) {
           mvwprintw(_win, i, j, space.c_str());
         }
       }
     } else {
-      mvwprintw(_win, i, 1, fill.c_str());
+      mvwprintw(_win, i, _showBorder, fill.c_str());
     }
   }
   wrefresh(_win);
 }
 
 /// MF ACTIVE
-void Kmenu::erase(std::vector<size_t> const &elements) {
+void Menu::erase(std::vector<size_t> const &elements) {
   size_t numOfAreas = elements.size() / 4; /*two coordinates per block*/
   for (size_t areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
 
@@ -529,39 +545,31 @@ void Kmenu::erase(std::vector<size_t> const &elements) {
 }
 
 /// MF ACTIVE
-void Kmenu::eraseExcept(std::vector<size_t> const &elements) {
-  size_t width = _winSzX - 2;
-  size_t height = _winSzY - 2;
-  std::string fill(width, ' ');
-  std::string space = " ";
-  for (size_t i = 1; i <= height; ++i) {
-    std::vector<size_t> blocks = blocksFound(i, elements);
-    if (blocks.empty()) {
-      mvwprintw(_win, i, 1, fill.c_str());
-    } else {
-      for (size_t j = 1; j <= width; ++j) {
-        bool _inBlocks = inBlocks(j, blocks, elements);
-        if (!_inBlocks) {
-          mvwprintw(_win, i, j, space.c_str());
-        }
-      }
-    }
+void Menu::eraseExcept(std::vector<size_t> const &elements) {
+  size_t numOfAreas = elements.size() / 4; /*two coordinates per block*/
+  for (size_t areaIdx = 0; areaIdx < numOfAreas; ++areaIdx) {
+
+    size_t y1 = elements[0 + (areaIdx * 4)];
+    size_t x1 = elements[1 + (areaIdx * 4)];
+    size_t y2 = elements[2 + (areaIdx * 4)];
+    size_t x2 = elements[3 + (areaIdx * 4)];
+
+    eraseExcept(y1, x1, y2, x2);
   }
-  wrefresh(_win);
 }
 
-void Kmenu::refresh() { wrefresh(_win); }
+void Menu::refresh() { wrefresh(_win); }
 
 /// MF ACTIVE
-void Kmenu::label(std::string const &label) const {
+void Menu::label(std::string const &label) const {
   size_t labellocy = _winSzY - 1;
   size_t labellocx = _winSzX - (3 + (size_t)label.length());
   mvwaddstr(_win, labellocy, labellocx, label.c_str());
 }
 
 /// MF ACTIVE
-void Kmenu::setWin(bool const initWin) {
-  if (initWin == 1) {
+void Menu::setWin(bool const init) {
+  if (init == 1) {
 
     initscr();
     cbreak();
@@ -571,21 +579,21 @@ void Kmenu::setWin(bool const initWin) {
     _win = newwin(0, 0, 0, 0);
     wresize(_win, _winSzY, _winSzX);
     mvwin(_win, _winPosY, _winPosX);
-  } else if (initWin == 0) {
+  } else if (init == 0) {
     delwin(_win);
     endwin();
     _win = nullptr;
   }
 }
 
-int Kmenu::resize(size_t const y, size_t const x) {
+int Menu::resize(size_t const y, size_t const x) {
   _winSzY = y;
   _winSzX = x;
   wresize(_win, _winSzY, _winSzX);
   return 1;
 }
 
-int Kmenu::reposition(size_t const y, size_t const x) {
+int Menu::reposition(size_t const y, size_t const x) {
   _winPosY = y;
   _winPosX = x;
   mvwin(_win, _winPosY, _winPosX);
@@ -593,7 +601,8 @@ int Kmenu::reposition(size_t const y, size_t const x) {
 }
 
 /// MF ACTIVE
-void Kmenu::display(std::vector<int> const &breakConditions) {
+void Menu::display(std::vector<int> const &breakConditions,
+                   std::vector<size_t> const &ignoreBlocks) {
   keypad(_win, true);
   int selection;
   _highlighted = 0;
@@ -611,9 +620,7 @@ void Kmenu::display(std::vector<int> const &breakConditions) {
       if (_page != 0) {
         _page--;
         _highlighted = 0;
-        erase(1 + (size_t)(_showBorder), 0 + (size_t)(_showBorder),
-              _winSzY - 1 - (size_t)(_showBorder),
-              _winSzX - 1 - (size_t)(_showBorder));
+        eraseExcept(ignoreBlocks);
       }
       break;
     case KEY_RIGHT:
@@ -621,9 +628,7 @@ void Kmenu::display(std::vector<int> const &breakConditions) {
         _page++;
         _highlighted = 0;
 
-        erase(1 + (size_t)(_showBorder), 0 + (size_t)(_showBorder),
-              _winSzY - 1 - (size_t)(_showBorder),
-              _winSzX - 1 - (size_t)(_showBorder));
+        eraseExcept(ignoreBlocks);
       }
       break;
     case KEY_UP:
@@ -654,7 +659,7 @@ void Kmenu::display(std::vector<int> const &breakConditions) {
 }
 
 /// MF RETROACTIVE PRIVATE
-std::vector<std::string> Kmenu::_loadPage() {
+std::vector<std::string> Menu::_loadPage() {
 
   if (_fieldSz == 0)
     throw std::runtime_error("No fields were set.");
@@ -696,7 +701,7 @@ std::vector<std::string> Kmenu::_loadPage() {
   return subFields;
 }
 
-Kmenu::~Kmenu() {
+Menu::~Menu() {
   if (!windowSet())
     setWin(0);
 }

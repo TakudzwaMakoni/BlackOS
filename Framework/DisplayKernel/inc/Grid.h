@@ -1,8 +1,8 @@
-#ifndef BLACKOS_KGRID_H
-#define BLACKOS_KGRID_H
+#ifndef DISPLAY_KERNEL_GRID_H
+#define DISPLAY_KERNEL_GRID_H
 
 /**
- * Kgrid
+ * Grid
  *
  * Copyright (C) 2019-07-27, Takudzwa Makoni
  * <https://github.com/TakudzwaMakoni>
@@ -23,8 +23,8 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+#include "DisplayObject.h"
 #include "Eigen/Dense"
-#include "Kwindow.h"
 #include <iomanip>
 #include <memory>
 #include <ncurses.h>
@@ -34,7 +34,7 @@
 namespace BlackOS {
 namespace DisplayKernel {
 template <typename dataType, size_t rows, size_t cols>
-class Kgrid : public Kwindow {
+class Grid : public DisplayObject {
 public:
   Kgrid(std::string &name, size_t sizeY, size_t sizeX, size_t posY,
         size_t posX);
@@ -76,7 +76,7 @@ public:
   std::vector<size_t> selectedIndices() const;
   void setTitle(std::string const &title);
 
-  ~Kgrid();
+  ~Grid();
 
 private:
   WINDOW *_win;
@@ -101,5 +101,5 @@ private:
 };
 } // namespace DisplayKernel
 } // namespace BlackOS
-#include "Kgrid.tpp"
+#include "Grid.tpp"
 #endif // BLACKOS_KGRID_H
