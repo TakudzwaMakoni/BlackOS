@@ -55,10 +55,12 @@ public:
   virtual char getCharFromWin(size_t const y, size_t const x,
                               bool const save_cursor = true) const override;
   virtual void fill(char const ch, bool const titleBar = false) override;
-  virtual void insert(std::string const &str, size_t const y,
-                      size_t const x,   TextStyle style = TextStyle::none) override;
-  virtual void insert(char const *ch, size_t const y, size_t const x, TextStyle style = TextStyle::none) override;
-  virtual void insert(char const ch, size_t const y, size_t const x, TextStyle style = TextStyle::none) override;
+  virtual void insert(std::string const &str, size_t const y, size_t const x,
+                      TextStyle style = TextStyle::none) override;
+  virtual void insert(char const *ch, size_t const y, size_t const x,
+                      TextStyle style = TextStyle::none) override;
+  virtual void insert(char const ch, size_t const y, size_t const x,
+                      TextStyle style = TextStyle::none) override;
   virtual void pause() const override;
   virtual bool windowSet() const override;
 
@@ -77,6 +79,7 @@ public:
   ~Screen();
 
 private:
+  bool _screenInitialised = 0;
   size_t _termSzY;
   size_t _termSzX;
   std::string _title;

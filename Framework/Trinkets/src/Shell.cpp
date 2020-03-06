@@ -30,8 +30,6 @@
 // whether there was a pipe in the command, a redirect to a file, or neither.
 // cmd1 and cmd2 will only be populated if there was a pipe or a redirect.
 
-//
-
 namespace BlackOS {
 namespace Trinkets {
 

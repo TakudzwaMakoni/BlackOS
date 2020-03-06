@@ -702,7 +702,7 @@ std::vector<std::string> Menu::_loadPage() {
 }
 
 Menu::~Menu() {
-  if (!windowSet())
+  if (windowSet())
     setWin(0);
 }
 

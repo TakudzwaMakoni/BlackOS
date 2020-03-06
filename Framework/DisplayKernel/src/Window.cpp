@@ -457,7 +457,7 @@ int Window::reposition(size_t const y, size_t const x) {
 }
 
 Window::~Window() {
-  if (!windowSet())
+  if (windowSet())
     setWin(0);
 }
 

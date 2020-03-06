@@ -16,6 +16,8 @@ find_package(fmt REQUIRED) # Natives
             ${TRINKETS_PATH}/src/PathController.cpp
             ${TRINKETS_PATH}/inc/Shell.h
             ${TRINKETS_PATH}/src/Shell.cpp
+            ${TRINKETS_PATH}/inc/TrShell.h
+            ${TRINKETS_PATH}/src/TrShell.cpp
             ${TRINKETS_PATH}/inc/Natives.h
             ${TRINKETS_PATH}/src/Natives.cpp
             ${TRINKETS_PATH}/inc/SplashScreen.h

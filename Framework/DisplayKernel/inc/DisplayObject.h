@@ -52,11 +52,11 @@ public:
                               bool const preserve_cursor_pos) const = 0;
   virtual void fill(char ch, bool titleBar = false) = 0;
   virtual void insert(std::string const &str, size_t const y, size_t const x,
-                      TextStyle style) = 0;
+                      TextStyle style = TextStyle::none) = 0;
   virtual void insert(char const *ch, size_t const y, size_t const x,
-                      TextStyle style) = 0;
+                      TextStyle style = TextStyle::none) = 0;
   virtual void insert(char const ch, size_t const y, size_t const x,
-                      TextStyle style) = 0;
+                      TextStyle style = TextStyle::none) = 0;
   virtual void pause() const = 0;
   virtual bool windowSet() const = 0;
 };

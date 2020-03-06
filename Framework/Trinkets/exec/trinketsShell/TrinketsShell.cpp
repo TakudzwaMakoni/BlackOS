@@ -19,7 +19,7 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "Shell.h"
+#include "TrShell.h"
 
 using namespace BlackOS::Trinkets;
 
@@ -27,13 +27,25 @@ using namespace BlackOS::Trinkets;
 // https://www.3till7.net/2008/11/29/c-shell-with-forks-and-pipes/index.html
 int main() {
 
+  // auto screen = generateScreen();
+
+  // use stdscreen
+  DisplayObject_sptr display =
+      std::make_shared<BlackOS::DisplayKernel::Screen>();
+
+  Shell shell(display);
+
+  // shell.initShell();
+
+  /*
+
   char *argv[MAX_ARGS], *cmd1[MAX_ARGS], *cmd2[MAX_ARGS];
   PipeRedirect pipe_redirect;
   int argc;
 
   static int first_time = 1;
   if (first_time) {
-    const char *CLEAR_SCREEN_ANSI = "\e[0;0H\e[2J";
+    char const *CLEAR_SCREEN_ANSI = "\e[0;0H\e[2J";
     std::cout << CLEAR_SCREEN_ANSI;
 
     std::string title = "Tr(inkets) Shell (C)";
@@ -83,5 +95,8 @@ int main() {
     for (int i = 0; i < argc; i++)
       argv[i] = NULL;
   }
-  return 0;
+*/
+
+  // shell.quit("quit");
+  return ExitStatus::USER_EXIT;
 }

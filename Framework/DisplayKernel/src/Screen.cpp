@@ -133,7 +133,7 @@ void Screen::borderStyle(int const L, int const R, int const T, int const B,
 }
 
 bool Screen::windowSet() const { /*TODO: need?*/
-  return 0;
+  return _screenInitialised;
 }
 
 int Screen::lastKeyPressed() const { return _lastKeyPressed; }
@@ -413,13 +413,19 @@ void Screen::setWin(bool const init) {
     auto termSz = TERMINAL_SIZE();
     _termSzY = termSz[0];
     _termSzX = termSz[1];
+    _screenInitialised = 1;
 
   } else if (init == 0) {
+    _screenInitialised = 0;
     endwin();
   }
 }
 
-Screen::~Screen() { setWin(0); }
+Screen::~Screen() {
+  // if last screen state was initialised
+  if (windowSet())
+    setWin(0);
+}
 
 } // namespace DisplayKernel
 } // namespace BlackOS
