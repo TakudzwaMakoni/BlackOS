@@ -2,7 +2,7 @@
 #define TRINKETS_TR_SHELL_H
 
 /**
- * TrShell
+ * Tr ScreenShell
  *
  * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -57,22 +57,25 @@ std::string const TERMENV = "TERM=" + (std::string)getenv("TERM");
 std::string const SHELLENV = "SHELL=" + (std::string)getenv("SHELL");
 std::string const EDITORENV = "EDITOR=vim";
 
-using DisplayObject_sptr = std::shared_ptr<DisplayKernel::DisplayObject>;
 using Screen_sptr = std::shared_ptr<DisplayKernel::Screen>;
 using Window_sptr = std::shared_ptr<DisplayKernel::Window>;
 
 Screen_sptr generateScreen();
 Window_sptr generateWindow();
 
-class Shell {
+class ScreenShell {
 
 public:
-  Shell(DisplayObject_sptr &display);
-  //  Shell(Screen_sptr &display);
-  //  Shell(Window_sptr &display);
+  ScreenShell(Screen_sptr &display);
 
   // execute native commands
   int execute(int, char **);
+
+  void logCursorPosition();
+
+  size_t cursorY() const;
+
+  size_t cursorX() const;
 
   // initialise the shell
   void initShell();
@@ -89,14 +92,34 @@ public:
   // arguments taken in.
   int readArgs(char **);
 
+  void displayPrompt(size_t y);
+
+  void backSpace();
+
   // clear the display
   void clearDisplay();
 
-  ~Shell();
+  // Splits a user's command into two commands, or a command and a file name.
+  PipeRedirect parseCommand(int, char **, char **, char **);
+
+  // Given the number of arguments and an array of arguments, this will execute
+  // those arguments.  The first argument in the array should be a command.
+  void runCmd(int, char **);
+
+  // Redirects the output from the given command into the given file.
+  void redirectCmd(char **, char **);
+
+  // Pipes the first command's output into the second.
+  void pipeCmd(char **, char **);
+
+  ~ScreenShell();
 
 private:
-  DisplayObject_sptr _display;
+  Screen_sptr _display;
   std::string _displayType;
+  size_t _cursorY = 0;
+  size_t _cursorX = 0;
+  size_t _promptLen;
   std::string _TERM;
   std::string _PATH;
   std::string _SHELL; // fallback shell

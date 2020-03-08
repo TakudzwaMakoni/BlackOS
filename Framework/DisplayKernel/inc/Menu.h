@@ -39,7 +39,7 @@ namespace DisplayKernel {
 class Menu : public DisplayObject {
 public:
   Menu(size_t const sizeY, size_t const sizeX, size_t const posY,
-        size_t const posX);
+       size_t const posX);
 
   virtual void borderStyle(int const ch = 0) override;
   virtual void borderStyle(int const L, int const R, int const T, int const B,
@@ -61,10 +61,12 @@ public:
   virtual char getCharFromWin(size_t const y, size_t const x,
                               bool const save_cursor = true) const override;
   virtual void fill(char const ch, bool const titleBar = false) override;
-  virtual void insert(std::string const &str, size_t const y,
-                      size_t const x,   TextStyle style = TextStyle::none) override;
-  virtual void insert(char const *ch, size_t const y, size_t const x, TextStyle style = TextStyle::none) override;
-  virtual void insert(char const ch, size_t const y, size_t const x, TextStyle style = TextStyle::none) override;
+  virtual void insert(std::string const &str, size_t const y, size_t const x,
+                      TextStyle style = TextStyle::none) override;
+  virtual void insert(char const *ch, size_t const y, size_t const x,
+                      TextStyle style = TextStyle::none) override;
+  virtual void insert(char const ch, size_t const y, size_t const x,
+                      TextStyle style = TextStyle::none) override;
   virtual void pause() const override;
   virtual bool windowSet() const override;
 
@@ -73,8 +75,10 @@ public:
   void clear();
   void refresh();
 
-  void display(std::vector<int> const &breakConditions = {
-                   (int)'q', 10 /*ENTER key*/, 27 /*ESC key*/}, std::vector<size_t> const &ignoreBlocks ={});
+  void display(std::vector<int> const &breakConditions = {(int)'q',
+                                                          10 /*ENTER key*/,
+                                                          27 /*ESC key*/},
+               std::vector<size_t> const &ignoreBlocks = {});
   virtual void loadFields(std::vector<std::string> const &fields);
   virtual std::string selectedField() const;
   size_t selectedFieldIndex() const;
@@ -89,6 +93,7 @@ public:
   size_t winSzX() const;
   size_t winPosY() const;
   size_t winPosX() const;
+  char getCharFromUser() const;
   size_t page() const;
   size_t pages() const;
 
@@ -99,6 +104,7 @@ public:
   void loadTitleStyle(TextStyle style);
   void showTitle();
   int lastKeyPressed() const;
+  std::vector<int> cursorPosition() const;
 
   ~Menu();
 

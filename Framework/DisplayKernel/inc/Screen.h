@@ -65,6 +65,7 @@ public:
   virtual bool windowSet() const override;
 
   size_t winSzY() const;
+  char getCharFromUser() const;
   size_t winSzX() const;
   size_t winPosY() const;
   size_t winPosX() const;
@@ -75,6 +76,7 @@ public:
   void loadTitleStyle(TextStyle style);
   void showTitle();
   int lastKeyPressed() const;
+  std::vector<int> cursorPosition() const;
 
   ~Screen();
 

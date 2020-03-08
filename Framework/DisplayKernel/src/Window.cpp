@@ -85,6 +85,15 @@ std::vector<size_t> Window::maxSize() const {
   return termSz;
 }
 
+std::vector<int> Window::cursorPosition() const {
+  int x, y;
+  getyx(_win, y, x);
+  std::vector<int> v{x, y};
+  return v;
+}
+
+char Window::getCharFromUser() const { return wgetch(_win); }
+
 void Window::insert(std::string const &str, size_t const y, size_t const x,
                     TextStyle style) {
   if (style == TextStyle::highlight) {

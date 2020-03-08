@@ -40,7 +40,11 @@ int execute(int argc, char **argv) {
   if (command == "cd") {
     changeDir(argv[1]);
   } else if (command == "ls") {
-    listChildren(argc, argv);
+    std::vector<std::string> children;
+    listChildren(argc, argv, children);
+    for (std::string const &child : children) {
+      std::cout << child << "\n";
+    }
   } else if (command == "ndir" || command == "nd") {
     navigateDir(argc, argv);
   } else if (command == "set") {
@@ -51,7 +55,7 @@ int execute(int argc, char **argv) {
   return 0;
 }
 
-PipeRedirect parse_command(int argc, char **argv, char **cmd1, char **cmd2) {
+PipeRedirect parseCommand(int argc, char **argv, char **cmd1, char **cmd2) {
   // Assume no pipe or redirect will be found.
   PipeRedirect result = PipeRedirect::NEITHER;
 

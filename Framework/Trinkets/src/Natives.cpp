@@ -65,7 +65,7 @@ char getch_(int echo) {
 }
 } // namespace
 
-int navigateDir(int argc, char **argv) {
+int navigateDir(int argc, char **argv, int y, int x) {
 
   /*
   ====================================================================
@@ -87,9 +87,16 @@ int navigateDir(int argc, char **argv) {
   size_t const ROWS = termSz[0];
   size_t const COLS = termSz[1];
 
+  if (y < 0)
+    cursor_pos_y = ROWS / 2;
+  else
+    cursor_pos_y = y;
+
+  if (x < 0)
+    cursor_pos_x = 0;
+  else
+    cursor_pos_x = x;
   // uncomment if using externally specified window position
-  cursor_pos_y = ROWS / 2;
-  cursor_pos_x = 0;
 
   if (argc == 1) {
     withHidden = 0;
@@ -297,7 +304,7 @@ int navigateDir(int argc, char **argv) {
   return 0;
 }
 
-int listChildren(int argc, char **argv) {
+int listChildren(int argc, char **argv, std::vector<std::string> &v) {
 
   /*
   ====================================================================
@@ -391,12 +398,12 @@ int listChildren(int argc, char **argv) {
 
   title = pathController.generateTitle();
   fields = pathController.generateFields();
-  std::cout << "\n\033[4m" << title << "\033[0m"
-            << "\n";
-  for (std::string const &field : fields) {
-    std::cout << field << "\n";
+
+  v.push_back(title);
+  for (auto const field : fields) {
+    v.push_back(field);
   }
-  std::cout << std::endl;
+
   return 0;
 }
 

@@ -24,6 +24,10 @@
 #include <iostream>
 using namespace BlackOS::Trinkets;
 int main(int argc, char **argv) {
-  listChildren(argc, argv);
+  std::vector<std::string> children;
+  listChildren(argc, argv, children);
+  for (auto const &child : children) {
+    std::cout << child << "\n";
+  }
   return 0;
 }

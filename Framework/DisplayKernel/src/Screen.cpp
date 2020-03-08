@@ -100,6 +100,15 @@ void Screen::insert(char const *ch, size_t const y, size_t const x,
   }
 }
 
+std::vector<int> Screen::cursorPosition() const {
+  int x, y;
+  getsyx(y, x);
+  std::vector<int> v{y, x};
+  return v;
+}
+
+char Screen::getCharFromUser() const { return getch(); }
+
 void Screen::insert(char const ch, size_t const y, size_t const x,
                     TextStyle style) {
   char const *chstr = &ch;

@@ -93,6 +93,13 @@ std::string Menu::selectedField() const {
   return this->_fields[map];
 }
 
+std::vector<int> Menu::cursorPosition() const {
+  int x, y;
+  getyx(_win, y, x);
+  std::vector<int> v{x, y};
+  return v;
+}
+
 size_t Menu::selectedFieldIndex() const { return _highlightedMap(); }
 
 /// ACCESSOR
@@ -103,6 +110,8 @@ std::vector<size_t> Menu::maxSize() const {
   std::vector<size_t> termSz{rows, cols};
   return termSz;
 }
+
+char Menu::getCharFromUser() const { return wgetch(_win); }
 
 void Menu::insert(std::string const &str, size_t const y, size_t const x,
                   TextStyle style) {
