@@ -58,6 +58,30 @@ void ScreenShell::initShell() {
   keypad(stdscr, TRUE);
   scrollok(stdscr, TRUE);
   curs_set(2);
+
+  auto const termSz = DisplayKernel::TERMINAL_SIZE();
+  size_t const ROWS = termSz[0];
+
+  std::string title = "Tr(inkets) (C) ScreenShell";
+  std::string version = "1.0";
+  std::string repo = "Dark Horse Repository";
+  std::string license = "GPL v3.0";
+  std::string year = "2020";
+  std::string language = "C++";
+  std::string author = "Takudzwa Makoni";
+  std::string git = "https://github.com/TakudzwaMakoni";
+
+  std::vector<std::string> v{title, version,  repo,   license,
+                             year,  language, author, git};
+  auto banner = splashScreen(v);
+
+  std::string pushDown((ROWS - 8 /*banner height*/) / 2, '\n');
+  printw(pushDown.c_str());
+  for (std::string const &line : banner) {
+    printw(line.c_str());
+    printw("\n");
+  }
+  printw("\n");
 }
 
 void ScreenShell::displayPrompt(size_t y) {
@@ -254,12 +278,14 @@ void ScreenShell::runCmd(int argc, char **argv) {
         argc--;
       }
 
+      move(_cursorY + 1, 0);
+      logCursorPosition();
+
       char cmd[100];
       strcpy(cmd, "/usr/bin/");
       strcat(cmd, argv[0]);
       int result = execve(cmd, argv, environ);
 
-      // perror("execve error");
       if (result != 0) {
         exit(3); // duplicate child process is created.
       }

@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -14,9 +15,9 @@
 
 namespace BlackOS {
 namespace Trinkets {
-void eol(int v = 1);
+
 void pf(std::string const &str, int winwidth);
-int splashScreen(std::vector<std::string> const &argv);
+std::vector<std::string> splashScreen(std::vector<std::string> const &argv);
 } // namespace Trinkets
 } // namespace BlackOS
 

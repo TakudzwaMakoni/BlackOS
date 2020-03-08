@@ -37,32 +37,13 @@ void usageListChildren() {
             << "options:\n'-a' : show hidden\n";
 }
 
-static struct termios old, current;
-
-/* Initialize new terminal i/o settings */
-void initTermios(int echo) {
-  tcgetattr(0, &old);         /* grab old terminal i/o settings */
-  current = old;              /* make new settings same as old settings */
-  current.c_lflag &= ~ICANON; /* disable buffered i/o */
-  if (echo) {
-    current.c_lflag |= ECHO; /* set echo mode */
-  } else {
-    current.c_lflag &= ~ECHO; /* set no echo mode */
-  }
-  tcsetattr(0, TCSANOW, &current); /* use these new terminal i/o settings now */
+std::string produceBanner(std::string const &str, int winwidth) {
+  int widthA = (winwidth + str.length()) / 2;
+  std::stringstream ss;
+  ss << std::setw(widthA) << std::right << str;
+  return ss.str();
 }
 
-/* Restore old terminal i/o settings */
-void resetTermios(void) { tcsetattr(0, TCSANOW, &old); }
-
-/* Read 1 character - echo defines echo mode */
-char getch_(int echo) {
-  char ch;
-  initTermios(echo);
-  ch = getchar();
-  resetTermios();
-  return ch;
-}
 } // namespace
 
 int navigateDir(int argc, char **argv, int y, int x) {
@@ -421,31 +402,50 @@ int changeDir(char const *path) {
   return 0;
 }
 
-int parseUserInput(char **argv) {
-  std::string line;
-  char *cstr;
-  char ch;
-  int argc = 0;
-  do {
-    ch = getch_(1);
-    std::cout << ch;
-    if (ch == 27) {
-      return userInput::up;
-    }
-    line += ch;
-  } while (ch != '\n');
+std::vector<std::string> splashScreen(std::vector<std::string> const &argv) {
 
-  // tokenize the string
-  std::stringstream ss(line);
-  std::string item;
+  std::string spc = " "; // space string for easier reading.
+  std::string marginline =
+      "* * * * * * * * * * * * * * * * * * * * * * * * * * * * "
+      "* * * *"; // border
 
-  while (std::getline(ss, item, ' ')) {
-    cstr = new char[item.size() + 1];
-    strcpy(cstr, item.c_str());
-    argv[argc] = cstr;
-    argc++;
+  std::vector<std::string> v;
+
+  if (argv.size() != 8) {
+    return v;
   }
-  return 0;
+
+  std::string title;
+  std::string version;
+  std::string repo;
+  std::string license;
+  std::string year;
+  std::string language;
+  std::string author;
+  std::string git;
+
+  title = argv[0] + spc;
+  version = argv[1] + spc;
+  repo = argv[2] + spc;
+  license = argv[3] + spc;
+  year = argv[4] + spc;
+  language = argv[5] + spc;
+  author = argv[6] + spc;
+  git = argv[7] + spc;
+
+  std::vector<size_t> sz = DisplayKernel::TERMINAL_SIZE();
+  int x = sz[1];
+  int y = sz[0];
+
+  v.push_back(produceBanner(marginline, x));
+  v.push_back(produceBanner(title + "v" + version + ", " + repo, x));
+  v.push_back(
+      produceBanner(license + year + ", " + "written in " + language, x));
+  v.push_back(produceBanner("by " + author, x));
+  v.push_back(produceBanner("git: " + git, x));
+  v.push_back(produceBanner(marginline, x));
+
+  return v;
 }
 
 } // namespace Trinkets

@@ -19,7 +19,7 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "SplashScreen.h"
+#include "Natives.h"
 
 using namespace BlackOS::Trinkets;
 int main(int argc, char **argv) {

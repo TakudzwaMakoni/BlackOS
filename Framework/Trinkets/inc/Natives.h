@@ -43,10 +43,10 @@
 namespace BlackOS {
 namespace Trinkets {
 enum userInput { up = -5, down, left, right, backspace };
-int parseUserInput(char **argv);
 int changeDir(char const *path = nullptr);
 int listChildren(int, char **, std::vector<std::string> &v);
 int navigateDir(int, char **, int y = -1, int x = -1);
+std::vector<std::string> splashScreen(std::vector<std::string> const &argv);
 } // namespace Trinkets
 } // namespace BlackOS
 
