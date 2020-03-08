@@ -94,7 +94,7 @@ public:
 
   void displayPrompt(size_t y);
 
-  void backSpace();
+  void configureShell(std::string const &, std::string const &);
 
   // clear the display
   void clearDisplay();
@@ -124,6 +124,7 @@ private:
   std::string _PATH;
   std::string _SHELL; // fallback shell
   std::string _EDITOR;
+  int CURSOR = 2;
 };
 } // namespace Trinkets
 } // namespace BlackOS

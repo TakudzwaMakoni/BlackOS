@@ -55,9 +55,10 @@ void clearDisplay() {}
 
 void ScreenShell::initShell() {
   _display->setWin(1);
+  noecho();
   keypad(stdscr, TRUE);
   scrollok(stdscr, TRUE);
-  curs_set(2);
+  curs_set(CURSOR);
 
   auto const termSz = DisplayKernel::TERMINAL_SIZE();
   size_t const ROWS = termSz[0];
@@ -85,7 +86,8 @@ void ScreenShell::initShell() {
 }
 
 void ScreenShell::displayPrompt(size_t y) {
-  curs_set(2);
+  noecho();
+  curs_set(CURSOR);
   char buf[MAX_ARGS];
   getcwd(buf, sizeof buf);
   std::string prompt = buf;
@@ -101,12 +103,46 @@ size_t ScreenShell::cursorX() const { return _cursorY; }
 
 void ScreenShell::logCursorPosition() { getyx(stdscr, _cursorY, _cursorX); }
 
+void ScreenShell::configureShell(std::string const &argv1,
+                                 std::string const &argv2) {
+  if (argv1 == "CURSOR") {
+    int value;
+    std::string errorMessage =
+        "could not assign cursor to this value: " + argv2 +
+        "\nexpected an integer from 0 to 2.";
+    try {
+      value = std::stoi(argv2);
+
+    } catch (...) {
+
+      printw(errorMessage.c_str());
+      printw("\n");
+      logCursorPosition();
+      return;
+    }
+    if (value < 0 || value > 2) {
+
+      printw(errorMessage.c_str());
+      printw("\n");
+      logCursorPosition();
+      return;
+    }
+
+    CURSOR = value;
+
+  } else {
+    std::string message = "Shell variable " + argv1 + " is unrecognised.";
+    printw(message.c_str());
+    printw("\n");
+    logCursorPosition();
+  }
+}
+
 int ScreenShell::readArgs(char **argv) {
 
   std::string line;
   char *cstr;
   int argc = 0;
-  int count = 0;
   char ch;
 
   do {
@@ -119,12 +155,10 @@ int ScreenShell::readArgs(char **argv) {
       return userInput::up;
     } else if (intch == KEY_BACKSPACE || intch == KEY_DC || intch == 127) {
       if (!line.empty()) {
-
-        move(_cursorY, _promptLen + count - 1);
+        addch('\b');
         delch();
         logCursorPosition();
         refresh();
-        count--;
         line.pop_back();
       }
     } else if ((int)ch == KEY_LEFT) {
@@ -137,7 +171,6 @@ int ScreenShell::readArgs(char **argv) {
       addch(ch);
       logCursorPosition();
       refresh();
-      count++;
       line += ch;
     }
   } while (ch != '\n');
@@ -186,6 +219,12 @@ int ScreenShell::execute(int argc, char **argv) {
     logCursorPosition();
   } else if (command == "set") {
     setenv(argv[1], argv[2], 1);
+    logCursorPosition();
+  } else if (command == "config" || command == "configure") {
+    // TODO: breaks if user does not input enough args
+    std::string argv1 = argv[1];
+    std::string argv2 = argv[2];
+    configureShell(argv1, argv2);
     logCursorPosition();
   } else if (command == "clear") {
     clear();
