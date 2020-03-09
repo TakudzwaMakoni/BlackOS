@@ -92,7 +92,7 @@ public:
   // arguments taken in.
   int readArgs(char **);
 
-  void displayPrompt(size_t y);
+  void displayPrompt();
 
   void configureShell(std::string const &, std::string const &);
 
@@ -108,6 +108,8 @@ public:
 
   // Redirects the output from the given command into the given file.
   void redirectCmd(char **, char **);
+
+  void standardPrint(std::string const &);
 
   // Pipes the first command's output into the second.
   void pipeCmd(char **, char **);

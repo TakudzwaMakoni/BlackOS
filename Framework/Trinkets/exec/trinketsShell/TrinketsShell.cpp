@@ -30,7 +30,6 @@ int main() {
   char *argv[MAX_ARGS], *cmd1[MAX_ARGS], *cmd2[MAX_ARGS];
   PipeRedirect pipe_redirect;
   int argc;
-  size_t lineCount = 0;
 
   auto termSz = BlackOS::DisplayKernel::TERMINAL_SIZE();
   size_t termSzY = termSz[0];
@@ -43,13 +42,12 @@ int main() {
 
   shell.initShell();
 
-  shell.displayPrompt(lineCount);
-
   while (1) {
 
+    shell.displayPrompt();
     argc = shell.readArgs(argv);
 
-    if (argc != 0) {
+    if (argv[0] != nullptr) {
 
       // quit on user prompt
       std::string firstArg = argv[0];
@@ -74,8 +72,6 @@ int main() {
       for (int i = 0; i < argc; i++)
         argv[i] = NULL;
     }
-
-    shell.displayPrompt(shell.cursorY() + 1);
   }
 
   /*

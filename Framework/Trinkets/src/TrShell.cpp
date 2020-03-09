@@ -24,18 +24,6 @@
 namespace BlackOS {
 namespace Trinkets {
 
-namespace {
-struct cout_redirect {
-  cout_redirect(std::streambuf *new_buffer)
-      : old(std::cout.rdbuf(new_buffer)) {}
-
-  ~cout_redirect() { std::cout.rdbuf(old); }
-
-private:
-  std::streambuf *old;
-};
-} // namespace
-
 Screen_sptr generateScreen() {
   auto screen = std::make_shared<DisplayKernel::Screen>();
   return screen;
@@ -85,15 +73,17 @@ void ScreenShell::initShell() {
   printw("\n");
 }
 
-void ScreenShell::displayPrompt(size_t y) {
-  noecho();
+void ScreenShell::displayPrompt() {
+
   curs_set(CURSOR);
   char buf[MAX_ARGS];
   getcwd(buf, sizeof buf);
+  noecho();
+
   std::string prompt = buf;
   prompt = "Tr " + prompt + "> ";
   _promptLen = prompt.length();
-  printw(prompt.c_str()); // TODO: make wrapper?
+  printw(prompt.c_str());
   logCursorPosition();
 }
 
@@ -101,7 +91,7 @@ size_t ScreenShell::cursorY() const { return _cursorY; }
 
 size_t ScreenShell::cursorX() const { return _cursorY; }
 
-void ScreenShell::logCursorPosition() { getyx(stdscr, _cursorY, _cursorX); }
+void ScreenShell::logCursorPosition() { getsyx(_cursorY, _cursorX); }
 
 void ScreenShell::configureShell(std::string const &argv1,
                                  std::string const &argv2) {
@@ -129,6 +119,7 @@ void ScreenShell::configureShell(std::string const &argv1,
     }
 
     CURSOR = value;
+    curs_set(CURSOR); // TODO: extra arg to save preference to config file?
 
   } else {
     std::string message = "Shell variable " + argv1 + " is unrecognised.";
@@ -147,7 +138,6 @@ int ScreenShell::readArgs(char **argv) {
 
   do {
     ch = getch();
-
     int intch = ch;
     if (ch == '\n') {
       break;
@@ -155,9 +145,8 @@ int ScreenShell::readArgs(char **argv) {
       return userInput::up;
     } else if (intch == KEY_BACKSPACE || intch == KEY_DC || intch == 127) {
       if (!line.empty()) {
-        addch('\b');
-        delch();
-        logCursorPosition();
+
+        printw("\b \b");
         refresh();
         line.pop_back();
       }
@@ -173,8 +162,7 @@ int ScreenShell::readArgs(char **argv) {
       refresh();
       line += ch;
     }
-  } while (ch != '\n');
-  move(_cursorY + 1, 0);
+  } while (1);
 
   // tokenize the string
   std::stringstream ss(line);
@@ -186,9 +174,9 @@ int ScreenShell::readArgs(char **argv) {
     argv[argc] = cstr;
     argc++;
   }
+  printw("\n");
   // Have to have the last argument be NULL so that execvp works.
   argv[argc] = NULL;
-
   return argc;
 }
 
@@ -215,8 +203,11 @@ int ScreenShell::execute(int argc, char **argv) {
     printw("\n");
     logCursorPosition();
   } else if (command == "ndir" || command == "nd") {
-    navigateDir(argc, argv, _cursorY + 1, 0);
-    logCursorPosition();
+
+    int y, x;
+    getsyx(y, x);
+    navigateDir(argc, argv, y + 2, 0);
+
   } else if (command == "set") {
     setenv(argv[1], argv[2], 1);
     logCursorPosition();
@@ -231,6 +222,8 @@ int ScreenShell::execute(int argc, char **argv) {
     move(0, 0);
     logCursorPosition();
   } else {
+    system("stty onlcr");
+    std::cout << "\n";
     return 1;
   }
   return 0;
@@ -299,7 +292,6 @@ void ScreenShell::runCmd(int argc, char **argv) {
 
   // TODO: no ampersand support for parent processes?
   if (/*run builtin comands with parent*/ execute(argc, argv) != 0) {
-
     // Fork our process
     pid = fork();
 
@@ -317,13 +309,10 @@ void ScreenShell::runCmd(int argc, char **argv) {
         argc--;
       }
 
-      move(_cursorY + 1, 0);
-      logCursorPosition();
-
       char cmd[100];
       strcpy(cmd, "/usr/bin/");
       strcat(cmd, argv[0]);
-      int result = execve(cmd, argv, environ);
+      int result = execvp(cmd, argv);
 
       if (result != 0) {
         exit(3); // duplicate child process is created.

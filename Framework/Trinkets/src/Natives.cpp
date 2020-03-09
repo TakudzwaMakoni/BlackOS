@@ -68,7 +68,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
   size_t const ROWS = termSz[0];
   size_t const COLS = termSz[1];
 
-  if (y < 0)
+  if (y < 0 || y > ROWS - 8)
     cursor_pos_y = ROWS / 2;
   else
     cursor_pos_y = y;
