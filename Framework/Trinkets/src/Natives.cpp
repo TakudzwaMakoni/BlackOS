@@ -204,7 +204,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
       NavigationMenu.clear(); // clear previous output
       NavigationMenu.insert(message.c_str(), cursor_pos_y, 0);
       NavigationMenu.refresh(); // present message to screen
-      wgetch(stdscr);
+      NavigationMenu.pause();
       // go back up a level and skip iteration.
       parentPath = parentPath.parent_path(); // go up a dir
       NavigationMenu.clear(); // clear message for next iteration.
@@ -271,17 +271,30 @@ int navigateDir(int argc, char **argv, int y, int x) {
       }
       NavigationMenu.clear();
     } else {
+
       // last key pressed is enter
       fieldIdx = NavigationMenu.selectedFieldIndex();
       chosenPath = children[fieldIdx];
-      NavigationMenu.clear();
-      NavigationMenu.setWin(0);
-      AttributeWindow.setWin(0);
+      auto chosenPathType = pathType(chosenPath);
 
-      break; // break from while loop
+      if (chosenPathType == "directory") {
+        changeDir(chosenPath.c_str());
+        NavigationMenu.clear();
+        NavigationMenu.setWin(0);
+        AttributeWindow.setWin(0);
+        break;
+      } else if (chosenPathType == "file") {
+        int result = openWithTextEditor(chosenPath);
+        NavigationMenu.clear();
+        if (result == -1) {
+          NavigationMenu.insert("no editor environment variable is set.", 0, 0);
+          NavigationMenu.refresh();
+          NavigationMenu.pause();
+        }
+      }
     }
   }
-  changeDir(chosenPath.c_str());
+
   return 0;
 }
 
@@ -399,6 +412,16 @@ int changeDir(char const *path) {
       return 1;
     }
   }
+  return 0;
+}
+
+int openWithTextEditor(std::string const &path) {
+  char *editor = getenv("EDITOR");
+  if (editor == NULL)
+    return -1;
+  std::string command = editor;
+  command += " " + path;
+  system(command.c_str());
   return 0;
 }
 
