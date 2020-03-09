@@ -31,6 +31,7 @@
 #include <fcntl.h>
 #include <fstream>
 #include <iostream>
+#include <cctype>
 #include <memory>
 #include <stdlib.h>
 #include <string>
@@ -126,7 +127,8 @@ private:
   std::string _PATH;
   std::string _SHELL; // fallback shell
   std::string _EDITOR;
-  int CURSOR = 2;
+  int _CURSOR = 2;
+  int _DELETE = -1;
 };
 } // namespace Trinkets
 } // namespace BlackOS

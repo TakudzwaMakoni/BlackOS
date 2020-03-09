@@ -46,7 +46,7 @@ void ScreenShell::initShell() {
   noecho();
   keypad(stdscr, TRUE);
   scrollok(stdscr, TRUE);
-  curs_set(CURSOR);
+  curs_set(_CURSOR);
 
   auto const termSz = DisplayKernel::TERMINAL_SIZE();
   size_t const ROWS = termSz[0];
@@ -71,11 +71,12 @@ void ScreenShell::initShell() {
     printw("\n");
   }
   printw("\n");
+  changeDir(nullptr);
 }
 
 void ScreenShell::displayPrompt() {
 
-  curs_set(CURSOR);
+  curs_set(_CURSOR);
   char buf[MAX_ARGS];
   getcwd(buf, sizeof buf);
   noecho();
@@ -118,9 +119,56 @@ void ScreenShell::configureShell(std::string const &argv1,
       return;
     }
 
-    CURSOR = value;
-    curs_set(CURSOR); // TODO: extra arg to save preference to config file?
+    _CURSOR = value;
+    curs_set(_CURSOR); // TODO: extra arg to save preference to config file?
 
+  } else if (argv1 == "DELETE"){
+  // linux TERM environment variable does not seem to read regular backspace.
+  // allow the user to specify which key is delete.
+	std::string errorMessage = 
+	"could not assign delete key to this value: " + argv2 +
+	"\nexpected a single character, or number in range " + 
+	"0-127, or 'unset' to unset";
+
+	if(argv2 == "unset"){
+	_DELETE = -1;
+	return;
+	}
+	
+	try{
+	int value = std::stoi(argv2);
+
+	if(value>127 || value < 0){
+	printw("2nd argument must be in range: 0 < [arg2] < 127");
+	printw("\n");
+	return;
+	}
+
+	if(value==10/*Enter*/ || value==35/*Space*/){
+	// may need to specify more reserved values.
+	printw("this key is reserved.");
+	printw("\n");
+	}
+	_DELETE = value;
+	}catch(...){
+	// parse character
+
+  	if(argv2.length()!=1){
+	printw(errorMessage.c_str());
+	printw("\n");
+	return;
+	}
+
+	char c = argv2[0];
+	if(std::isprint(static_cast<unsigned char>(c))){
+	_DELETE = (int)c;
+	return;
+	} else{
+	printw("2nd argument is not a printable character.");
+	printw("\n");
+	}
+
+	}
   } else {
     std::string message = "Shell variable " + argv1 + " is unrecognised.";
     printw(message.c_str());
@@ -143,7 +191,7 @@ int ScreenShell::readArgs(char **argv) {
       break;
     } else if (intch == 27 || intch == KEY_UP) {
       return userInput::up;
-    } else if (intch == KEY_BACKSPACE || intch == KEY_DC || intch == 127) {
+    } else if ( (_DELETE>0&&intch==_DELETE) || intch==8 || intch == KEY_BACKSPACE || intch == KEY_DC || intch == 127) {
       if (!line.empty()) {
 
         printw("\b \b");
@@ -320,8 +368,6 @@ void ScreenShell::runCmd(int argc, char **argv) {
       // parent process
     } else if (!found_amp)
       waitpid(pid, NULL, 0); // only wait if no ampersand
-
-    logCursorPosition();
   }
 }
 
