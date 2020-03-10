@@ -149,13 +149,15 @@ int navigateDir(int argc, char **argv, int y, int x) {
   BlackOS::DisplayKernel::Menu NavigationMenu(ROWS - cursor_pos_y, COLS,
                                               cursor_pos_y, cursor_pos_x);
 
-  BlackOS::DisplayKernel::Window AttributeWindow(1, COLS, ROWS - 1, 0);
+  //create new window object
+  BlackOS::DisplayKernel::Window CurrentDirWindow(1,COLS,cursor_pos_y, cursor_pos_x);
 
   // create path navigator object;
   PathController pathController;
 
   NavigationMenu.setWin(1);
-  AttributeWindow.setWin(1);
+  CurrentDirWindow.setWin(1);
+
   while (1) {
 
     pathController.showHidden(withHidden);
@@ -170,7 +172,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
       if (parentPath == initPath) {
         // user initialised parent directory without access
         NavigationMenu.setWin(0);
-        AttributeWindow.setWin(0);
+	CurrentDirWindow.setWin(0);
         return -1; // leave here TODO: exit codes
       } else {
         // user navigated into directory without permissions
@@ -187,11 +189,11 @@ int navigateDir(int argc, char **argv, int y, int x) {
 
     // include 1 additional space.
     menuWidth = title.length() + 1;
-    menuHeight = ROWS - cursor_pos_y;
+    menuHeight = ROWS - cursor_pos_y-2;
     pagination = menuHeight - 3;
 
     NavigationMenu.resize(menuHeight, menuWidth);
-    NavigationMenu.reposition(cursor_pos_y /*maintain cursor y position*/,
+    NavigationMenu.reposition(cursor_pos_y+2 /*maintain cursor y position*/,
                               cursor_pos_x /*left of screen*/);
 
     if (fieldSz == 0) {
@@ -202,7 +204,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
         message = "no entries to show (excl. hidden paths).";
       }
       NavigationMenu.clear(); // clear previous output
-      NavigationMenu.insert(message.c_str(), cursor_pos_y, 0);
+      NavigationMenu.insert(message.c_str(), cursor_pos_y+2, 0);
       NavigationMenu.refresh(); // present message to screen
       NavigationMenu.pause();
       // go back up a level and skip iteration.
@@ -215,7 +217,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
     NavigationMenu.loadTitle(title,
                              BlackOS::DisplayKernel::TextStyle::underline);
     NavigationMenu.loadFields(fields);
-    NavigationMenu.loadFieldAlignment(-1, 1); // top left of window
+    NavigationMenu.loadFieldAlignment(-1, 1); // bottom left of window
     NavigationMenu.paginate(pagination, pagination <= fieldSz);
 
     NavigationMenu.hideBorder();
@@ -224,6 +226,16 @@ int navigateDir(int argc, char **argv, int y, int x) {
     std::string showingHidden = withHidden ? "t" : "f";
     std::string hiddenInfo = hiddenAttribute + showingHidden;
     size_t attributePosition = menuHeight - 1;
+
+    std::string currentDir = parentPath;
+    std::string currentDirMessage = "looking in: ";
+    currentDir = currentDir;
+
+    CurrentDirWindow.resize(1,currentDirMessage.length() + currentDir.length());
+    CurrentDirWindow.insert(currentDirMessage,0,0,BlackOS::DisplayKernel::TextStyle::underline);
+    CurrentDirWindow.insert(currentDir,0,currentDirMessage.length());
+    CurrentDirWindow.refresh();
+
     std::vector<size_t> ignoreBlocks = {attributePosition, 0, attributePosition,
                                         hiddenInfo.length()};
     NavigationMenu.insert(hiddenInfo, attributePosition, 0);
@@ -237,14 +249,15 @@ int navigateDir(int argc, char **argv, int y, int x) {
     if (lastKey == (int)'q' || lastKey == 27 /*ESC*/) {
       // user exited program
       NavigationMenu.clear();
+      CurrentDirWindow.clear();
       NavigationMenu.setWin(0);
-      AttributeWindow.setWin(0);
-
+      CurrentDirWindow.setWin(0);      
       return 0; // leave here
     } else if (lastKey == (int)'a' /*out of directory*/) {
       // user navigated up a directory
       parentPath = parentPath.parent_path();
       NavigationMenu.clear();
+      CurrentDirWindow.clear();
     } else if (lastKey == (int)'d' /*into dir*/) {
 
       // user navigated into a child directory
@@ -262,6 +275,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
       }
       // clear window for next iteration
       NavigationMenu.clear();
+      CurrentDirWindow.clear();
     } else if (lastKey == (int)'h') {
       // toggle hide files
       if (withHidden) {
@@ -280,8 +294,9 @@ int navigateDir(int argc, char **argv, int y, int x) {
       if (chosenPathType == "directory") {
         changeDir(chosenPath.c_str());
         NavigationMenu.clear();
+	CurrentDirWindow.clear();
         NavigationMenu.setWin(0);
-        AttributeWindow.setWin(0);
+	CurrentDirWindow.setWin(0);
         break;
       } else if (chosenPathType == "file") {
         int result = openWithTextEditor(chosenPath);
