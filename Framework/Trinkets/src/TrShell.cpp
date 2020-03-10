@@ -75,6 +75,10 @@ void ScreenShell::initShell() {
 }
 
 void ScreenShell::displayPrompt() {
+  if(_TTY_FLAG_ECHO){
+  system("stty -echo");
+  _TTY_FLAG_ECHO = 0;
+  }
   curs_set(_CURSOR);
   char buf[MAX_ARGS];
   getcwd(buf, sizeof buf);
@@ -270,6 +274,8 @@ int ScreenShell::execute(int argc, char **argv) {
     logCursorPosition();
   } else {
     system("stty onlcr");
+    system("stty echo");
+    _TTY_FLAG_ECHO = 1;
     std::cout << "\n";
     return 1;
   }

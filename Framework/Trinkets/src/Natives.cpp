@@ -228,8 +228,8 @@ int navigateDir(int argc, char **argv, int y, int x) {
     size_t attributePosition = menuHeight - 1;
 
     std::string currentDir = parentPath;
-    std::string currentDirMessage = "looking in: ";
-    currentDir = currentDir;
+    std::string currentDirMessage = "looking in:";
+    currentDir = " " + currentDir;
 
     CurrentDirWindow.resize(1,currentDirMessage.length() + currentDir.length());
     CurrentDirWindow.insert(currentDirMessage,0,0,BlackOS::DisplayKernel::TextStyle::underline);

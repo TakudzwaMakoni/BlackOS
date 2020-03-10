@@ -129,6 +129,7 @@ private:
   std::string _EDITOR;
   int _CURSOR = 2;
   int _DELETE = -1;
+  bool _TTY_FLAG_ECHO;
 };
 } // namespace Trinkets
 } // namespace BlackOS
