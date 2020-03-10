@@ -75,9 +75,9 @@ void ScreenShell::initShell() {
 }
 
 void ScreenShell::displayPrompt() {
-  if(_TTY_FLAG_ECHO){
-  system("stty -echo");
-  _TTY_FLAG_ECHO = 0;
+  if (_TTY_FLAG_ECHO) {
+    system("stty -echo -icanon");
+    _TTY_FLAG_ECHO = 0;
   }
   curs_set(_CURSOR);
   char buf[MAX_ARGS];
@@ -273,8 +273,7 @@ int ScreenShell::execute(int argc, char **argv) {
     move(0, 0);
     logCursorPosition();
   } else {
-    system("stty onlcr");
-    system("stty echo");
+    system("stty sane"); // onlcr crterase echo icanon ocrnl");
     _TTY_FLAG_ECHO = 1;
     std::cout << "\n";
     return 1;
