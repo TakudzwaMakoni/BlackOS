@@ -168,13 +168,15 @@ void ScreenShell::logCursorPosition() { getsyx(_cursorY, _cursorX); }
 
 void ScreenShell::configureShell(int argc, char **argv) {
   if (argc != 3) {
-    // print usage
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
     return;
   }
-  // std::string const argv1 = argv[1];
-  // std::string const argv2 = argv[2];
+  std::string const argv1 = argv[1];
+  std::string const argv2 = argv[2];
 
-  //  configureShell(argv1, argv2);
+  configureShell(argv1, argv2);
 }
 
 void ScreenShell::configureShell(std::string const &argv1,
@@ -210,7 +212,7 @@ void ScreenShell::configureShell(std::string const &argv1,
     std::string errorMessage =
         "could not assign delete key to this value: " + argv2 +
         "\nexpected a single character, or number in range " +
-        "0-127, or 'unset' to unset";
+        "0-127, or 'unset' to unset.";
 
     if (argv2 == "unset") {
       _DELETE = -1;
@@ -265,7 +267,8 @@ void ScreenShell::configureShell(std::string const &argv1,
 
 void ScreenShell::setShellEnv(int argc, char **argv) {
   if (argc != 3) {
-    // print usage
+    printw("Usage:\n"
+           "set <ENV> <value>\n");
     return;
   }
   setenv(argv[1], argv[2], 1);

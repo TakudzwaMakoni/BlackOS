@@ -134,8 +134,11 @@ private:
 
   std::filesystem::path _CONFIG_FILE;
   std::filesystem::path _SHELL_ENV_FILE;
+
+  // shell environment variables
   int _CURSOR = 2;
   int _DELETE = -1;
+
   bool _TTY_FLAG_FALLBACK;
 };
 } // namespace Trinkets
