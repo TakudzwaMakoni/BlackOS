@@ -91,7 +91,7 @@ void ScreenShell::initShell() {
 
   std::string title = "Tr(inkets) (C) ScreenShell";
   std::string version = "1.0";
-  std::string repo = "Dark Horse Repository";
+  std::string repo = "Operation Dark Horse";
   std::string license = "GPL v3.0";
   std::string year = "2020";
   std::string language = "C++";
