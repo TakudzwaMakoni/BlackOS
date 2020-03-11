@@ -37,7 +37,45 @@ Window_sptr generateWindow() {
   return window;
 }
 
-ScreenShell::ScreenShell(Screen_sptr &display) { _display = display; }
+ScreenShell::ScreenShell(Screen_sptr &display) {
+
+  // std::string const PATHENV std::string const TERMENV std::string const
+  // SHELLENV
+  //    std::string const HOMEENV
+
+  // required environment variables
+  char *path = getenv("PATH");
+  char *term = getenv("TERM");
+  char *shell = getenv("SHELL");
+  char *home = getenv("HOME");
+
+  if (path == nullptr) {
+    std::cout << "no PATH environment variable is set." << std::endl;
+    exit(ExitStatus::ERROR);
+  }
+  if (term == nullptr) {
+    std::cout << "no TERM environment variable is set." << std::endl;
+    exit(ExitStatus::ERROR);
+  }
+  if (shell == nullptr) {
+    std::cout << "no SHELL environment variable is set." << std::endl;
+    exit(ExitStatus::ERROR);
+  }
+  if (home == nullptr) {
+    std::cout << "no HOME environment variable is set." << std::endl;
+    exit(ExitStatus::ERROR);
+  }
+
+  _PATH = path;
+  _TERM = term;
+  _SHELL = shell;
+  _HOME = home;
+
+  _CONFIG_FILE = _HOME + "/.tr/config.txt";
+  _SHELL_ENV_FILE = _HOME + "/.tr/environment.txt";
+
+  _display = display;
+}
 
 void clearDisplay() {}
 
@@ -72,12 +110,43 @@ void ScreenShell::initShell() {
   }
   printw("\n");
   changeDir(nullptr);
+
+  // initialise shell with config settings and shell variables described in
+  // config and environment files.
+  initShellVariables();
+  initEnvironmentVariables();
+
+  // recommended environment variables
+  char *editor = getenv("EDITOR");
+
+  if (editor == nullptr) {
+    printw("warning: no EDITOR environment variable is set.");
+    printw("\n");
+  }
+}
+
+int ScreenShell::initShellVariables() {
+  std::ifstream infile(_CONFIG_FILE);
+  std::string a, b;
+  while (infile >> a >> b) {
+    configureShell(a, b);
+  }
+  return 0;
+}
+
+int ScreenShell::initEnvironmentVariables() {
+  std::ifstream infile(_SHELL_ENV_FILE);
+  std::string a, b;
+  while (infile >> a >> b) {
+    setenv(a.c_str(), b.c_str(), 1);
+  }
+  return 0;
 }
 
 void ScreenShell::displayPrompt() {
-  if (_TTY_FLAG_ECHO) {
+  if (_TTY_FLAG_FALLBACK) {
     system("stty -echo -icanon");
-    _TTY_FLAG_ECHO = 0;
+    _TTY_FLAG_FALLBACK = 0;
   }
   curs_set(_CURSOR);
   char buf[MAX_ARGS];
@@ -97,16 +166,26 @@ size_t ScreenShell::cursorX() const { return _cursorY; }
 
 void ScreenShell::logCursorPosition() { getsyx(_cursorY, _cursorX); }
 
+void ScreenShell::configureShell(int argc, char **argv) {
+  if (argc != 3) {
+    // print usage
+    return;
+  }
+  // std::string const argv1 = argv[1];
+  // std::string const argv2 = argv[2];
+
+  //  configureShell(argv1, argv2);
+}
+
 void ScreenShell::configureShell(std::string const &argv1,
                                  std::string const &argv2) {
   if (argv1 == "CURSOR") {
     int value;
     std::string errorMessage =
         "could not assign cursor to this value: " + argv2 +
-        "\nexpected an integer from 0 to 2.";
+        "\n2nd argument must be in range: 0 <= [arg2] <= 2";
     try {
       value = std::stoi(argv2);
-
     } catch (...) {
 
       printw(errorMessage.c_str());
@@ -139,10 +218,15 @@ void ScreenShell::configureShell(std::string const &argv1,
     }
 
     try {
+
       int value = std::stoi(argv2);
 
       if (value > 127 || value < 0) {
-        printw("2nd argument must be in range: 0 < [arg2] < 127");
+        std::string errorMessage =
+            "could not assign delete key to this value: " +
+            std::to_string(value) +
+            "\n2nd argument must be in range: 0 < [arg2] < 127";
+        printw(errorMessage.c_str());
         printw("\n");
         return;
       }
@@ -151,6 +235,7 @@ void ScreenShell::configureShell(std::string const &argv1,
         // may need to specify more reserved values.
         printw("this key is reserved.");
         printw("\n");
+        return;
       }
       _DELETE = value;
     } catch (...) {
@@ -165,7 +250,6 @@ void ScreenShell::configureShell(std::string const &argv1,
       char c = argv2[0];
       if (std::isprint(static_cast<unsigned char>(c))) {
         _DELETE = (int)c;
-        return;
       } else {
         printw("2nd argument is not a printable character.");
         printw("\n");
@@ -177,6 +261,14 @@ void ScreenShell::configureShell(std::string const &argv1,
     printw("\n");
     logCursorPosition();
   }
+}
+
+void ScreenShell::setShellEnv(int argc, char **argv) {
+  if (argc != 3) {
+    // print usage
+    return;
+  }
+  setenv(argv[1], argv[2], 1);
 }
 
 int ScreenShell::readArgs(char **argv) {
@@ -254,27 +346,23 @@ int ScreenShell::execute(int argc, char **argv) {
     printw("\n");
     logCursorPosition();
   } else if (command == "ndir" || command == "nd") {
-
     int y, x;
     getsyx(y, x);
     navigateDir(argc, argv, y + 2, 0);
-
   } else if (command == "set") {
-    setenv(argv[1], argv[2], 1);
+    setShellEnv(argc, argv);
     logCursorPosition();
   } else if (command == "config" || command == "configure") {
-    // TODO: breaks if user does not input enough args
-    std::string argv1 = argv[1];
-    std::string argv2 = argv[2];
-    configureShell(argv1, argv2);
+    configureShell(argc, argv);
     logCursorPosition();
   } else if (command == "clear") {
     clear();
     move(0, 0);
     logCursorPosition();
   } else {
-    system("stty sane"); // onlcr crterase echo icanon ocrnl");
-    _TTY_FLAG_ECHO = 1;
+    system("stty sane"); // TODO: use tcsetattr in termios.h // onlcr crterase
+                         // echo icanon ocrnl");
+    _TTY_FLAG_FALLBACK = 1;
     std::cout << "\n";
     return 1;
   }
@@ -365,6 +453,7 @@ void ScreenShell::runCmd(int argc, char **argv) {
       strcpy(cmd, "/usr/bin/");
       strcat(cmd, argv[0]);
       int result = execvp(cmd, argv);
+      perror("Fallback Shell");
 
       if (result != 0) {
         exit(3); // duplicate child process is created.
@@ -468,9 +557,10 @@ void ScreenShell::pipeCmd(char **cmd1, char **cmd2) {
     waitpid(pid, NULL, 0);
 }
 
-void ScreenShell::quit(std::string) { std::cout << "goodbye!\n"; }
-
-ScreenShell::~ScreenShell() { std::cout << "exited Tr.\n"; }
+ScreenShell::~ScreenShell() {
+  _display->setWin(0);
+  std::cout << "\nexited Tr.\n";
+}
 
 } // namespace Trinkets
 } // namespace BlackOS

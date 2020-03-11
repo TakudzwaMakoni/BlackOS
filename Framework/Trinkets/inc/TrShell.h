@@ -26,13 +26,15 @@
 #include "../inc/SplashScreen.h"
 #include "Screen.h"
 
+#include <cctype>
 #include <cerrno>
 #include <cstring>
 #include <fcntl.h>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <cctype>
 #include <memory>
+#include <sstream>
 #include <stdlib.h>
 #include <string>
 #include <sys/stat.h>
@@ -52,11 +54,6 @@ static char const *CLEAR_SCREEN_ANSI = "\e[0;0H\e[2J";
 
 enum class PipeRedirect { PIPE, REDIRECT, NEITHER };
 enum ExitStatus { ERROR = -1, USER_EXIT };
-
-std::string const PATHENV = "PATH=" + (std::string)getenv("PATH");
-std::string const TERMENV = "TERM=" + (std::string)getenv("TERM");
-std::string const SHELLENV = "SHELL=" + (std::string)getenv("SHELL");
-std::string const EDITORENV = "EDITOR=vim";
 
 using Screen_sptr = std::shared_ptr<DisplayKernel::Screen>;
 using Window_sptr = std::shared_ptr<DisplayKernel::Window>;
@@ -93,9 +90,17 @@ public:
   // arguments taken in.
   int readArgs(char **);
 
+  int initShellVariables();
+
+  int initEnvironmentVariables();
+
   void displayPrompt();
 
+  void configureShell(int, char **);
+
   void configureShell(std::string const &, std::string const &);
+
+  void setShellEnv(int, char **);
 
   // clear the display
   void clearDisplay();
@@ -110,8 +115,6 @@ public:
   // Redirects the output from the given command into the given file.
   void redirectCmd(char **, char **);
 
-  void standardPrint(std::string const &);
-
   // Pipes the first command's output into the second.
   void pipeCmd(char **, char **);
 
@@ -123,13 +126,17 @@ private:
   size_t _cursorY = 0;
   size_t _cursorX = 0;
   size_t _promptLen;
-  std::string _TERM;
+
   std::string _PATH;
+  std::string _TERM;
   std::string _SHELL; // fallback shell
-  std::string _EDITOR;
+  std::string _HOME;
+
+  std::filesystem::path _CONFIG_FILE;
+  std::filesystem::path _SHELL_ENV_FILE;
   int _CURSOR = 2;
   int _DELETE = -1;
-  bool _TTY_FLAG_ECHO;
+  bool _TTY_FLAG_FALLBACK;
 };
 } // namespace Trinkets
 } // namespace BlackOS

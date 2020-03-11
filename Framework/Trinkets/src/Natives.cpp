@@ -48,12 +48,6 @@ std::string produceBanner(std::string const &str, int winwidth) {
 
 int navigateDir(int argc, char **argv, int y, int x) {
 
-  /*
-  ====================================================================
-  SYSTEM ARGUMENTS
-  ====================================================================
-  */
-
   bool withHidden;
   size_t cursor_pos_y;
   size_t cursor_pos_x;
@@ -68,7 +62,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
   size_t const ROWS = termSz[0];
   size_t const COLS = termSz[1];
 
-  if (y < 0 || y > ROWS - 8)
+  if (y < 0 || y > ROWS - 10)
     cursor_pos_y = ROWS / 2;
   else
     cursor_pos_y = y;
@@ -137,11 +131,13 @@ int navigateDir(int argc, char **argv, int y, int x) {
   // 'a' key to navigate up a directory.
   // 'd' key to navigate into highlighted directory.
   // 'h' key to toggle hidden folders view.
+  // 'e' key to exit here (in the current parent directory).
   // 'ENTER' key to change directory, or open file with EDITOR environment
   // variable.
   // 'q' or 'ESC' key to exit navigation menu.
-  std::vector<int> breakConditions = {(int)'a', (int)'d',     (int)'q',
-                                      (int)'h', 10 /*ENTER*/, 27 /*ESC*/};
+  std::vector<int> breakConditions = {(int)'a', (int)'d', (int)'q',
+                                      (int)'h', (int)'e', 10 /*ENTER*/,
+                                      27 /*ESC*/};
 
   std::string hiddenAttribute = "showing hidden paths: ";
 
@@ -149,8 +145,9 @@ int navigateDir(int argc, char **argv, int y, int x) {
   BlackOS::DisplayKernel::Menu NavigationMenu(ROWS - cursor_pos_y, COLS,
                                               cursor_pos_y, cursor_pos_x);
 
-  //create new window object
-  BlackOS::DisplayKernel::Window CurrentDirWindow(1,COLS,cursor_pos_y, cursor_pos_x);
+  // create new window object
+  BlackOS::DisplayKernel::Window CurrentDirWindow(1, COLS, cursor_pos_y,
+                                                  cursor_pos_x);
 
   // create path navigator object;
   PathController pathController;
@@ -172,7 +169,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
       if (parentPath == initPath) {
         // user initialised parent directory without access
         NavigationMenu.setWin(0);
-	CurrentDirWindow.setWin(0);
+        CurrentDirWindow.setWin(0);
         return -1; // leave here TODO: exit codes
       } else {
         // user navigated into directory without permissions
@@ -189,11 +186,11 @@ int navigateDir(int argc, char **argv, int y, int x) {
 
     // include 1 additional space.
     menuWidth = title.length() + 1;
-    menuHeight = ROWS - cursor_pos_y-2;
+    menuHeight = ROWS - cursor_pos_y - 2;
     pagination = menuHeight - 3;
 
     NavigationMenu.resize(menuHeight, menuWidth);
-    NavigationMenu.reposition(cursor_pos_y+2 /*maintain cursor y position*/,
+    NavigationMenu.reposition(cursor_pos_y + 2 /*maintain cursor y position*/,
                               cursor_pos_x /*left of screen*/);
 
     if (fieldSz == 0) {
@@ -204,7 +201,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
         message = "no entries to show (excl. hidden paths).";
       }
       NavigationMenu.clear(); // clear previous output
-      NavigationMenu.insert(message.c_str(), cursor_pos_y+2, 0);
+      NavigationMenu.insert(message.c_str(), 0, 0);
       NavigationMenu.refresh(); // present message to screen
       NavigationMenu.pause();
       // go back up a level and skip iteration.
@@ -231,9 +228,11 @@ int navigateDir(int argc, char **argv, int y, int x) {
     std::string currentDirMessage = "looking in:";
     currentDir = " " + currentDir;
 
-    CurrentDirWindow.resize(1,currentDirMessage.length() + currentDir.length());
-    CurrentDirWindow.insert(currentDirMessage,0,0,BlackOS::DisplayKernel::TextStyle::underline);
-    CurrentDirWindow.insert(currentDir,0,currentDirMessage.length());
+    CurrentDirWindow.resize(1,
+                            currentDirMessage.length() + currentDir.length());
+    CurrentDirWindow.insert(currentDirMessage, 0, 0,
+                            BlackOS::DisplayKernel::TextStyle::underline);
+    CurrentDirWindow.insert(currentDir, 0, currentDirMessage.length());
     CurrentDirWindow.refresh();
 
     std::vector<size_t> ignoreBlocks = {attributePosition, 0, attributePosition,
@@ -251,7 +250,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
       NavigationMenu.clear();
       CurrentDirWindow.clear();
       NavigationMenu.setWin(0);
-      CurrentDirWindow.setWin(0);      
+      CurrentDirWindow.setWin(0);
       return 0; // leave here
     } else if (lastKey == (int)'a' /*out of directory*/) {
       // user navigated up a directory
@@ -284,25 +283,35 @@ int navigateDir(int argc, char **argv, int y, int x) {
         withHidden = 1;
       }
       NavigationMenu.clear();
+    } else if (lastKey == (int)'e') {
+
+      // exit at parent directory
+
+      std::string parentDir = parentPath;
+      changeDir(parentDir.c_str());
+      NavigationMenu.clear();
+      CurrentDirWindow.clear();
+      NavigationMenu.setWin(0);
+      CurrentDirWindow.setWin(0);
+      break;
     } else {
 
       // last key pressed is enter
       fieldIdx = NavigationMenu.selectedFieldIndex();
       chosenPath = children[fieldIdx];
       auto chosenPathType = pathType(chosenPath);
-
       if (chosenPathType == "directory") {
         changeDir(chosenPath.c_str());
         NavigationMenu.clear();
-	CurrentDirWindow.clear();
+        CurrentDirWindow.clear();
         NavigationMenu.setWin(0);
-	CurrentDirWindow.setWin(0);
+        CurrentDirWindow.setWin(0);
         break;
       } else if (chosenPathType == "file") {
         int result = openWithTextEditor(chosenPath);
         NavigationMenu.clear();
         if (result == -1) {
-          NavigationMenu.insert("no editor environment variable is set.", 0, 0);
+          NavigationMenu.insert("no EDITOR environment variable is set.", 0, 0);
           NavigationMenu.refresh();
           NavigationMenu.pause();
         }
@@ -314,12 +323,6 @@ int navigateDir(int argc, char **argv, int y, int x) {
 }
 
 int listChildren(int argc, char **argv, std::vector<std::string> &v) {
-
-  /*
-  ====================================================================
-  SYSTEM ARGUMENTS
-  ====================================================================
-  */
 
   bool withHidden;
   size_t cursor_pos_y;
@@ -380,12 +383,6 @@ int listChildren(int argc, char **argv, std::vector<std::string> &v) {
   if (initPath.back() == '/') {
     initPath.pop_back();
   }
-
-  /*
-  ====================================================================
-  PATH CONTROLLER VARIABLES
-  ====================================================================
-  */
 
   std::filesystem::path parentPath(initPath);
   std::string title;
