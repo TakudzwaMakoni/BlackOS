@@ -30,6 +30,7 @@
 
 #include <cstring>
 #include <filesystem>
+#include <fmt/format.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -47,6 +48,7 @@ int changeDir(char const *path = nullptr);
 int openWithTextEditor(std::string const &);
 int listChildren(int, char **, std::vector<std::string> &v);
 int navigateDir(int, char **, int y = -1, int x = -1);
+int shortcut(std::string const &, int y = -1, int x = -1);
 std::vector<std::string> splashScreen(std::vector<std::string> const &argv);
 } // namespace Trinkets
 } // namespace BlackOS

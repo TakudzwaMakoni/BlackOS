@@ -46,6 +46,123 @@ std::string produceBanner(std::string const &str, int winwidth) {
 
 } // namespace
 
+int shortcut(std::string const &file, int y, int x) {
+  size_t cursor_pos_y;
+  size_t cursor_pos_x;
+
+  // uncomment to allow externally specified window position
+  // cursor_pos_y = strtol(argv[2], nullptr, 10);
+  // cursor_pos_x = strtol(argv[3], nullptr, 10);
+  // initPath = argv[4];
+
+  auto const termSz = BlackOS::DisplayKernel::TERMINAL_SIZE();
+  size_t const ROWS = termSz[0];
+  size_t const COLS = termSz[1];
+
+  if (y < 0 || y > ROWS - 10)
+    cursor_pos_y = ROWS / 2;
+  else
+    cursor_pos_y = y;
+
+  if (x < 0)
+    cursor_pos_x = 0;
+  else
+    cursor_pos_x = x;
+  // uncomment if using externally specified window position
+
+  std::string chosenPath;
+  size_t fieldIdx;
+  size_t fieldSz;
+
+  std::string title;
+  size_t menuWidth;
+  size_t menuHeight;
+  size_t pagination;
+
+  std::string hiddenAttribute = "showing hidden paths: ";
+
+  // create menu object
+  BlackOS::DisplayKernel::Menu ShortcutMenu(ROWS - cursor_pos_y, COLS,
+                                            cursor_pos_y, cursor_pos_x);
+
+  // create new window object
+  BlackOS::DisplayKernel::Window CurrentDirWindow(1, COLS, cursor_pos_y,
+                                                  cursor_pos_x);
+
+  // load shortcuts
+  int maxNameLen = 0;
+  int maxDirLen = 0;
+
+  std::ifstream infile(file);
+  std::string shortcutName, directory;
+  std::vector<std::string> shortcutNames, directories, fields;
+
+  while (infile >> shortcutName >> directory) {
+    shortcutNames.push_back(shortcutName);
+    directories.push_back(directory);
+
+    if (maxNameLen < shortcutName.length())
+      maxNameLen = shortcutName.length();
+    if (maxDirLen < directory.length())
+      maxDirLen = directory.length();
+  }
+
+  if (maxNameLen > 8 /*length of 'shortcut'*/)
+    maxNameLen += 3;
+  else
+    maxNameLen = 11;
+
+  if (maxDirLen < 6 /*length of 'entity'*/)
+    maxDirLen = 6;
+
+  std::string formatString = "{0:<" + std::to_string(maxNameLen) + "}{1:<" +
+                             std::to_string(maxDirLen) + "}";
+  title = fmt::format(formatString, "shortcut", "path");
+  for (int i = 0; i < shortcutNames.size() - 1; i++) {
+    std::string field =
+        fmt::format(formatString, shortcutNames[i], directories[i]);
+    fields.push_back(field);
+  }
+
+  fieldSz = fields.size();
+  ShortcutMenu.setWin(1);
+
+  if (fieldSz == 0) {
+    std::string message = "no entries to show.";
+    ShortcutMenu.clear(); // clear previous output
+    ShortcutMenu.insert(message.c_str(), 0, 0);
+    ShortcutMenu.refresh(); // present message to screen
+    ShortcutMenu.pause();
+    ShortcutMenu.setWin(0);
+    return 0;
+  }
+
+  menuWidth = maxDirLen + maxNameLen + 1;
+  menuHeight = ROWS - cursor_pos_y - 2;
+  pagination = menuHeight - 1;
+
+  ShortcutMenu.loadTitle(title, BlackOS::DisplayKernel::TextStyle::underline);
+  ShortcutMenu.loadFields(fields);
+  ShortcutMenu.loadFieldAlignment(-1, 1);
+  ShortcutMenu.paginate(pagination, pagination <= fieldSz);
+
+  ShortcutMenu.hideBorder();
+  ShortcutMenu.showTitle();
+
+  ShortcutMenu.resize(menuHeight, menuWidth);
+  ShortcutMenu.reposition(cursor_pos_y + 2 /*maintain cursor y position*/,
+                          cursor_pos_x /*left of screen*/);
+
+  ShortcutMenu.display();
+
+  size_t selected = ShortcutMenu.selectedFieldIndex();
+  ShortcutMenu.clear();   // clear previous output
+  ShortcutMenu.refresh(); // present message to screen
+  ShortcutMenu.setWin(0);
+  changeDir(directories[selected].c_str());
+  return 0;
+}
+
 int navigateDir(int argc, char **argv, int y, int x) {
 
   bool withHidden;
@@ -214,7 +331,7 @@ int navigateDir(int argc, char **argv, int y, int x) {
     NavigationMenu.loadTitle(title,
                              BlackOS::DisplayKernel::TextStyle::underline);
     NavigationMenu.loadFields(fields);
-    NavigationMenu.loadFieldAlignment(-1, 1); // bottom left of window
+    NavigationMenu.loadFieldAlignment(-1, 1);
     NavigationMenu.paginate(pagination, pagination <= fieldSz);
 
     NavigationMenu.hideBorder();

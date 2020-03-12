@@ -134,6 +134,7 @@ private:
 
   std::filesystem::path _CONFIG_FILE;
   std::filesystem::path _SHELL_ENV_FILE;
+  std::filesystem::path _SHORTCUTS_FILE;
 
   // shell environment variables
   int _CURSOR = 2;

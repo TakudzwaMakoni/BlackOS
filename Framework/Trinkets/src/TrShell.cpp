@@ -73,6 +73,7 @@ ScreenShell::ScreenShell(Screen_sptr &display) {
 
   _CONFIG_FILE = _HOME + "/.tr/config.txt";
   _SHELL_ENV_FILE = _HOME + "/.tr/environment.txt";
+  _SHORTCUTS_FILE = _HOME + "/.tr/shortcuts.txt";
 
   _display = display;
 }
@@ -362,6 +363,8 @@ int ScreenShell::execute(int argc, char **argv) {
     clear();
     move(0, 0);
     logCursorPosition();
+  } else if (command == "shortcut" || command == "sc") {
+    shortcut(_SHORTCUTS_FILE);
   } else {
     system("stty sane"); // TODO: use tcsetattr in termios.h // onlcr crterase
                          // echo icanon ocrnl");
