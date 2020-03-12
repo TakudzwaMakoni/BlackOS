@@ -118,7 +118,7 @@ int shortcut(std::string const &file, int y, int x) {
   std::string formatString = "{0:<" + std::to_string(maxNameLen) + "}{1:<" +
                              std::to_string(maxDirLen) + "}";
   title = fmt::format(formatString, "shortcut", "path");
-  for (int i = 0; i < shortcutNames.size() - 1; i++) {
+  for (int i = 0; i < shortcutNames.size(); i++) {
     std::string field =
         fmt::format(formatString, shortcutNames[i], directories[i]);
     fields.push_back(field);
@@ -138,7 +138,7 @@ int shortcut(std::string const &file, int y, int x) {
   }
 
   menuWidth = maxDirLen + maxNameLen + 1;
-  menuHeight = ROWS - cursor_pos_y - 2;
+  menuHeight = ROWS - cursor_pos_y;
   pagination = menuHeight - 1;
 
   ShortcutMenu.loadTitle(title, BlackOS::DisplayKernel::TextStyle::underline);
@@ -150,17 +150,37 @@ int shortcut(std::string const &file, int y, int x) {
   ShortcutMenu.showTitle();
 
   ShortcutMenu.resize(menuHeight, menuWidth);
-  ShortcutMenu.reposition(cursor_pos_y + 2 /*maintain cursor y position*/,
+  ShortcutMenu.reposition(cursor_pos_y /*maintain cursor y position*/,
                           cursor_pos_x /*left of screen*/);
 
-  ShortcutMenu.display();
+  std::vector<int> breakConditions = {/*(int)'n',*/ (int)'q', 10 /*ENTER*/,
+                                      27 /*ESC*/};
+  ShortcutMenu.display(breakConditions);
 
+  int lastKey = ShortcutMenu.lastKeyPressed();
   size_t selected = ShortcutMenu.selectedFieldIndex();
-  ShortcutMenu.clear();   // clear previous output
-  ShortcutMenu.refresh(); // present message to screen
-  ShortcutMenu.setWin(0);
-  changeDir(directories[selected].c_str());
-  return 0;
+
+  if (lastKey == (int)'q' || lastKey == 27 /*ESC*/) {
+    // user exited program
+    ShortcutMenu.clear();
+    ShortcutMenu.refresh();
+    ShortcutMenu.setWin(0);
+    return 0; // leave here
+  } else if (lastKey == (int)'n' /*out of directory*/) {
+    // user navigated up a directory
+    ShortcutMenu.clear(); // clear previous output
+    ShortcutMenu.refresh();
+    ShortcutMenu.setWin(0);
+    // TODO: eable navigateDir mode
+    return 0;
+  } else {
+    // enter was pressed
+    ShortcutMenu.clear(); // clear previous output
+    ShortcutMenu.refresh();
+    ShortcutMenu.setWin(0);
+    changeDir(directories[selected].c_str());
+    return 0;
+  }
 }
 
 int navigateDir(int argc, char **argv, int y, int x) {
