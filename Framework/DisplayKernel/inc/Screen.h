@@ -78,6 +78,8 @@ public:
   int lastKeyPressed() const;
   std::vector<int> cursorPosition() const;
 
+  void setCursorColour(char const *colour);
+
   ~Screen();
 
 private:

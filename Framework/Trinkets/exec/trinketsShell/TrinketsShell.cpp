@@ -47,7 +47,7 @@ int main() {
     shell.displayPrompt();
     argc = shell.readArgs(argv);
 
-    if (argv[0] != nullptr) {
+    if (argv[0] != nullptr && argc > 0) {
 
       // quit on user prompt
       std::string firstArg = argv[0];

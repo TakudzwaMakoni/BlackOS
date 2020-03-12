@@ -85,6 +85,11 @@ void Screen::insert(std::string const &str, size_t const y, size_t const x,
   }
 }
 
+void Screen::setCursorColour(char const *colour) {
+  printf("\e]12;%s\a", colour);
+  fflush(stdout);
+}
+
 void Screen::insert(char const *ch, size_t const y, size_t const x,
                     TextStyle style) {
   if (style == TextStyle::highlight) {

@@ -54,6 +54,7 @@ static char const *CLEAR_SCREEN_ANSI = "\e[0;0H\e[2J";
 
 enum class PipeRedirect { PIPE, REDIRECT, NEITHER };
 enum ExitStatus { ERROR = -1, USER_EXIT };
+enum UserInput { UP = -2, DOWN };
 
 using Screen_sptr = std::shared_ptr<DisplayKernel::Screen>;
 using Window_sptr = std::shared_ptr<DisplayKernel::Window>;
@@ -138,6 +139,7 @@ private:
 
   // shell environment variables
   int _CURSOR = 2;
+  std::string _CURSOR_COLOUR = "red";
   int _DELETE = -1;
 
   bool _TTY_FLAG_FALLBACK;

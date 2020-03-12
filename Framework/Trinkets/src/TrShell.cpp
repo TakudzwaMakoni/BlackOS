@@ -83,7 +83,6 @@ void clearDisplay() {}
 void ScreenShell::initShell() {
   _display->setWin(1);
   noecho();
-  keypad(stdscr, TRUE);
   scrollok(stdscr, TRUE);
   curs_set(_CURSOR);
 
@@ -182,6 +181,11 @@ void ScreenShell::configureShell(int argc, char **argv) {
 
 void ScreenShell::configureShell(std::string const &argv1,
                                  std::string const &argv2) {
+
+  /**
+   * CONFIG CURSOR
+   *
+   */
   if (argv1 == "CURSOR") {
     int value;
     std::string errorMessage =
@@ -207,7 +211,12 @@ void ScreenShell::configureShell(std::string const &argv1,
     _CURSOR = value;
     curs_set(_CURSOR); // TODO: extra arg to save preference to config file?
 
-  } else if (argv1 == "DELETE") {
+  }
+  /**
+   * CONFIG DELETE
+   *
+   */
+  else if (argv1 == "DELETE") {
     // linux TERM environment variable does not seem to read regular backspace.
     // allow the user to specify which key is delete.
     std::string errorMessage =
@@ -258,6 +267,21 @@ void ScreenShell::configureShell(std::string const &argv1,
         printw("\n");
       }
     }
+  }
+  /**
+   * CONFIG CURSOR_COLOUR
+   *
+   */
+  else if (argv1 == "CURSOR_COLOUR") {
+    if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
+          argv2 == "blue")) {
+      std::string message = "2nd argument " + argv2 + " is not a valid colour.";
+      printw(message.c_str());
+      printw("\n");
+      return;
+    }
+    printf("\e]12;%s\a", argv2.c_str());
+    fflush(stdout);
   } else {
     std::string message = "Shell variable " + argv1 + " is unrecognised.";
     printw(message.c_str());
@@ -277,6 +301,8 @@ void ScreenShell::setShellEnv(int argc, char **argv) {
 
 int ScreenShell::readArgs(char **argv) {
 
+  keypad(stdscr, TRUE);
+
   std::string line;
   char *cstr;
   int argc = 0;
@@ -284,31 +310,48 @@ int ScreenShell::readArgs(char **argv) {
 
   do {
     ch = getch();
-    int intch = ch;
     if (ch == '\n') {
       break;
-    } else if (intch == 27 || intch == KEY_UP) {
-      return userInput::up;
-    } else if ((_DELETE > 0 && intch == _DELETE) || intch == 8 ||
-               intch == KEY_BACKSPACE || intch == KEY_DC || intch == 127) {
-      if (!line.empty()) {
-
+    } else if ((_DELETE > 0 && (int)ch == _DELETE) || (int)ch == 8 ||
+               (int)ch == KEY_BACKSPACE || (int)ch == KEY_DC ||
+               (int)ch == 127) {
+      logCursorPosition();
+      if (_cursorX > _promptLen) {
         printw("\b \b");
         refresh();
+      }
+      if (!line.empty()) {
         line.pop_back();
       }
-    } else if ((int)ch == KEY_LEFT) {
-      // do something
-      return userInput::left;
-    } else if ((int)ch == KEY_RIGHT) {
-      // do something
-      return userInput::right;
+    } else if ((int)ch == 27 || (int)ch == KEY_UP || (int)ch == 3) {
+      printw("\n");
+      refresh();
+      return UserInput::UP;
+    } else if ((int)ch == KEY_LEFT || (int)ch == 4) {
+      logCursorPosition();
+      if (_cursorX > _promptLen) {
+        printw("\b");
+        refresh();
+      }
+    } else if ((int)ch == KEY_RIGHT || (int)ch == 5) {
+      auto const termSz = DisplayKernel::TERMINAL_SIZE();
+      size_t const COLS = termSz[1];
+      logCursorPosition();
+      if (_cursorX < COLS) {
+        move(_cursorY, _cursorX + 1);
+        refresh();
+      }
+    } else if ((int)ch == KEY_DOWN || (int)ch == 2) {
+      printw("\n");
+      refresh();
+      return UserInput::DOWN;
     } else {
       addch(ch);
       logCursorPosition();
       refresh();
       line += ch;
     }
+
   } while (1);
 
   // tokenize the string
@@ -331,6 +374,10 @@ int ScreenShell::execute(int argc, char **argv) {
 
   char cmd[100];
   std::string command = argv[0];
+  /**
+   * NATIVE COMMAND CD
+   *
+   */
   if (command == "cd") {
     changeDir(argv[1]);
   } else if (command == "ls") {
@@ -349,23 +396,53 @@ int ScreenShell::execute(int argc, char **argv) {
     }
     printw("\n");
     logCursorPosition();
-  } else if (command == "ndir" || command == "nd") {
+  }
+  /**
+   * NATIVE COMMAND ND/NDIR
+   *
+   */
+  else if (command == "ndir" || command == "nd") {
     int y, x;
     getsyx(y, x);
     navigateDir(argc, argv, y + 2, 0);
-  } else if (command == "set") {
+  }
+  /**
+   * NATIVE COMMAND SET
+   *
+   */
+  else if (command == "set") {
     setShellEnv(argc, argv);
     logCursorPosition();
-  } else if (command == "config" || command == "configure") {
+  }
+  /**
+   * NATIVE COMMAND CONFIG/CONFIGURE
+   *
+   */
+  else if (command == "config" || command == "configure") {
     configureShell(argc, argv);
     logCursorPosition();
-  } else if (command == "clear") {
+  }
+  /**
+   * NATIVE COMMAND CLEAR
+   *
+   */
+  else if (command == "clear") {
     clear();
     move(0, 0);
     logCursorPosition();
-  } else if (command == "shortcut" || command == "sc") {
+  }
+  /**
+   * NATIVE COMMAND SHORTCUT
+   *
+   */
+  else if (command == "shortcut" || command == "sc") {
     shortcut(_SHORTCUTS_FILE);
-  } else {
+  }
+  /**
+   * FALLBACK TO SHELL
+   *
+   */
+  else {
     system("stty sane"); // TODO: use tcsetattr in termios.h // onlcr crterase
                          // echo icanon ocrnl");
     _TTY_FLAG_FALLBACK = 1;

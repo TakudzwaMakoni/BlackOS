@@ -138,7 +138,7 @@ int shortcut(std::string const &file, int y, int x) {
   }
 
   menuWidth = maxDirLen + maxNameLen + 1;
-  menuHeight = ROWS - cursor_pos_y;
+  menuHeight = ROWS - cursor_pos_y-2;
   pagination = menuHeight - 1;
 
   ShortcutMenu.loadTitle(title, BlackOS::DisplayKernel::TextStyle::underline);
@@ -150,7 +150,7 @@ int shortcut(std::string const &file, int y, int x) {
   ShortcutMenu.showTitle();
 
   ShortcutMenu.resize(menuHeight, menuWidth);
-  ShortcutMenu.reposition(cursor_pos_y /*maintain cursor y position*/,
+  ShortcutMenu.reposition(cursor_pos_y+2/*maintain cursor y position*/,
                           cursor_pos_x /*left of screen*/);
 
   std::vector<int> breakConditions = {/*(int)'n',*/ (int)'q', 10 /*ENTER*/,
