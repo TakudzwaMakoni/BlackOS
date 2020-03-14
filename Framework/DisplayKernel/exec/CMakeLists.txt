@@ -99,5 +99,6 @@
         target_include_directories(MenuTests
             PRIVATE
             ${DISPLAY_KERNEL_PATH}/inc
+            ${EXTERNAL_PATH}/inc
             )
         target_link_libraries(MenuTests DisplayKernel)

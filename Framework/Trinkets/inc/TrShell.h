@@ -26,6 +26,7 @@
 #include "../inc/SplashScreen.h"
 #include "Screen.h"
 
+#include <../../External/inc/pstream.h>
 #include <cctype>
 #include <cerrno>
 #include <cstring>
@@ -34,7 +35,8 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <sstream>
+#include <stdexcept>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <sys/stat.h>
@@ -61,6 +63,7 @@ using Window_sptr = std::shared_ptr<DisplayKernel::Window>;
 
 Screen_sptr generateScreen();
 Window_sptr generateWindow();
+void vectorToNullArray(std::vector<std::string> const &v, char **a);
 
 class ScreenShell {
 
@@ -68,7 +71,9 @@ public:
   ScreenShell(Screen_sptr &display);
 
   // execute native commands
-  int execute(int, char **);
+  int execute(std::vector<std::string> const &);
+
+  int executeFallback(std::vector<std::string> const &);
 
   void logCursorPosition();
 
@@ -85,11 +90,11 @@ public:
 
   // Given the number of arguments and an array of arguments, this will execute
   // those arguments.  The first argument in the array should be a command.
-  void runCommand(int, char **);
+  void runCommand(std::vector<std::string> const &);
 
   // Reads input from the user into the given array and returns the number of
   // arguments taken in.
-  int readArgs(char **);
+  int readArgs(std::vector<std::string> &);
 
   int initShellVariables();
 
@@ -97,27 +102,11 @@ public:
 
   void displayPrompt();
 
-  void configureShell(int, char **);
+  void configureShell(std::vector<std::string> const &);
 
   void configureShell(std::string const &, std::string const &);
 
-  void setShellEnv(int, char **);
-
-  // clear the display
-  void clearDisplay();
-
-  // Splits a user's command into two commands, or a command and a file name.
-  PipeRedirect parseCommand(int, char **, char **, char **);
-
-  // Given the number of arguments and an array of arguments, this will execute
-  // those arguments.  The first argument in the array should be a command.
-  void runCmd(int, char **);
-
-  // Redirects the output from the given command into the given file.
-  void redirectCmd(char **, char **);
-
-  // Pipes the first command's output into the second.
-  void pipeCmd(char **, char **);
+  void setShellEnv(std::vector<std::string> const &);
 
   ~ScreenShell();
 
@@ -145,7 +134,7 @@ private:
   std::filesystem::path _SHELL_ENV_FILE;
   std::filesystem::path _SHORTCUTS_FILE;
 
-  bool _TTY_FLAG_FALLBACK;
+  bool _TTY_FLAG_FALLBACK = 0;
   bool _USING_COLOR_FLAG = 0;
 };
 } // namespace Trinkets

@@ -1,6 +1,6 @@
-#######################
-#       Framework     #
-#######################
+###############
+#  Framework  #
+###############
 
 project (Trinkets LANGUAGES CXX)
 
@@ -11,6 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(DISPLAY_KERNEL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/DisplayKernel")
 set(TRINKETS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Trinkets")
+set(EXTERNAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/External")
 
 # MAKE libraries available for all Framework Projects
 set(DISPLAY_KERNEL_LINK_DIR "${DISPLAY_KERNEL_PATH}/libraries")

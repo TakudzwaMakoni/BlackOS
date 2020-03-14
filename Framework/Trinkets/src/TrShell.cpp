@@ -37,6 +37,18 @@ Window_sptr generateWindow() {
   return window;
 }
 
+void vectorToNullArray(std::vector<std::string> const &v, char **a) {
+  int i = 0;
+  while (i < v.size()) {
+    std::string str = v[i];
+    char *cstr = new char[str.size() + 1];
+    strcpy(cstr, str.c_str());
+    a[i] = cstr;
+    i++;
+  }
+  a[i] = nullptr;
+}
+
 ScreenShell::ScreenShell(Screen_sptr &display) {
 
   // std::string const PATHENV std::string const TERMENV std::string const
@@ -110,7 +122,7 @@ void ScreenShell::initShell() {
     printw("\n");
   }
   printw("\n");
-  changeDir(nullptr);
+  changeDir();
 
   // check colour support
   if (has_colors() == FALSE) {
@@ -125,7 +137,6 @@ void ScreenShell::initShell() {
 
   // recommended environment variables
   char *editor = getenv("EDITOR");
-
   if (editor == nullptr) {
     printw("warning: no EDITOR environment variable is set.");
     printw("\n");
@@ -154,7 +165,10 @@ void ScreenShell::displayPrompt() {
   if (_TTY_FLAG_FALLBACK) {
     system("stty -echo -icanon");
     _TTY_FLAG_FALLBACK = 0;
+    logCursorPosition();
+    move(_cursorY, _cursorX);
   }
+
   curs_set(_CURSOR);
   char buf[MAX_ARGS];
   getcwd(buf, sizeof buf);
@@ -173,8 +187,8 @@ size_t ScreenShell::cursorX() const { return _cursorY; }
 
 void ScreenShell::logCursorPosition() { getsyx(_cursorY, _cursorX); }
 
-void ScreenShell::configureShell(int argc, char **argv) {
-  if (argc != 3) {
+void ScreenShell::configureShell(std::vector<std::string> const &argv) {
+  if (argv.size() != 3) {
     printw("Usage:\n"
            "config/configure <arg1> <arg2>\n"
            "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
@@ -360,22 +374,20 @@ void ScreenShell::configureShell(std::string const &argv1,
   }
 }
 
-void ScreenShell::setShellEnv(int argc, char **argv) {
-  if (argc != 3) {
+void ScreenShell::setShellEnv(std::vector<std::string> const &argv) {
+  if (argv.size() != 3) {
     printw("Usage:\n"
            "set <ENV> <value>\n");
     return;
   }
-  setenv(argv[1], argv[2], 1);
+  setenv(argv[1].c_str(), argv[2].c_str(), 1);
 }
 
-int ScreenShell::readArgs(char **argv) {
+int ScreenShell::readArgs(std::vector<std::string> &argv) {
 
   keypad(stdscr, TRUE);
 
   std::string line;
-  char *cstr;
-  int argc = 0;
   char ch;
 
   do {
@@ -429,31 +441,26 @@ int ScreenShell::readArgs(char **argv) {
   std::stringstream ss(line);
   std::string item;
 
-  while (std::getline(ss, item, ' ')) {
-    cstr = new char[item.size() + 1];
-    strcpy(cstr, item.c_str());
-    argv[argc] = cstr;
-    argc++;
-  }
+  while (std::getline(ss, item, ' '))
+    argv.push_back(item);
   printw("\n");
-  // Have to have the last argument be NULL so that execvp works.
-  argv[argc] = NULL;
-  return argc;
+
+  return 0;
 }
 
-int ScreenShell::execute(int argc, char **argv) {
+int ScreenShell::execute(std::vector<std::string> const &argv) {
 
-  char cmd[100];
   std::string command = argv[0];
+
   /**
    * NATIVE COMMAND CD
    *
    */
   if (command == "cd") {
-    changeDir(argv[1]);
+    changeDir(argv[0]);
   } else if (command == "ls") {
     std::vector<std::string> children;
-    listChildren(argc, argv, children);
+    listChildren(argv, children);
     printw("\n"); // TODO: wrapper for printw?
     std::string title = children.front();
     attron(A_UNDERLINE);
@@ -476,9 +483,9 @@ int ScreenShell::execute(int argc, char **argv) {
     int y, x;
     getsyx(y, x);
     if (_USING_COLOR_FLAG) {
-      navigateDir(argc, argv, y + 2, 0, {_FOREGROUND, _BACKGROUND});
+      navigateDir(argv, y + 2, 0, {_FOREGROUND, _BACKGROUND});
     } else {
-      navigateDir(argc, argv, y + 2, 0);
+      navigateDir(argv, y + 2, 0);
     }
 
   }
@@ -487,7 +494,7 @@ int ScreenShell::execute(int argc, char **argv) {
    *
    */
   else if (command == "set") {
-    setShellEnv(argc, argv);
+    setShellEnv(argv);
     logCursorPosition();
   }
   /**
@@ -495,7 +502,7 @@ int ScreenShell::execute(int argc, char **argv) {
    *
    */
   else if (command == "config" || command == "configure") {
-    configureShell(argc, argv);
+    configureShell(argv);
     logCursorPosition();
   }
   /**
@@ -525,8 +532,7 @@ int ScreenShell::execute(int argc, char **argv) {
    *
    */
   else {
-    system("stty sane"); // TODO: use tcsetattr in termios.h // onlcr crterase
-                         // echo icanon ocrnl");
+    system("stty sane");
     _TTY_FLAG_FALLBACK = 1;
     std::cout << "\n";
     return 1;
@@ -534,71 +540,21 @@ int ScreenShell::execute(int argc, char **argv) {
   return 0;
 }
 
-PipeRedirect ScreenShell::parseCommand(int argc, char **argv, char **cmd1,
-                                       char **cmd2) {
-  // Assume no pipe or redirect will be found.
-  PipeRedirect result = PipeRedirect::NEITHER;
-
-  // Will hold the index of argv where the pipe or redirect is found.
-  int split = -1;
-
-  // Go through the array of arguments...
-  for (int i = 0; i < argc; i++) {
-    // Pipe found!
-    if (strcmp(argv[i], "|") == 0) {
-      result = PipeRedirect::PIPE;
-      split = i;
-
-      // Redirect found!
-    } else if (strcmp(argv[i], ">>") == 0) {
-      result = PipeRedirect::REDIRECT;
-      split = i;
-    }
-  }
-
-  // If either a pipe or a redirect was found...
-  if (result != PipeRedirect::NEITHER) {
-    // Go through the array of arguments up to the point where the
-    // pipe/redirect was found and store each of those arguments in cmd1.
-    for (int i = 0; i < split; i++)
-      cmd1[i] = argv[i];
-
-    // Go through the array of arguments from the point where the pipe/redirect
-    // was found through the end of the array of arguments and store each
-    // argument in cmd2.
-    int count = 0;
-    for (int i = split + 1; i < argc; i++) {
-      cmd2[count] = argv[i];
-      count++;
-    }
-
-    // Terminate cmd1 and cmd2 with NULL, so that execvp likes them.
-    cmd1[split] = NULL;
-    cmd2[count] = NULL;
-  }
-
-  // Return an enum showing whether a pipe, redirect, or neither was found.
-  return result;
-}
-
 // Given the number of arguments (argc) and an array of arguments (argv),
 // this will fork a new process and run those arguments.
 // Thanks to http://tldp.org/LDP/lpg/node11.html for their tutorial on pipes
 // in C, which allowed me to handle user input with ampersands.
-void ScreenShell::runCmd(int argc, char **argv) {
-  pid_t pid;
-  const char *amp;
-  amp = "&";
-  bool found_amp = false;
+void ScreenShell::runCommand(std::vector<std::string> const &argv) {
+  int result;
 
-  // If we find an ampersand as the last argument, set a flag.
-  if (strcmp(argv[argc - 1], amp) == 0)
-    found_amp = true;
+  pid_t pid;
 
   // TODO: no ampersand support for parent processes?
-  if (/*run builtin comands with parent*/ execute(argc, argv) != 0) {
+  if (/*run builtin comands with parent*/ execute(argv) != 0) {
     // Fork our process
     pid = fork();
+    char **argvA;
+    vectorToNullArray(argv, argvA);
 
     // error
     if (pid < 0)
@@ -606,120 +562,20 @@ void ScreenShell::runCmd(int argc, char **argv) {
 
     // child process
     else if (pid == 0) {
-      // If the last argument is an ampersand, that's a special flag that we
-      // don't want to pass on as one of the arguments.  Catch it and remove
-      // it here.
-      if (found_amp) {
-        argv[argc - 1] = NULL;
-        argc--;
-      }
 
       char cmd[100];
       strcpy(cmd, "/usr/bin/");
-      strcat(cmd, argv[0]);
-      int result = execvp(cmd, argv);
+      strcat(cmd, argvA[0]);
+      int result = execvp(cmd, argvA);
       perror("Fallback Shell");
 
       if (result != 0) {
         exit(3); // duplicate child process is created.
       }
       // parent process
-    } else if (!found_amp)
-      waitpid(pid, NULL, 0); // only wait if no ampersand
-  }
-}
-
-void ScreenShell::redirectCmd(char **cmd, char **file) {
-  int fds[2]; // file descriptors
-  int count;  // used for reading from stdout
-  int fd;     // single file descriptor
-  char c;     // used for writing and reading a character at a time
-  pid_t pid;  // will hold process ID; used with fork()
-
-  pipe(fds);
-
-  // child process #1
-  if (fork() == 0) {
-    // Thanks to http://linux.die.net/man/2/open for showing which headers
-    // need to be included to use this function and its flags.
-    fd = open(file[0], O_RDWR | O_CREAT, 0666);
-
-    // open() returns a -1 if an error occurred
-    if (fd < 0) {
-      printf("Error: %s\n", strerror(errno));
-      return;
     }
-
-    dup2(fds[0], 0);
-
-    // Don't need stdout end of pipe.
-    close(fds[1]);
-
-    // Read from stdout...
-    while ((count = read(0, &c, 1)) > 0)
-      write(fd, &c, 1); // Write to file.
-
-    // Okay, so this is a bit contrived, but when I didn't have any kind of exec
-    // function call here, I got my SarahShell prompt repeated over and over
-    // again on the Multilab machines, I think because of this crazy child
-    // process or something.  When I put this execlp here with the useless call
-    // to echo, however, that looping stops and you can actually enter things
-    // at the prompt again, hurray!
-    execlp("echo", "echo", NULL);
-
-    // child process #2
-  } else if ((pid = fork()) == 0) {
-    dup2(fds[1], 1);
-
-    // Don't need stdin end of pipe.
-    close(fds[0]);
-
-    // Output contents of the given file to stdout.
-    execvp(cmd[0], cmd);
-    perror("execvp failed");
-
-    // parent process
-  } else {
-    waitpid(pid, NULL, 0);
-    close(fds[0]);
-    close(fds[1]);
+    waitpid(pid, NULL, 0); // only wait if no ampersand
   }
-}
-
-// This pipes the output of cmd1 into cmd2.
-void ScreenShell::pipeCmd(char **cmd1, char **cmd2) {
-  int fds[2]; // file descriptors
-  pipe(fds);
-  pid_t pid;
-
-  // child process #1
-  if (fork() == 0) {
-    // Reassign stdin to fds[0] end of pipe.
-    dup2(fds[0], 0);
-
-    // Not going to write in this child process, so we can close this end
-    // of the pipe.
-    close(fds[1]);
-
-    // Execute the second command.
-    execvp(cmd2[0], cmd2);
-    perror("execvp failed");
-
-    // child process #2
-  } else if ((pid = fork()) == 0) {
-    // Reassign stdout to fds[1] end of pipe.
-    dup2(fds[1], 1);
-
-    // Not going to read in this child process, so we can close this end
-    // of the pipe.
-    close(fds[0]);
-
-    // Execute the first command.
-    execvp(cmd1[0], cmd1);
-    perror("execvp failed");
-    // parent process
-  } else
-    waitpid(pid, NULL, 0);
 }
 
 ScreenShell::~ScreenShell() {

@@ -44,10 +44,10 @@
 namespace BlackOS {
 namespace Trinkets {
 enum userInput { up = -5, down, left, right, backspace };
-int changeDir(char const *path = nullptr);
+int changeDir(std::string const &path = "");
 int openWithTextEditor(std::string const &);
-int listChildren(int, char **, std::vector<std::string> &v);
-int navigateDir(int, char **, int y = -1, int x = -1,
+int listChildren(std::vector<std::string> const &, std::vector<std::string> &);
+int navigateDir(std::vector<std::string> const &, int y = -1, int x = -1,
                 std::vector<int> const &colours = {});
 int shortcut(std::string const &, int y = -1, int x = -1,
              std::vector<int> const &colours = {});

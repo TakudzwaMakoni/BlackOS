@@ -184,8 +184,10 @@ int shortcut(std::string const &file, int y, int x,
   }
 }
 
-int navigateDir(int argc, char **argv, int y, int x,
+int navigateDir(std::vector<std::string> const &argv, int y, int x,
                 std::vector<int> const &colours) {
+
+  int argc = argv.size();
 
   bool withHidden;
   size_t cursor_pos_y;
@@ -242,7 +244,7 @@ int navigateDir(int argc, char **argv, int y, int x,
       usageNavigateDir();
       return 2;
     }
-    withHidden = argv[1];
+    withHidden = 1;
     initPath = argv[2];
   } else {
     usageNavigateDir();
@@ -298,9 +300,9 @@ int navigateDir(int argc, char **argv, int y, int x,
   NavigationMenu.setWin(1);
   CurrentDirWindow.setWin(1);
 
-  if(!colours.empty()){
-  NavigationMenu.bgfg(colours[0],colours[1]);
-  CurrentDirWindow.bgfg(colours[0],colours[1]);
+  if (!colours.empty()) {
+    NavigationMenu.bgfg(colours[0], colours[1]);
+    CurrentDirWindow.bgfg(colours[0], colours[1]);
   }
 
   while (1) {
@@ -470,7 +472,10 @@ int navigateDir(int argc, char **argv, int y, int x,
   return 0;
 }
 
-int listChildren(int argc, char **argv, std::vector<std::string> &v) {
+int listChildren(std::vector<std::string> const &argv,
+                 std::vector<std::string> &v) {
+
+  int argc = argv.size();
 
   bool withHidden;
   size_t cursor_pos_y;
@@ -520,7 +525,7 @@ int listChildren(int argc, char **argv, std::vector<std::string> &v) {
       usageListChildren();
       return 2;
     }
-    withHidden = argv[1];
+    withHidden = 1;
     initPath = argv[2];
   } else {
     usageListChildren();
@@ -561,14 +566,14 @@ int listChildren(int argc, char **argv, std::vector<std::string> &v) {
   return 0;
 }
 
-int changeDir(char const *path) {
-  if (path == nullptr) {
+int changeDir(std::string const &path) {
+  if (path.empty()) {
     char const *homeDir = getenv("HOME");
     chdir(homeDir);
   } else {
-    if (chdir(path) != 0) {
+    if (chdir(path.c_str()) != 0) {
       char errStr[256] = "cd: ";
-      perror(strcat(errStr, path));
+      perror(strcat(errStr, path.c_str()));
       return 1;
     }
   }

@@ -22,7 +22,8 @@
 #include "Natives.h"
 
 using namespace BlackOS::Trinkets;
-int main(int argc, char **argv) {
-  navigateDir(argc, argv);
+int main() {
+  std::vector<std::string> v{"ls", "-a"};
+  navigateDir(v);
   return 0;
 }
