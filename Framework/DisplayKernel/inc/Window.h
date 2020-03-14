@@ -84,6 +84,7 @@ public:
   int resize(size_t const y, size_t const x);
   int reposition(size_t const y, size_t const x);
   std::vector<int> cursorPosition() const;
+  void bgfg(int const fg, int const bg); // TODO: rename
 
   ~Window();
 

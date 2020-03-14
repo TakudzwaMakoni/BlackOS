@@ -85,6 +85,14 @@ std::vector<size_t> Window::maxSize() const {
   return termSz;
 }
 
+void Window::bgfg(int const fg, int const bg) {
+  start_color();
+  // TODO: check if Foreground is the same colour and warn invisibility/deny
+  init_pair(1 /*1 reserved for BG/FG pair*/, fg, bg);
+  wbkgd(_win, COLOR_PAIR(1));
+  wclear(_win);
+}
+
 std::vector<int> Window::cursorPosition() const {
   int x, y;
   getyx(_win, y, x);

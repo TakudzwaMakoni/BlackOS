@@ -29,7 +29,11 @@
 namespace BlackOS {
 namespace DisplayKernel {
 
-enum class TextStyle : size_t { underline, highlight, none };
+enum class TextStyle : int {
+  underline = A_UNDERLINE,
+  highlight = A_REVERSE,
+  none = A_NORMAL
+};
 
 class DisplayObject {
 public:

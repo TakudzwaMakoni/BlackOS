@@ -47,8 +47,10 @@ enum userInput { up = -5, down, left, right, backspace };
 int changeDir(char const *path = nullptr);
 int openWithTextEditor(std::string const &);
 int listChildren(int, char **, std::vector<std::string> &v);
-int navigateDir(int, char **, int y = -1, int x = -1);
-int shortcut(std::string const &, int y = -1, int x = -1);
+int navigateDir(int, char **, int y = -1, int x = -1,
+                std::vector<int> const &colours = {});
+int shortcut(std::string const &, int y = -1, int x = -1,
+             std::vector<int> const &colours = {});
 std::vector<std::string> splashScreen(std::vector<std::string> const &argv);
 } // namespace Trinkets
 } // namespace BlackOS

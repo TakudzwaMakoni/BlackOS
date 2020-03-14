@@ -128,21 +128,25 @@ private:
   size_t _cursorX = 0;
   size_t _promptLen;
 
+  // environment variables
   std::string _PATH;
   std::string _TERM;
   std::string _SHELL; // fallback shell
   std::string _HOME;
 
+  // shell variables
+  int _CURSOR = 2;
+  std::string _CURSOR_COLOUR = "red";
+  int _DELETE = -1;
+  int _BACKGROUND = COLOR_BLACK;
+  int _FOREGROUND = COLOR_WHITE;
+
   std::filesystem::path _CONFIG_FILE;
   std::filesystem::path _SHELL_ENV_FILE;
   std::filesystem::path _SHORTCUTS_FILE;
 
-  // shell environment variables
-  int _CURSOR = 2;
-  std::string _CURSOR_COLOUR = "red";
-  int _DELETE = -1;
-
   bool _TTY_FLAG_FALLBACK;
+  bool _USING_COLOR_FLAG = 0;
 };
 } // namespace Trinkets
 } // namespace BlackOS

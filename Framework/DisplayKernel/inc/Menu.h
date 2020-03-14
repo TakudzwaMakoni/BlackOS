@@ -96,7 +96,6 @@ public:
   char getCharFromUser() const;
   size_t page() const;
   size_t pages() const;
-
   void hideBorder();
   void hideTitle();
   void loadTitle(std::string const &title,
@@ -105,6 +104,7 @@ public:
   void showTitle();
   int lastKeyPressed() const;
   std::vector<int> cursorPosition() const;
+  void bgfg(int const fg, int const bg); // TODO: rename
 
   ~Menu();
 

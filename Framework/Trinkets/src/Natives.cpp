@@ -46,7 +46,8 @@ std::string produceBanner(std::string const &str, int winwidth) {
 
 } // namespace
 
-int shortcut(std::string const &file, int y, int x) {
+int shortcut(std::string const &file, int y, int x,
+             std::vector<int> const &colours) {
   size_t cursor_pos_y;
   size_t cursor_pos_x;
 
@@ -84,10 +85,6 @@ int shortcut(std::string const &file, int y, int x) {
   // create menu object
   BlackOS::DisplayKernel::Menu ShortcutMenu(ROWS - cursor_pos_y, COLS,
                                             cursor_pos_y, cursor_pos_x);
-
-  // create new window object
-  BlackOS::DisplayKernel::Window CurrentDirWindow(1, COLS, cursor_pos_y,
-                                                  cursor_pos_x);
 
   // load shortcuts
   int maxNameLen = 0;
@@ -127,6 +124,10 @@ int shortcut(std::string const &file, int y, int x) {
   fieldSz = fields.size();
   ShortcutMenu.setWin(1);
 
+  if (!colours.empty()) {
+    ShortcutMenu.bgfg(colours[0], colours[1]);
+  }
+
   if (fieldSz == 0) {
     std::string message = "no entries to show.";
     ShortcutMenu.clear(); // clear previous output
@@ -138,7 +139,7 @@ int shortcut(std::string const &file, int y, int x) {
   }
 
   menuWidth = maxDirLen + maxNameLen + 1;
-  menuHeight = ROWS - cursor_pos_y-2;
+  menuHeight = ROWS - cursor_pos_y - 2;
   pagination = menuHeight - 1;
 
   ShortcutMenu.loadTitle(title, BlackOS::DisplayKernel::TextStyle::underline);
@@ -150,7 +151,7 @@ int shortcut(std::string const &file, int y, int x) {
   ShortcutMenu.showTitle();
 
   ShortcutMenu.resize(menuHeight, menuWidth);
-  ShortcutMenu.reposition(cursor_pos_y+2/*maintain cursor y position*/,
+  ShortcutMenu.reposition(cursor_pos_y + 2 /*maintain cursor y position*/,
                           cursor_pos_x /*left of screen*/);
 
   std::vector<int> breakConditions = {/*(int)'n',*/ (int)'q', 10 /*ENTER*/,
@@ -183,7 +184,8 @@ int shortcut(std::string const &file, int y, int x) {
   }
 }
 
-int navigateDir(int argc, char **argv, int y, int x) {
+int navigateDir(int argc, char **argv, int y, int x,
+                std::vector<int> const &colours) {
 
   bool withHidden;
   size_t cursor_pos_y;
@@ -286,11 +288,20 @@ int navigateDir(int argc, char **argv, int y, int x) {
   BlackOS::DisplayKernel::Window CurrentDirWindow(1, COLS, cursor_pos_y,
                                                   cursor_pos_x);
 
+  if (!colours.empty()) {
+    NavigationMenu.bgfg(colours[0], colours[1]);
+    CurrentDirWindow.bgfg(colours[0], colours[1]);
+  }
   // create path navigator object;
   PathController pathController;
 
   NavigationMenu.setWin(1);
   CurrentDirWindow.setWin(1);
+
+  if(!colours.empty()){
+  NavigationMenu.bgfg(colours[0],colours[1]);
+  CurrentDirWindow.bgfg(colours[0],colours[1]);
+  }
 
   while (1) {
 

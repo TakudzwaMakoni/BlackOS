@@ -72,17 +72,9 @@ std::vector<size_t> Screen::maxSize() const { return TERMINAL_SIZE(); }
 
 void Screen::insert(std::string const &str, size_t const y, size_t const x,
                     TextStyle style) {
-  if (style == TextStyle::highlight) {
-    attron(A_REVERSE);
-    mvprintw(y, x, str.c_str());
-    attroff(A_REVERSE);
-  } else if (style == TextStyle::underline) {
-    attron(A_UNDERLINE);
-    mvprintw(y, x, str.c_str());
-    attroff(A_UNDERLINE);
-  } else /*none*/ {
-    mvprintw(y, x, str.c_str());
-  }
+  attron(style);
+  mvprintw(y, x, str.c_str());
+  attroff(style);
 }
 
 void Screen::setCursorColour(char const *colour) {

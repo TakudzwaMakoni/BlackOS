@@ -82,6 +82,7 @@ void clearDisplay() {}
 
 void ScreenShell::initShell() {
   _display->setWin(1);
+
   noecho();
   scrollok(stdscr, TRUE);
   curs_set(_CURSOR);
@@ -110,6 +111,12 @@ void ScreenShell::initShell() {
   }
   printw("\n");
   changeDir(nullptr);
+
+  // check colour support
+  if (has_colors() == FALSE) {
+    printf("warning: this terminal does not support colour\n");
+    printw("\n");
+  }
 
   // initialise shell with config settings and shell variables described in
   // config and environment files.
@@ -274,14 +281,77 @@ void ScreenShell::configureShell(std::string const &argv1,
    */
   else if (argv1 == "CURSOR_COLOUR") {
     if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
-          argv2 == "blue")) {
+          argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
       std::string message = "2nd argument " + argv2 + " is not a valid colour.";
       printw(message.c_str());
       printw("\n");
       return;
     }
+
+    // TODO: check if Background is the same colour and warn invisibility
+
     printf("\e]12;%s\a", argv2.c_str());
     fflush(stdout);
+  } else if (argv1 == "BACKGROUND" || argv1 == "BG") {
+
+    if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
+          argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
+      std::string message = "2nd argument " + argv2 + " is not a valid colour.";
+      printw(message.c_str());
+      printw("\n");
+      return;
+    }
+
+    if (argv2 == "black")
+      _BACKGROUND = COLOR_BLACK;
+    if (argv2 == "white")
+      _BACKGROUND = COLOR_WHITE;
+    if (argv2 == "red")
+      _BACKGROUND = COLOR_RED;
+    if (argv2 == "blue")
+      _BACKGROUND = COLOR_BLUE;
+    if (argv2 == "yellow")
+      _BACKGROUND = COLOR_YELLOW;
+    if (argv2 == "green")
+      _BACKGROUND = COLOR_GREEN;
+
+    start_color();
+    // TODO: check if Foreground is the same colour and warn invisibility/deny
+    init_pair(1 /*1 reserved for BG/FG pair*/, _FOREGROUND, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+
+    _USING_COLOR_FLAG = 1;
+  } else if (argv1 == "FOREGROUND" || argv1 == "FG") {
+
+    if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
+          argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
+      std::string message = "2nd argument " + argv2 + " is not a valid colour.";
+      printw(message.c_str());
+      printw("\n");
+      return;
+    }
+
+    if (argv2 == "black")
+      _FOREGROUND = COLOR_BLACK;
+    if (argv2 == "white")
+      _FOREGROUND = COLOR_WHITE;
+    if (argv2 == "red")
+      _FOREGROUND = COLOR_RED;
+    if (argv2 == "blue")
+      _FOREGROUND = COLOR_BLUE;
+    if (argv2 == "yellow")
+      _FOREGROUND = COLOR_YELLOW;
+    if (argv2 == "green")
+      _FOREGROUND = COLOR_GREEN;
+
+    start_color();
+    // TODO: check if Foreground is the same colour and warn invisibility/deny
+    init_pair(1 /*1 reserved for BG/FG pair*/, _FOREGROUND, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+
+    _USING_COLOR_FLAG = 1;
   } else {
     std::string message = "Shell variable " + argv1 + " is unrecognised.";
     printw(message.c_str());
@@ -317,7 +387,8 @@ int ScreenShell::readArgs(char **argv) {
                (int)ch == 127) {
       logCursorPosition();
       if (_cursorX > _promptLen) {
-        printw("\b \b");
+        printw("\b");
+        delch();
         refresh();
       }
       if (!line.empty()) {
@@ -404,7 +475,12 @@ int ScreenShell::execute(int argc, char **argv) {
   else if (command == "ndir" || command == "nd") {
     int y, x;
     getsyx(y, x);
-    navigateDir(argc, argv, y + 2, 0);
+    if (_USING_COLOR_FLAG) {
+      navigateDir(argc, argv, y + 2, 0, {_FOREGROUND, _BACKGROUND});
+    } else {
+      navigateDir(argc, argv, y + 2, 0);
+    }
+
   }
   /**
    * NATIVE COMMAND SET
@@ -436,7 +512,13 @@ int ScreenShell::execute(int argc, char **argv) {
    *
    */
   else if (command == "shortcut" || command == "sc") {
-    shortcut(_SHORTCUTS_FILE);
+    int y, x;
+    getsyx(y, x);
+    if (_USING_COLOR_FLAG) {
+      shortcut(_SHORTCUTS_FILE, y + 2, 0, {_FOREGROUND, _BACKGROUND});
+    } else {
+      shortcut(_SHORTCUTS_FILE, y + 2, 0);
+    }
   }
   /**
    * FALLBACK TO SHELL
