@@ -35,6 +35,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,6 +58,24 @@ static char const *CLEAR_SCREEN_ANSI = "\e[0;0H\e[2J";
 enum class PipeRedirect { PIPE, REDIRECT, NEITHER };
 enum ExitStatus { ERROR = -1, USER_EXIT };
 enum UserInput { UP = -2, DOWN };
+enum standardColours {
+  BLACK = 30,
+  RED,
+  GREEN,
+  YELLOW,
+  BLUE,
+  MAGENTA,
+  CYAN,
+  WHITE,
+  BBLACK = 90,
+  BRED,
+  BGREEN,
+  BYELLOW,
+  BBLUE,
+  BMAGENTA,
+  BCYAN,
+  BWHITE
+};
 
 using Screen_sptr = std::shared_ptr<DisplayKernel::Screen>;
 using Window_sptr = std::shared_ptr<DisplayKernel::Window>;
@@ -73,7 +92,7 @@ public:
   // execute native commands
   int execute(std::vector<std::string> const &);
 
-  int executeFallback(std::vector<std::string> const &);
+  void listChildrenWrapper(std::vector<std::string> const &);
 
   void logCursorPosition();
 
@@ -129,6 +148,8 @@ private:
   int _DELETE = -1;
   int _BACKGROUND = COLOR_BLACK;
   int _FOREGROUND = COLOR_WHITE;
+  int _STD_BG = standardColours::BLACK;
+  int _STD_FG = standardColours::WHITE;
 
   std::filesystem::path _CONFIG_FILE;
   std::filesystem::path _SHELL_ENV_FILE;

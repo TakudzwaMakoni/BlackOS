@@ -49,6 +49,29 @@ void vectorToNullArray(std::vector<std::string> const &v, char **a) {
   a[i] = nullptr;
 }
 
+void ScreenShell::listChildrenWrapper(std::vector<std::string> const &argv) {
+  logCursorPosition();
+  move(_cursorY, _cursorX);
+
+  std::vector<std::string> children;
+  listChildren(argv, children);
+
+  printw("\n");
+  std::string title = children.front();
+  attron(A_UNDERLINE);
+  printw(title.c_str());
+  attroff(A_UNDERLINE);
+  printw("\n");
+
+  for (std::vector<std::string>::iterator i = children.begin() + 1;
+       i != children.end(); i++) {
+    printw(i->c_str());
+    printw("\n");
+  }
+  printw("\n");
+  refresh();
+}
+
 ScreenShell::ScreenShell(Screen_sptr &display) {
 
   // std::string const PATHENV std::string const TERMENV std::string const
@@ -165,8 +188,6 @@ void ScreenShell::displayPrompt() {
   if (_TTY_FLAG_FALLBACK) {
     system("stty -echo -icanon");
     _TTY_FLAG_FALLBACK = 0;
-    logCursorPosition();
-    move(_cursorY, _cursorX);
   }
 
   curs_set(_CURSOR);
@@ -316,24 +337,38 @@ void ScreenShell::configureShell(std::string const &argv1,
       return;
     }
 
-    if (argv2 == "black")
+    if (argv2 == "black") {
       _BACKGROUND = COLOR_BLACK;
-    if (argv2 == "white")
+      _STD_BG = standardColours::BLACK;
+    }
+    if (argv2 == "white") {
       _BACKGROUND = COLOR_WHITE;
-    if (argv2 == "red")
+      _STD_BG = standardColours::WHITE;
+    }
+    if (argv2 == "red") {
       _BACKGROUND = COLOR_RED;
-    if (argv2 == "blue")
+      _STD_BG = standardColours::RED;
+    }
+    if (argv2 == "blue") {
       _BACKGROUND = COLOR_BLUE;
-    if (argv2 == "yellow")
+      _STD_BG = standardColours::BLUE;
+    }
+    if (argv2 == "yellow") {
       _BACKGROUND = COLOR_YELLOW;
-    if (argv2 == "green")
+      _STD_BG = standardColours::YELLOW;
+    }
+    if (argv2 == "green") {
       _BACKGROUND = COLOR_GREEN;
+      _STD_BG = standardColours::GREEN;
+    }
 
     start_color();
     // TODO: check if Foreground is the same colour and warn invisibility/deny
     init_pair(1 /*1 reserved for BG/FG pair*/, _FOREGROUND, _BACKGROUND);
     bkgd(COLOR_PAIR(1));
     refresh();
+
+    printf("\e[%im\e[%im", _STD_FG, _STD_BG + 10);
 
     _USING_COLOR_FLAG = 1;
   } else if (argv1 == "FOREGROUND" || argv1 == "FG") {
@@ -346,24 +381,38 @@ void ScreenShell::configureShell(std::string const &argv1,
       return;
     }
 
-    if (argv2 == "black")
+    if (argv2 == "black") {
       _FOREGROUND = COLOR_BLACK;
-    if (argv2 == "white")
+      _STD_FG = standardColours::BLACK;
+    }
+    if (argv2 == "white") {
       _FOREGROUND = COLOR_WHITE;
-    if (argv2 == "red")
+      _STD_FG = standardColours::WHITE;
+    }
+    if (argv2 == "red") {
       _FOREGROUND = COLOR_RED;
-    if (argv2 == "blue")
+      _STD_FG = standardColours::RED;
+    }
+    if (argv2 == "blue") {
       _FOREGROUND = COLOR_BLUE;
-    if (argv2 == "yellow")
+      _STD_FG = standardColours::BLUE;
+    }
+    if (argv2 == "yellow") {
       _FOREGROUND = COLOR_YELLOW;
-    if (argv2 == "green")
+      _STD_FG = standardColours::YELLOW;
+    }
+    if (argv2 == "green") {
       _FOREGROUND = COLOR_GREEN;
+      _STD_FG = standardColours::GREEN;
+    }
 
     start_color();
     // TODO: check if Foreground is the same colour and warn invisibility/deny
     init_pair(1 /*1 reserved for BG/FG pair*/, _FOREGROUND, _BACKGROUND);
     bkgd(COLOR_PAIR(1));
     refresh();
+
+    printf("\e[%im\e[%im", _STD_FG, _STD_BG + 10);
 
     _USING_COLOR_FLAG = 1;
   } else {
@@ -452,33 +501,16 @@ int ScreenShell::execute(std::vector<std::string> const &argv) {
 
   std::string command = argv[0];
 
-  /**
-   * NATIVE COMMAND CD
-   *
-   */
+  // NATIVE COMMAND CD
+
   if (command == "cd") {
     changeDir(argv[0]);
   } else if (command == "ls") {
-    std::vector<std::string> children;
-    listChildren(argv, children);
-    printw("\n"); // TODO: wrapper for printw?
-    std::string title = children.front();
-    attron(A_UNDERLINE);
-    printw(title.c_str());
-    attroff(A_UNDERLINE);
-    printw("\n");
-    for (std::vector<std::string>::iterator i = children.begin() + 1;
-         i != children.end(); i++) {
-      printw(i->c_str());
-      printw("\n");
-    }
-    printw("\n");
-    logCursorPosition();
+    listChildrenWrapper(argv);
   }
-  /**
-   * NATIVE COMMAND ND/NDIR
-   *
-   */
+
+  // NATIVE COMMAND ND/NDIR
+
   else if (command == "ndir" || command == "nd") {
     int y, x;
     getsyx(y, x);
@@ -489,35 +521,31 @@ int ScreenShell::execute(std::vector<std::string> const &argv) {
     }
 
   }
-  /**
-   * NATIVE COMMAND SET
-   *
-   */
+
+  // NATIVE COMMAND SET
+
   else if (command == "set") {
     setShellEnv(argv);
-    logCursorPosition();
+
   }
-  /**
-   * NATIVE COMMAND CONFIG/CONFIGURE
-   *
-   */
+
+  // NATIVE COMMAND CONFIG/CONFIGURE
+
   else if (command == "config" || command == "configure") {
     configureShell(argv);
-    logCursorPosition();
+
   }
-  /**
-   * NATIVE COMMAND CLEAR
-   *
-   */
+
+  // NATIVE COMMAND CLEAR
+
   else if (command == "clear") {
     clear();
     move(0, 0);
     logCursorPosition();
   }
-  /**
-   * NATIVE COMMAND SHORTCUT
-   *
-   */
+
+  // NATIVE COMMAND SHORTCUT
+
   else if (command == "shortcut" || command == "sc") {
     int y, x;
     getsyx(y, x);
@@ -527,14 +555,12 @@ int ScreenShell::execute(std::vector<std::string> const &argv) {
       shortcut(_SHORTCUTS_FILE, y + 2, 0);
     }
   }
-  /**
-   * FALLBACK TO SHELL
-   *
-   */
+
+  // FALLBACK TO SHELL
+
   else {
     system("stty sane");
     _TTY_FLAG_FALLBACK = 1;
-    std::cout << "\n";
     return 1;
   }
   return 0;
@@ -551,6 +577,7 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
 
   // TODO: no ampersand support for parent processes?
   if (/*run builtin comands with parent*/ execute(argv) != 0) {
+
     // Fork our process
     pid = fork();
     char **argvA;
@@ -563,6 +590,8 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
     // child process
     else if (pid == 0) {
 
+      std::cout << "\n";
+
       char cmd[100];
       strcpy(cmd, "/usr/bin/");
       strcat(cmd, argvA[0]);
@@ -572,9 +601,11 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
       if (result != 0) {
         exit(3); // duplicate child process is created.
       }
-      // parent process
+
+    } else if (pid > 0) {
+      // parent
     }
-    waitpid(pid, NULL, 0); // only wait if no ampersand
+    waitpid(pid, NULL, 0);
   }
 }
 
