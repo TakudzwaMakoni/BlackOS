@@ -127,6 +127,10 @@ public:
 
   void setShellEnv(std::vector<std::string> const &);
 
+  void listConfigVariables() const;
+
+  void bell();
+
   ~ScreenShell();
 
 private:
@@ -142,7 +146,7 @@ private:
   std::string _SHELL; // fallback shell
   std::string _HOME;
 
-  // shell variables
+  // shell config variables
   int _CURSOR = 2;
   std::string _CURSOR_COLOUR = "red";
   int _DELETE = -1;

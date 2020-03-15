@@ -49,6 +49,41 @@ void vectorToNullArray(std::vector<std::string> const &v, char **a) {
   a[i] = nullptr;
 }
 
+void ScreenShell::listConfigVariables() const {
+  printw("Background: %i\nForeground: %i\nCursor mode: %i\nCursor colour: %s\nDelete: %i\n",_BACKGROUND,_FOREGROUND,_CURSOR,_CURSOR_COLOUR.c_str(),_DELETE);
+}
+
+void ScreenShell::bell(){
+
+    start_color();
+
+    init_pair(1 /*1 reserved for BG/FG pair*/, COLOR_BLACK, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+    usleep(50000);
+    init_pair(1 /*1 reserved for BG/FG pair*/, COLOR_WHITE, _BACKGROUND); 
+    bkgd(COLOR_PAIR(1));
+    refresh();
+    usleep(50000);
+    init_pair(1 /*1 reserved for BG/FG pair*/, COLOR_RED, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+    usleep(50000);
+    init_pair(1 /*1 reserved for BG/FG pair*/, COLOR_GREEN, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+    usleep(50000);
+    init_pair(1 /*1 reserved for BG/FG pair*/, COLOR_YELLOW, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+    usleep(50000);
+    init_pair(1 /*1 reserved for BG/FG pair*/, _FOREGROUND, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+
+    
+}
+
 void ScreenShell::listChildrenWrapper(std::vector<std::string> const &argv) {
   logCursorPosition();
   move(_cursorY, _cursorX);
@@ -56,7 +91,7 @@ void ScreenShell::listChildrenWrapper(std::vector<std::string> const &argv) {
   std::vector<std::string> children;
   listChildren(argv, children);
 
-  printw("\n");
+  printw("\n\n");
   std::string title = children.front();
   attron(A_UNDERLINE);
   printw(title.c_str());
@@ -504,7 +539,7 @@ int ScreenShell::execute(std::vector<std::string> const &argv) {
   // NATIVE COMMAND CD
 
   if (command == "cd") {
-    changeDir(argv[0]);
+    changeDir(argv);
   } else if (command == "ls") {
     listChildrenWrapper(argv);
   }
@@ -555,9 +590,13 @@ int ScreenShell::execute(std::vector<std::string> const &argv) {
       shortcut(_SHORTCUTS_FILE, y + 2, 0);
     }
   }
-
+  else if(command == "lsconfig"){
+    listConfigVariables();
+  }
+  else if(command == "bell"){
+    bell();
+  }
   // FALLBACK TO SHELL
-
   else {
     system("stty sane");
     _TTY_FLAG_FALLBACK = 1;

@@ -151,10 +151,10 @@ int shortcut(std::string const &file, int y, int x,
   ShortcutMenu.showTitle();
 
   ShortcutMenu.resize(menuHeight, menuWidth);
-  ShortcutMenu.reposition(cursor_pos_y + 2 /*maintain cursor y position*/,
+  ShortcutMenu.reposition(cursor_pos_y /*maintain cursor y position*/,
                           cursor_pos_x /*left of screen*/);
 
-  std::vector<int> breakConditions = {/*(int)'n',*/ (int)'q', 10 /*ENTER*/,
+  std::vector<int> breakConditions = {(int)'d', (int)'q', 10 /*ENTER*/,
                                       27 /*ESC*/};
   ShortcutMenu.display(breakConditions);
 
@@ -167,19 +167,21 @@ int shortcut(std::string const &file, int y, int x,
     ShortcutMenu.refresh();
     ShortcutMenu.setWin(0);
     return 0; // leave here
-  } else if (lastKey == (int)'n' /*out of directory*/) {
+  } else if (lastKey == (int)'d' /*begin navigateDir into dir*/) {
     // user navigated up a directory
     ShortcutMenu.clear(); // clear previous output
     ShortcutMenu.refresh();
     ShortcutMenu.setWin(0);
-    // TODO: eable navigateDir mode
+    std::string chosenDir = directories[selected];
+    std::vector<std::string> argvsForND={"nd",chosenDir};
+    navigateDir(argvsForND, cursor_pos_y, cursor_pos_x,colours);
     return 0;
   } else {
     // enter was pressed
     ShortcutMenu.clear(); // clear previous output
     ShortcutMenu.refresh();
     ShortcutMenu.setWin(0);
-    changeDir(directories[selected].c_str());
+    changeDir({"cd",directories[selected]});
     return 0;
   }
 }
@@ -438,7 +440,7 @@ int navigateDir(std::vector<std::string> const &argv, int y, int x,
       // exit at parent directory
 
       std::string parentDir = parentPath;
-      changeDir(parentDir.c_str());
+      changeDir({"cd",parentDir});
       NavigationMenu.clear();
       CurrentDirWindow.clear();
       NavigationMenu.setWin(0);
@@ -451,7 +453,7 @@ int navigateDir(std::vector<std::string> const &argv, int y, int x,
       chosenPath = children[fieldIdx];
       auto chosenPathType = pathType(chosenPath);
       if (chosenPathType == "directory") {
-        changeDir(chosenPath.c_str());
+        changeDir({"cd",chosenPath});
         NavigationMenu.clear();
         CurrentDirWindow.clear();
         NavigationMenu.setWin(0);
@@ -566,11 +568,13 @@ int listChildren(std::vector<std::string> const &argv,
   return 0;
 }
 
-int changeDir(std::string const &path) {
-  if (path.empty()) {
+int changeDir(std::vector<std::string> const &argv) {
+  if (argv.size()==1) {
     char const *homeDir = getenv("HOME");
     chdir(homeDir);
-  } else {
+  } else if (argv.size()==2) {
+	
+	std::string const &path = argv[1];
     if (chdir(path.c_str()) != 0) {
       char errStr[256] = "cd: ";
       perror(strcat(errStr, path.c_str()));
