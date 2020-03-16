@@ -1,8 +1,8 @@
-#ifndef TRINKETS_NAVIGATION_HELPERS_H
-#define TRINKETS_NAVIGATION_HELPERS_H
+#ifndef TRINKETS_PATH_CONTROLLER_H
+#define TRINKETS_PATH_CONTROLLER_H
 
 /**
- * NavigationHelpers
+ * PathController
  *
  * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -23,22 +23,34 @@
  */
 
 #include <filesystem>
-#include <list>
 #include <string>
-#include <time.h>
 #include <vector>
 
 namespace BlackOS {
 namespace Trinkets {
+struct PathController {
+public:
+  size_t childrenSize() const;
+  std::vector<std::filesystem::path> children() const;
+  std::vector<std::string> generateFields();
+  std::string generateTitle() const;
+  std::filesystem::path parentPathObj() const;
+  void loadChildren();
+  void loadParent(std::filesystem::path const &path);
+  void showHidden(bool const showHiddenFiles = 0);
 
-std::string stripSubstring(std::string str, std::string const &substring);
-std::string timestampToDateTime(time_t const rawtime);
-std::string pathPermissions(std::string const &path);
-std::string pathLastModifiedDate(std::string const &path);
-std::vector<std::string> loadFields(std::list<std::string> const &children,
-                                    std::string const &parentPath);
-std::string pathType(std::filesystem::path const &path);
+  std::string stripSubstring(std::string str, std::string const &substring);
+  std::string timestampToDateTime(time_t const rawtime);
+  std::string pathLastModifiedDate(std::string const &path);
+  std::string pathPermissions(std::string const &path);
+  std::string pathType(std::filesystem::path const &path);
+
+private:
+  std::vector<std::filesystem::path> _children;
+  std::filesystem::path _parentPath;
+  bool _showHiddenFiles;
+  size_t _max = 0;
+};
 } // namespace Trinkets
 } // namespace BlackOS
-
 #endif

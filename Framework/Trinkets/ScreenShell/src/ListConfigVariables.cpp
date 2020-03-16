@@ -1,5 +1,5 @@
 /**
- * SplashScreen
+ * Tr ScreenShell
  *
  * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,24 +19,17 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "Natives.h"
+#include "../ScreenShell.h"
 
-using namespace BlackOS::Trinkets;
-int main(int argc, char **argv) {
-
-  std::string title = "someTitle";
-  std::string version = "someVersion";
-  std::string repo = "someRepo";
-  std::string license = "someLicense";
-  std::string year = "someYear";
-  std::string language = "someLanguage";
-  std::string author = "someAuthor";
-  std::string git = "someGitHubLink";
-
-  std::vector<std::string> v{title, version,  repo,   license,
-                             year,  language, author, git};
-
-  splashScreen(v);
+namespace BlackOS {
+namespace Trinkets {
+int ScreenShell::listConfigVariables() {
+  printw("Background: %i\nForeground: %i\nCursor mode: %i\nCursor colour: "
+         "%s\nDelete: %i\n",
+         _BACKGROUND, _FOREGROUND, _CURSOR, _CURSOR_COLOUR.c_str(), _DELETE);
 
   return 0;
 }
+
+} // namespace Trinkets
+} // namespace BlackOS

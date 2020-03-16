@@ -19,7 +19,7 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../inc/TrShell.h"
+#include "../ScreenShell.h"
 
 namespace BlackOS {
 namespace Trinkets {
@@ -49,69 +49,42 @@ void vectorToNullArray(std::vector<std::string> const &v, char **a) {
   a[i] = nullptr;
 }
 
-void ScreenShell::listConfigVariables() const {
-  printw("Background: %i\nForeground: %i\nCursor mode: %i\nCursor colour: %s\nDelete: %i\n",_BACKGROUND,_FOREGROUND,_CURSOR,_CURSOR_COLOUR.c_str(),_DELETE);
-}
+int ScreenShell::bell() {
 
-void ScreenShell::bell(){
+  start_color();
 
-    start_color();
-
-    init_pair(1 /*1 reserved for BG/FG pair*/, COLOR_BLACK, _BACKGROUND);
-    bkgd(COLOR_PAIR(1));
-    refresh();
-    usleep(50000);
-    init_pair(1 /*1 reserved for BG/FG pair*/, COLOR_WHITE, _BACKGROUND); 
-    bkgd(COLOR_PAIR(1));
-    refresh();
-    usleep(50000);
-    init_pair(1 /*1 reserved for BG/FG pair*/, COLOR_RED, _BACKGROUND);
-    bkgd(COLOR_PAIR(1));
-    refresh();
-    usleep(50000);
-    init_pair(1 /*1 reserved for BG/FG pair*/, COLOR_GREEN, _BACKGROUND);
-    bkgd(COLOR_PAIR(1));
-    refresh();
-    usleep(50000);
-    init_pair(1 /*1 reserved for BG/FG pair*/, COLOR_YELLOW, _BACKGROUND);
-    bkgd(COLOR_PAIR(1));
-    refresh();
-    usleep(50000);
-    init_pair(1 /*1 reserved for BG/FG pair*/, _FOREGROUND, _BACKGROUND);
-    bkgd(COLOR_PAIR(1));
-    refresh();
-
-    
-}
-
-void ScreenShell::listChildrenWrapper(std::vector<std::string> const &argv) {
-  logCursorPosition();
-  move(_cursorY, _cursorX);
-
-  std::vector<std::string> children;
-  listChildren(argv, children);
-
-  printw("\n\n");
-  std::string title = children.front();
-  attron(A_UNDERLINE);
-  printw(title.c_str());
-  attroff(A_UNDERLINE);
-  printw("\n");
-
-  for (std::vector<std::string>::iterator i = children.begin() + 1;
-       i != children.end(); i++) {
-    printw(i->c_str());
-    printw("\n");
-  }
-  printw("\n");
+  init_pair(1, COLOR_BLACK, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
   refresh();
+  usleep(50000);
+  init_pair(1, COLOR_WHITE, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+  refresh();
+  usleep(50000);
+  init_pair(1, COLOR_RED, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+  refresh();
+  usleep(50000);
+  init_pair(1, COLOR_GREEN, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+  refresh();
+  usleep(50000);
+  init_pair(1, COLOR_YELLOW, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+  refresh();
+  usleep(50000);
+  init_pair(1, COLOR_BLUE, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+  refresh();
+
+  init_pair(1, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+  refresh();
+
+  return 0;
 }
 
 ScreenShell::ScreenShell(Screen_sptr &display) {
-
-  // std::string const PATHENV std::string const TERMENV std::string const
-  // SHELLENV
-  //    std::string const HOMEENV
 
   // required environment variables
   char *path = getenv("PATH");
@@ -145,7 +118,11 @@ ScreenShell::ScreenShell(Screen_sptr &display) {
   _SHELL_ENV_FILE = _HOME + "/.tr/environment.txt";
   _SHORTCUTS_FILE = _HOME + "/.tr/shortcuts.txt";
 
+  auto const termSz = DisplayKernel::TERMINAL_SIZE();
+
   _display = display;
+  _termSzY = termSz[0];
+  _termSzX = termSz[1];
 }
 
 void clearDisplay() {}
@@ -156,9 +133,6 @@ void ScreenShell::initShell() {
   noecho();
   scrollok(stdscr, TRUE);
   curs_set(_CURSOR);
-
-  auto const termSz = DisplayKernel::TERMINAL_SIZE();
-  size_t const ROWS = termSz[0];
 
   std::string title = "Tr(inkets) (C) ScreenShell";
   std::string version = "1.0";
@@ -171,19 +145,12 @@ void ScreenShell::initShell() {
 
   std::vector<std::string> v{title, version,  repo,   license,
                              year,  language, author, git};
-  auto banner = splashScreen(v);
-
-  std::string pushDown((ROWS - 8 /*banner height*/) / 2, '\n');
-  printw(pushDown.c_str());
-  for (std::string const &line : banner) {
-    printw(line.c_str());
-    printw("\n");
-  }
-  printw("\n");
+  splashScreen(v);
   changeDir();
 
   // check colour support
-  if (has_colors() == FALSE) {
+  _COLOUR_SUPPORT = has_colors();
+  if (_COLOUR_SUPPORT == FALSE) {
     printf("warning: this terminal does not support colour\n");
     printw("\n");
   }
@@ -199,6 +166,8 @@ void ScreenShell::initShell() {
     printw("warning: no EDITOR environment variable is set.");
     printw("\n");
   }
+
+  bell();
 }
 
 int ScreenShell::initShellVariables() {
@@ -207,6 +176,16 @@ int ScreenShell::initShellVariables() {
   while (infile >> a >> b) {
     configureShell(a, b);
   }
+  return 0;
+}
+
+int ScreenShell::openWithTextEditor(std::string const &path) {
+  char *editor = getenv("EDITOR");
+  if (editor == NULL)
+    return -1;
+  std::string command = editor;
+  command += " " + path;
+  system(command.c_str());
   return 0;
 }
 
@@ -243,21 +222,8 @@ size_t ScreenShell::cursorX() const { return _cursorY; }
 
 void ScreenShell::logCursorPosition() { getsyx(_cursorY, _cursorX); }
 
-void ScreenShell::configureShell(std::vector<std::string> const &argv) {
-  if (argv.size() != 3) {
-    printw("Usage:\n"
-           "config/configure <arg1> <arg2>\n"
-           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
-    return;
-  }
-  std::string const argv1 = argv[1];
-  std::string const argv2 = argv[2];
-
-  configureShell(argv1, argv2);
-}
-
-void ScreenShell::configureShell(std::string const &argv1,
-                                 std::string const &argv2) {
+int ScreenShell::configureShell(std::string const &argv1,
+                                std::string const &argv2) {
 
   /**
    * CONFIG CURSOR
@@ -275,14 +241,14 @@ void ScreenShell::configureShell(std::string const &argv1,
       printw(errorMessage.c_str());
       printw("\n");
       logCursorPosition();
-      return;
+      return 1;
     }
     if (value < 0 || value > 2) {
 
       printw(errorMessage.c_str());
       printw("\n");
       logCursorPosition();
-      return;
+      return 1;
     }
 
     _CURSOR = value;
@@ -303,7 +269,7 @@ void ScreenShell::configureShell(std::string const &argv1,
 
     if (argv2 == "unset") {
       _DELETE = -1;
-      return;
+      return 1;
     }
 
     try {
@@ -317,14 +283,14 @@ void ScreenShell::configureShell(std::string const &argv1,
             "\n2nd argument must be in range: 0 < [arg2] < 127";
         printw(errorMessage.c_str());
         printw("\n");
-        return;
+        return 1;
       }
 
       if (value == 10 /*Enter*/ || value == 35 /*Space*/) {
         // may need to specify more reserved values.
         printw("this key is reserved.");
         printw("\n");
-        return;
+        return 1;
       }
       _DELETE = value;
     } catch (...) {
@@ -333,7 +299,7 @@ void ScreenShell::configureShell(std::string const &argv1,
       if (argv2.length() != 1) {
         printw(errorMessage.c_str());
         printw("\n");
-        return;
+        return 1;
       }
 
       char c = argv2[0];
@@ -355,7 +321,7 @@ void ScreenShell::configureShell(std::string const &argv1,
       std::string message = "2nd argument " + argv2 + " is not a valid colour.";
       printw(message.c_str());
       printw("\n");
-      return;
+      return 1;
     }
 
     // TODO: check if Background is the same colour and warn invisibility
@@ -369,7 +335,7 @@ void ScreenShell::configureShell(std::string const &argv1,
       std::string message = "2nd argument " + argv2 + " is not a valid colour.";
       printw(message.c_str());
       printw("\n");
-      return;
+      return 1;
     }
 
     if (argv2 == "black") {
@@ -413,7 +379,7 @@ void ScreenShell::configureShell(std::string const &argv1,
       std::string message = "2nd argument " + argv2 + " is not a valid colour.";
       printw(message.c_str());
       printw("\n");
-      return;
+      return 1;
     }
 
     if (argv2 == "black") {
@@ -455,25 +421,20 @@ void ScreenShell::configureShell(std::string const &argv1,
     printw(message.c_str());
     printw("\n");
     logCursorPosition();
+    return 1;
   }
+  return 0;
 }
 
-void ScreenShell::setShellEnv(std::vector<std::string> const &argv) {
-  if (argv.size() != 3) {
-    printw("Usage:\n"
-           "set <ENV> <value>\n");
-    return;
-  }
-  setenv(argv[1].c_str(), argv[2].c_str(), 1);
+void ScreenShell::resetArgs() {
+  _ARGV.clear();
+  _ARGC = 0;
 }
 
-int ScreenShell::readArgs(std::vector<std::string> &argv) {
-
+int ScreenShell::readArgs() {
   keypad(stdscr, TRUE);
-
   std::string line;
   char ch;
-
   do {
     ch = getch();
     if (ch == '\n') {
@@ -526,83 +487,28 @@ int ScreenShell::readArgs(std::vector<std::string> &argv) {
   std::string item;
 
   while (std::getline(ss, item, ' '))
-    argv.push_back(item);
+    _ARGV.push_back(item);
+  _ARGC = _ARGV.size();
   printw("\n");
 
   return 0;
 }
 
-int ScreenShell::execute(std::vector<std::string> const &argv) {
+std::vector<std::string> ScreenShell::argv() const { return _ARGV; }
 
-  std::string command = argv[0];
+int ScreenShell::execute() {
 
-  // NATIVE COMMAND CD
+  cmap::const_iterator x;
+  x = _COMMAND_MAP.find(_ARGV[0]);
 
-  if (command == "cd") {
-    changeDir(argv);
-  } else if (command == "ls") {
-    listChildrenWrapper(argv);
-  }
-
-  // NATIVE COMMAND ND/NDIR
-
-  else if (command == "ndir" || command == "nd") {
-    int y, x;
-    getsyx(y, x);
-    if (_USING_COLOR_FLAG) {
-      navigateDir(argv, y + 2, 0, {_FOREGROUND, _BACKGROUND});
-    } else {
-      navigateDir(argv, y + 2, 0);
-    }
-
-  }
-
-  // NATIVE COMMAND SET
-
-  else if (command == "set") {
-    setShellEnv(argv);
-
-  }
-
-  // NATIVE COMMAND CONFIG/CONFIGURE
-
-  else if (command == "config" || command == "configure") {
-    configureShell(argv);
-
-  }
-
-  // NATIVE COMMAND CLEAR
-
-  else if (command == "clear") {
-    clear();
-    move(0, 0);
-    logCursorPosition();
-  }
-
-  // NATIVE COMMAND SHORTCUT
-
-  else if (command == "shortcut" || command == "sc") {
-    int y, x;
-    getsyx(y, x);
-    if (_USING_COLOR_FLAG) {
-      shortcut(_SHORTCUTS_FILE, y + 2, 0, {_FOREGROUND, _BACKGROUND});
-    } else {
-      shortcut(_SHORTCUTS_FILE, y + 2, 0);
-    }
-  }
-  else if(command == "lsconfig"){
-    listConfigVariables();
-  }
-  else if(command == "bell"){
-    bell();
-  }
-  // FALLBACK TO SHELL
-  else {
+  if (x != _COMMAND_MAP.end()) {
+    (this->*(x->second))(); // call using pointer
+    return 0;
+  } else {
     system("stty sane");
     _TTY_FLAG_FALLBACK = 1;
     return 1;
   }
-  return 0;
 }
 
 // Given the number of arguments (argc) and an array of arguments (argv),
@@ -614,8 +520,7 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
 
   pid_t pid;
 
-  // TODO: no ampersand support for parent processes?
-  if (/*run builtin comands with parent*/ execute(argv) != 0) {
+  if (execute() != 0) {
 
     // Fork our process
     pid = fork();

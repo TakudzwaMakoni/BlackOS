@@ -1,5 +1,5 @@
 /**
- * Tr(inkets) Shell
+ * Tr(inkets) ScreenShell
  *
  * Copyright (C) 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,15 +19,13 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "TrShell.h"
+#include "ScreenShell.h"
 
 using namespace BlackOS::Trinkets;
 
 // thanks to Sarah Vessels for Pipe/Redirect:
 // https://www.3till7.net/2008/11/29/c-shell-with-forks-and-pipes/index.html
 int main() {
-
-  std::vector<std::string> argv;
 
   auto termSz = BlackOS::DisplayKernel::TERMINAL_SIZE();
   size_t termSzY = termSz[0];
@@ -37,23 +35,21 @@ int main() {
   auto display = generateScreen();
 
   ScreenShell shell(display);
-
   shell.initShell();
 
   while (1) {
 
     shell.displayPrompt();
-    int result = shell.readArgs(argv);
-
+    int result = shell.readArgs();
+    auto const &argv = shell.argv();
     if (!argv.empty()) {
-
       // quit on user prompt
       std::string firstArg = argv[0];
       if (firstArg == "exit" || firstArg == "quit")
         break;
 
       shell.runCommand(argv); // neither
-      argv.clear();
+      shell.resetArgs();
     }
   }
 

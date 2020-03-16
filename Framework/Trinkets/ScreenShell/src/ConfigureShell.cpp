@@ -1,8 +1,5 @@
-#ifndef TRINKETS_PATH_CONTROLLER_H
-#define TRINKETS_PATH_CONTROLLER_H
-
 /**
- * PathController
+ * Tr ScreenShell
  *
  * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -22,29 +19,25 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include <filesystem>
-#include <string>
-#include <vector>
+#include "../ScreenShell.h"
 
 namespace BlackOS {
 namespace Trinkets {
-struct PathController {
-public:
-  size_t childrenSize() const;
-  std::vector<std::filesystem::path> children() const;
-  std::vector<std::string> generateFields();
-  std::string generateTitle() const;
-  std::filesystem::path parentPathObj() const;
-  void loadChildren();
-  void loadParent(std::filesystem::path const &path);
-  void showHidden(bool const showHiddenFiles = 0);
 
-private:
-  std::vector<std::filesystem::path> _children;
-  std::filesystem::path _parentPath;
-  bool _showHiddenFiles;
-  size_t _max = 0;
-};
+int ScreenShell::configureShell() {
+  if (_ARGV.size() != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+  std::string const argv1 = _ARGV[1];
+  std::string const argv2 = _ARGV[2];
+
+  configureShell(argv1, argv2);
+
+  return 0;
+}
+
 } // namespace Trinkets
 } // namespace BlackOS
-#endif

@@ -22,11 +22,10 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../inc/Natives.h"
-#include "../inc/SplashScreen.h"
 #include "Screen.h"
+#include "Window.h"
 
-#include <../../External/inc/pstream.h>
+//#include <../../External/inc/pstream.h>
 #include <cctype>
 #include <cerrno>
 #include <cstring>
@@ -34,6 +33,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -49,11 +49,17 @@
 namespace BlackOS {
 namespace Trinkets {
 
-// thanks to Sarah Vessels for Pipe/Redirect:
-// https://www.3till7.net/2008/11/29/c-shell-with-forks-and-pipes/index.html
+class ScreenShell;
 
 int const MAX_ARGS = 1024;
 static char const *CLEAR_SCREEN_ANSI = "\e[0;0H\e[2J";
+
+/// command type
+typedef int (ScreenShell::*command)(void);
+/// command map
+typedef std::pair<std::string, command> pair;
+/// command map
+typedef std::map<std::string, command> cmap;
 
 enum class PipeRedirect { PIPE, REDIRECT, NEITHER };
 enum ExitStatus { ERROR = -1, USER_EXIT };
@@ -89,79 +95,109 @@ class ScreenShell {
 public:
   ScreenShell(Screen_sptr &display);
 
-  // execute native commands
-  int execute(std::vector<std::string> const &);
-
-  void listChildrenWrapper(std::vector<std::string> const &);
-
+  /// execute native commands
+  int execute();
+  ///
   void logCursorPosition();
-
+  ///
   size_t cursorY() const;
-
+  ///
   size_t cursorX() const;
-
-  // initialise the shell
+  /// initialise the shell
   void initShell();
-
-  // Given a string of user input, this will determine if the user wants to
-  // quit the shell.
-  void quit(std::string);
-
-  // Given the number of arguments and an array of arguments, this will execute
-  // those arguments.  The first argument in the array should be a command.
+  /// Reads input from the user into the given array and returns the number of
+  /// arguments taken in.
+  int readArgs();
+  /// Given the number of arguments and an array of arguments, this will execute
+  /// those arguments.  The first argument in the array should be a command.
   void runCommand(std::vector<std::string> const &);
-
-  // Reads input from the user into the given array and returns the number of
-  // arguments taken in.
-  int readArgs(std::vector<std::string> &);
-
+  ///
   int initShellVariables();
+  ///
+  void resetArgs();
 
+  std::vector<std::string> argv() const;
+  ///
   int initEnvironmentVariables();
-
+  ///
   void displayPrompt();
+  ///
+  int configureShell(std::string const &, std::string const &);
+  ///
+  int openWithTextEditor(std::string const &);
+  ///
+  void splashScreen(std::vector<std::string> const &argv);
 
-  void configureShell(std::vector<std::string> const &);
+  /// Native commands
 
-  void configureShell(std::string const &, std::string const &);
-
-  void setShellEnv(std::vector<std::string> const &);
-
-  void listConfigVariables() const;
-
-  void bell();
+  ///
+  int bell();
+  ///
+  int clearScreen();
+  ///
+  int listConfigVariables();
+  ///
+  int configureShell();
+  ///
+  int setShellEnv();
+  ///
+  int changeDir();
+  ///
+  int listChildren();
+  ///
+  int navigateDir();
+  ///
+  int shortcut();
 
   ~ScreenShell();
 
 private:
+  // display variables
   Screen_sptr _display;
   std::string _displayType;
   size_t _cursorY = 0;
   size_t _cursorX = 0;
   size_t _promptLen;
+  size_t _termSzY;
+  size_t _termSzX;
 
   // environment variables
   std::string _PATH;
   std::string _TERM;
-  std::string _SHELL; // fallback shell
+  std::string _SHELL;
   std::string _HOME;
 
   // shell config variables
   int _CURSOR = 2;
-  std::string _CURSOR_COLOUR = "red";
   int _DELETE = -1;
   int _BACKGROUND = COLOR_BLACK;
   int _FOREGROUND = COLOR_WHITE;
   int _STD_BG = standardColours::BLACK;
   int _STD_FG = standardColours::WHITE;
+  std::string _CURSOR_COLOUR = "red";
 
+  // system variables
   std::filesystem::path _CONFIG_FILE;
   std::filesystem::path _SHELL_ENV_FILE;
   std::filesystem::path _SHORTCUTS_FILE;
-
   bool _TTY_FLAG_FALLBACK = 0;
   bool _USING_COLOR_FLAG = 0;
+  bool _COLOUR_SUPPORT;
+  std::vector<std::string> _ARGV;
+  int _ARGC;
+  cmap _COMMAND_MAP{pair("bell", &ScreenShell::bell),
+                    pair("cd", &ScreenShell::changeDir),
+                    pair("clear", &ScreenShell::clearScreen),
+                    pair("configure", &ScreenShell::configureShell),
+                    pair("config", &ScreenShell::configureShell),
+                    pair("ls", &ScreenShell::listChildren),
+                    pair("lsconfig", &ScreenShell::listConfigVariables),
+                    pair("nd", &ScreenShell::navigateDir),
+                    pair("ndir", &ScreenShell::navigateDir),
+                    pair("sc", &ScreenShell::shortcut),
+                    pair("shortcut", &ScreenShell::shortcut)};
 };
+
 } // namespace Trinkets
 } // namespace BlackOS
 

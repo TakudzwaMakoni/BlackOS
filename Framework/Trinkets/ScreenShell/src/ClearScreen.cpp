@@ -1,5 +1,5 @@
 /**
- * NavigateDir
+ * Tr ScreenShell Clear
  *
  * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,11 +19,14 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "Natives.h"
+#include "../ScreenShell.h"
 
-using namespace BlackOS::Trinkets;
-int main() {
-  std::vector<std::string> v{"ls", "-a"};
-  navigateDir(v);
+namespace BlackOS {
+namespace Trinkets {
+int ScreenShell::clearScreen() {
+  clear();
+  move(0, 0);
   return 0;
 }
+} // namespace Trinkets
+} // namespace BlackOS

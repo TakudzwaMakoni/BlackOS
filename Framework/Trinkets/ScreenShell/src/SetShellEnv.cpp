@@ -1,7 +1,7 @@
 /**
- * ListChildren
+ * Tr(inkets) ScreenShell NavigateDir
  *
- * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
+ * Copyright (C) 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
  * This Program is free software: you can redistribute
  * it and/or modify it under the terms of the GNU General Public
@@ -19,18 +19,20 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "Natives.h"
+#include "../ScreenShell.h"
 
-#include <iostream>
-using namespace BlackOS::Trinkets;
-int main() {
+namespace BlackOS {
+namespace Trinkets {
 
-  std::vector<std::string> v{"ls", "-a"};
-
-  std::vector<std::string> children;
-  listChildren(v, children);
-  for (auto const &child : children) {
-    std::cout << child << "\n";
+int ScreenShell::setShellEnv() {
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "set <ENV> <value>\n");
+    return 1;
   }
+  setenv(_ARGV[1].c_str(), _ARGV[2].c_str(), 1);
   return 0;
 }
+
+} // namespace Trinkets
+} // namespace BlackOS

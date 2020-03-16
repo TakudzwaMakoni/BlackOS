@@ -19,21 +19,89 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../inc/PathController.h"
-#include "../inc/NavigationHelpers.h"
+#include "PathController.h"
 
 #include <algorithm>
 #include <cctype>
+#include <cerrno>
+#include <cstring>
+#include <fcntl.h>
 #include <filesystem>
 #include <fmt/format.h>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <list>
 #include <sstream>
+#include <stdio.h>
 #include <string>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+#include <vector>
 
 namespace BlackOS {
 namespace Trinkets {
+
+std::string PathController::stripSubstring(std::string str,
+                                           std::string const &substring) {
+  size_t pos = std::string::npos;
+  // Search for the substring in string in a loop untill nothing is found
+  while ((pos = str.find(substring)) != std::string::npos) {
+    // If found then erase it from string
+    str.erase(pos, substring.length());
+  }
+  return str;
+}
+
+std::string PathController::timestampToDateTime(time_t const rawtime) {
+  struct tm *dt;
+  char buffer[80];
+  dt = localtime(&rawtime);
+  strftime(buffer, sizeof(buffer), "%d-%m-%Y %H:%M  %Z", dt);
+  return std::string(buffer);
+}
+
+std::string PathController::pathLastModifiedDate(std::string const &path) {
+  struct stat modResult;
+  if (stat(path.c_str(), &modResult) == 0) {
+    return timestampToDateTime(modResult.st_mtime);
+  } else {
+    return "unknown";
+  }
+}
+
+std::string PathController::pathPermissions(std::string const &path) {
+  namespace fs = std::filesystem;
+  fs::perms p = fs::status(path).permissions();
+
+  std::string uR = (p & fs::perms::owner_read) != fs::perms::none ? "r" : "-";
+  std::string uW = (p & fs::perms::owner_write) != fs::perms::none ? "w" : "-";
+  std::string uX = (p & fs::perms::owner_exec) != fs::perms::none ? "x" : "-";
+
+  std::string gR = (p & fs::perms::group_read) != fs::perms::none ? "r" : "-";
+  std::string gW = (p & fs::perms::group_write) != fs::perms::none ? "w" : "-";
+  std::string gX = (p & fs::perms::group_exec) != fs::perms::none ? "x" : "-";
+
+  std::string oR = (p & fs::perms::others_read) != fs::perms::none ? "r" : "-";
+  std::string oW = (p & fs::perms::others_write) != fs::perms::none ? "w" : "-";
+  std::string oX = (p & fs::perms::others_exec) != fs::perms::none ? "x" : "-";
+
+  return uR + uW + uX + gR + gW + gX + oR + oW + oX;
+}
+
+std::string PathController::pathType(std::filesystem::path const &path) {
+  namespace fs = std::filesystem;
+  if (fs::is_directory(path)) {
+    return "directory";
+  } else if (fs::is_regular_file(path)) {
+    return "file";
+  } else {
+    return "unknown";
+  }
+}
 
 std::filesystem::path PathController::parentPathObj() const {
   return _parentPath;
