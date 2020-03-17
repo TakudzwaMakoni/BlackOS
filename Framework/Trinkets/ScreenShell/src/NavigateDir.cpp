@@ -45,12 +45,8 @@ int ScreenShell::navigateDir() {
 
   int y, x;
 
-  auto const termSz = BlackOS::DisplayKernel::TERMINAL_SIZE();
-  size_t const ROWS = termSz[0];
-  size_t const COLS = termSz[1];
-
-  if (_cursorY < 0 || _cursorY > ROWS - 10)
-    y = ROWS / 2;
+  if (_cursorY < 0 || _cursorY > _termSzY - 10)
+    y = _termSzY / 2;
   else
     y = _cursorY;
 
@@ -72,6 +68,8 @@ int ScreenShell::navigateDir() {
         initPath = std::filesystem::current_path();
       } else {
         usageNavigateDir();
+        move(_cursorY, 0);
+        refresh();
         return 2;
       }
     } else {
@@ -84,12 +82,14 @@ int ScreenShell::navigateDir() {
     std::string argv1 = _ARGV[1];
     if (argv1 != "-a") {
       usageNavigateDir();
+      refresh();
       return 2;
     }
     withHidden = 1;
     initPath = _ARGV[2];
   } else {
     usageNavigateDir();
+    refresh();
     return 2;
   }
 
@@ -157,6 +157,8 @@ int ScreenShell::navigateDir() {
         // user initialised parent directory without access
         NavigationMenu.setWin(0);
         CurrentDirWindow.setWin(0);
+        move(_cursorY, 0);
+        refresh();
         return -1; // leave here TODO: exit codes
       } else {
         // user navigated into directory without permissions
@@ -177,7 +179,7 @@ int ScreenShell::navigateDir() {
     pagination = menuHeight - 3;
 
     NavigationMenu.resize(menuHeight, menuWidth);
-    NavigationMenu.reposition(y /*maintain cursor _cursorY position*/,
+    NavigationMenu.reposition(y + 2 /*maintain cursor _cursorY position*/,
                               0 /*left of screen*/);
 
     if (fieldSz == 0) {
@@ -238,6 +240,8 @@ int ScreenShell::navigateDir() {
       CurrentDirWindow.clear();
       NavigationMenu.setWin(0);
       CurrentDirWindow.setWin(0);
+      move(_cursorY, 0);
+      refresh();
       return 0; // leave here
     } else if (lastKey == (int)'a' /*out of directory*/) {
       // user navigated up a directory
@@ -292,6 +296,8 @@ int ScreenShell::navigateDir() {
       _ARGV = {"sc"};
       _ARGC = 1;
       shortcut();
+      move(_cursorY, 0);
+      refresh();
       return 0;
     } else {
 
@@ -319,7 +325,8 @@ int ScreenShell::navigateDir() {
       }
     }
   }
-
+  move(_cursorY, 0);
+  refresh();
   return 0;
 }
 } // namespace Trinkets

@@ -104,6 +104,8 @@ int ScreenShell::shortcut() {
     ShortcutMenu.refresh(); // present message to screen
     ShortcutMenu.pause();
     ShortcutMenu.setWin(0);
+    move(_cursorY, 0);
+    refresh();
     return 0;
   }
 
@@ -135,6 +137,8 @@ int ScreenShell::shortcut() {
     ShortcutMenu.clear();
     ShortcutMenu.refresh();
     ShortcutMenu.setWin(0);
+    move(_cursorY, 0);
+    refresh();
     return 0; // leave here
   } else if (lastKey == (int)'d' /*begin navigateDir into dir*/) {
     // user navigated up a directory
@@ -145,6 +149,8 @@ int ScreenShell::shortcut() {
     _ARGV = {"nd", chosenPath};
     _ARGC = 2;
     navigateDir();
+    move(_cursorY, 0);
+    refresh();
     return 0;
   } else {
     // enter was pressed
@@ -155,6 +161,8 @@ int ScreenShell::shortcut() {
     _ARGV = {"cd", chosenPath};
     _ARGC = 2;
     changeDir();
+    move(_cursorY, 0);
+    refresh();
     return 0;
   }
 }
