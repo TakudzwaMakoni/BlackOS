@@ -43,6 +43,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <termios.h>
 #include <unistd.h>
 #include <vector>
 
@@ -62,8 +63,16 @@ typedef std::pair<std::string, command> pair;
 typedef std::map<std::string, command> cmap;
 
 enum class PipeRedirect { PIPE, REDIRECT, NEITHER };
-enum ExitStatus { ERROR = -1, USER_EXIT };
-enum UserInput { UP = -2, DOWN };
+enum RESULT {
+  LAUNCH_FAILURE, // program failed to launch
+  ABORT,          // call to abort program
+  EXIT,           // user call to end program
+  SUCCESS = 0,    // return function succeeded
+  FAILURE,        // return function failed
+  BAD_USAGE,      // return bad user input
+  NO_INPUT        // no user input
+};
+enum class USER_INPUT { UP = -2, DOWN }; // TODO: LEFT RIGHT ESC ETC.
 enum standardColours {
   BLACK = 30,
   RED,
@@ -107,10 +116,10 @@ public:
   void initShell();
   /// Reads input from the user into the given array and returns the number of
   /// arguments taken in.
-  int readArgs();
+  void readArgs();
   /// Given the number of arguments and an array of arguments, this will execute
   /// those arguments.  The first argument in the array should be a command.
-  void runCommand(std::vector<std::string> const &);
+  void runCommand();
   ///
   int initShellVariables();
   ///
@@ -122,16 +131,22 @@ public:
   ///
   void displayPrompt();
   ///
+  void moveCursor(int y, int x);
+  ///
   int configureShell(std::string const &, std::string const &);
   ///
   int openWithTextEditor(std::string const &);
   ///
   void splashScreen(std::vector<std::string> const &argv);
 
+  int getCharacter();
+
   /// Native commands
 
   ///
   int bell();
+  ///
+  int exitShell();
   ///
   int clearScreen();
   ///
@@ -155,11 +170,11 @@ private:
   // display variables
   Screen_sptr _display;
   std::string _displayType;
-  size_t _cursorY = 0;
-  size_t _cursorX = 0;
-  size_t _promptLen;
-  size_t _termSzY;
-  size_t _termSzX;
+  int _promptLen;
+  int _termSzY;
+  int _termSzX;
+  int _cursorY;
+  int _cursorX;
 
   // environment variables
   std::string _PATH;
@@ -177,6 +192,8 @@ private:
   std::string _CURSOR_COLOUR = "red";
 
   // system variables
+  struct termios _OLDT;
+  struct termios _NEWT;
   std::filesystem::path _CONFIG_FILE;
   std::filesystem::path _SHELL_ENV_FILE;
   std::filesystem::path _SHORTCUTS_FILE;
@@ -190,6 +207,8 @@ private:
                     pair("clear", &ScreenShell::clearScreen),
                     pair("configure", &ScreenShell::configureShell),
                     pair("config", &ScreenShell::configureShell),
+                    pair("exit", &ScreenShell::exitShell),
+                    pair("quit", &ScreenShell::exitShell),
                     pair("ls", &ScreenShell::listChildren),
                     pair("lsconfig", &ScreenShell::listConfigVariables),
                     pair("nd", &ScreenShell::navigateDir),

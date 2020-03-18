@@ -26,7 +26,7 @@ namespace Trinkets {
 
 int ScreenShell::configureShell() {
   if (_ARGV.size() != 3) {
-    printw("Usage:\n"
+    printf("Usage:\n"
            "config/configure <arg1> <arg2>\n"
            "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
     return 1;

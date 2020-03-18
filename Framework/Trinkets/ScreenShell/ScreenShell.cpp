@@ -27,10 +27,6 @@ using namespace BlackOS::Trinkets;
 // https://www.3till7.net/2008/11/29/c-shell-with-forks-and-pipes/index.html
 int main() {
 
-  auto termSz = BlackOS::DisplayKernel::TERMINAL_SIZE();
-  size_t termSzY = termSz[0];
-  size_t termSzX = termSz[1];
-
   // use stdscreen
   auto display = generateScreen();
 
@@ -38,20 +34,11 @@ int main() {
   shell.initShell();
 
   while (1) {
-
     shell.displayPrompt();
-    int result = shell.readArgs();
-    auto const &argv = shell.argv();
-    if (!argv.empty()) {
-      // quit on user prompt
-      std::string firstArg = argv[0];
-      if (firstArg == "exit" || firstArg == "quit")
-        break;
-
-      shell.runCommand(argv); // neither
-      shell.resetArgs();
-    }
+    shell.readArgs();
+    shell.runCommand(); // neither
+    shell.resetArgs();
   }
 
-  return ExitStatus::USER_EXIT;
+  return RESULT::SUCCESS;
 }

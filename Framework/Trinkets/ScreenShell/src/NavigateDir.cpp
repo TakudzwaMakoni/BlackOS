@@ -38,8 +38,6 @@ void usageNavigateDir() {
 
 int ScreenShell::navigateDir() {
 
-  logCursorPosition();
-
   bool withHidden;
   std::string initPath;
 
@@ -68,8 +66,6 @@ int ScreenShell::navigateDir() {
         initPath = std::filesystem::current_path();
       } else {
         usageNavigateDir();
-        move(_cursorY, 0);
-        refresh();
         return 2;
       }
     } else {
@@ -82,16 +78,16 @@ int ScreenShell::navigateDir() {
     std::string argv1 = _ARGV[1];
     if (argv1 != "-a") {
       usageNavigateDir();
-      refresh();
       return 2;
     }
     withHidden = 1;
     initPath = _ARGV[2];
   } else {
     usageNavigateDir();
-    refresh();
     return 2;
   }
+
+  clearScreen();
 
   // remove trailing '/' if any
   if (initPath.back() == '/') {
@@ -157,8 +153,6 @@ int ScreenShell::navigateDir() {
         // user initialised parent directory without access
         NavigationMenu.setWin(0);
         CurrentDirWindow.setWin(0);
-        move(_cursorY, 0);
-        refresh();
         return -1; // leave here TODO: exit codes
       } else {
         // user navigated into directory without permissions
@@ -240,8 +234,6 @@ int ScreenShell::navigateDir() {
       CurrentDirWindow.clear();
       NavigationMenu.setWin(0);
       CurrentDirWindow.setWin(0);
-      move(_cursorY, 0);
-      refresh();
       return 0; // leave here
     } else if (lastKey == (int)'a' /*out of directory*/) {
       // user navigated up a directory
@@ -296,8 +288,6 @@ int ScreenShell::navigateDir() {
       _ARGV = {"sc"};
       _ARGC = 1;
       shortcut();
-      move(_cursorY, 0);
-      refresh();
       return 0;
     } else {
 
@@ -325,8 +315,6 @@ int ScreenShell::navigateDir() {
       }
     }
   }
-  move(_cursorY, 0);
-  refresh();
   return 0;
 }
 } // namespace Trinkets

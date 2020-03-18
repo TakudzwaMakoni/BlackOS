@@ -37,6 +37,8 @@ std::string produceBanner(std::string const &str, int winwidth) {
 
 void ScreenShell::splashScreen(std::vector<std::string> const &argv) {
 
+  clearScreen();
+
   std::string spc = " "; // space string for easier reading.
   std::string marginline =
       "* * * * * * * * * * * * * * * * * * * * * * * * * * * * "
@@ -65,22 +67,22 @@ void ScreenShell::splashScreen(std::vector<std::string> const &argv) {
   git = argv[7] + spc;
 
   std::string pushDown((_termSzY - 8 /*banner height*/) / 2, '\n');
-  printw(pushDown.c_str());
+  printf(pushDown.c_str());
 
-  printw(produceBanner(marginline, _termSzX).c_str());
-  printw("\n");
-  printw(produceBanner(title + "v" + version + ", " + repo, _termSzX).c_str());
-  printw("\n");
-  printw(
+  printf(produceBanner(marginline, _termSzX).c_str());
+  printf("\n");
+  printf(produceBanner(title + "v" + version + ", " + repo, _termSzX).c_str());
+  printf("\n");
+  printf(
       produceBanner(license + year + ", " + "written in " + language, _termSzX)
           .c_str());
-  printw("\n");
-  printw(produceBanner("by " + author, _termSzX).c_str());
-  printw("\n");
-  printw(produceBanner("git: " + git, _termSzX).c_str());
-  printw("\n");
-  printw(produceBanner(marginline, _termSzX).c_str());
-  printw("\n");
+  printf("\n");
+  printf(produceBanner("by " + author, _termSzX).c_str());
+  printf("\n");
+  printf(produceBanner("git: " + git, _termSzX).c_str());
+  printf("\n");
+  printf(produceBanner(marginline, _termSzX).c_str());
+  printf("\n");
 }
 
 } // namespace Trinkets

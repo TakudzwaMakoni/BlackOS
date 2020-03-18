@@ -102,18 +102,17 @@ int ScreenShell::listChildren() {
   title = pathController.generateTitle();
   fields = pathController.generateFields();
 
-  printw("\n");
-  attron(A_UNDERLINE);
-  printw(title.c_str());
-  attroff(A_UNDERLINE);
-  printw("\n");
+  printf("\n");
+  // attron(A_UNDERLINE);
+  printf(title.c_str());
+  // attroff(A_UNDERLINE);
+  printf("\n");
 
   for (std::string const &field : fields) {
-    printw(field.c_str());
-    printw("\n");
+    printf(field.c_str());
+    printf("\n");
   }
-  printw("\n");
-  refresh();
+  printf("\n");
 
   return 0;
 }

@@ -24,8 +24,9 @@
 namespace BlackOS {
 namespace Trinkets {
 int ScreenShell::clearScreen() {
-  clear();
-  move(0, 0);
+  std::string pushDown(_termSzY, '\n');
+  printf(pushDown.c_str());
+  printf("\033[%d;%dH", 0, 0);
   return 0;
 }
 } // namespace Trinkets

@@ -94,19 +94,19 @@ ScreenShell::ScreenShell(Screen_sptr &display) {
 
   if (path == nullptr) {
     std::cout << "no PATH environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
+    exit(RESULT::LAUNCH_FAILURE);
   }
   if (term == nullptr) {
     std::cout << "no TERM environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
+    exit(RESULT::LAUNCH_FAILURE);
   }
   if (shell == nullptr) {
     std::cout << "no SHELL environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
+    exit(RESULT::LAUNCH_FAILURE);
   }
   if (home == nullptr) {
     std::cout << "no HOME environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
+    exit(RESULT::LAUNCH_FAILURE);
   }
 
   _PATH = path;
@@ -123,16 +123,13 @@ ScreenShell::ScreenShell(Screen_sptr &display) {
   _display = display;
   _termSzY = termSz[0];
   _termSzX = termSz[1];
+  _cursorY = _termSzY / 2;
+  _cursorX = 0;
 }
 
 void clearDisplay() {}
 
 void ScreenShell::initShell() {
-  _display->setWin(1);
-
-  noecho();
-  scrollok(stdscr, TRUE);
-  curs_set(_CURSOR);
 
   std::string title = "Tr(inkets) (C) ScreenShell";
   std::string version = "1.0";
@@ -145,29 +142,9 @@ void ScreenShell::initShell() {
 
   std::vector<std::string> v{title, version,  repo,   license,
                              year,  language, author, git};
+
   splashScreen(v);
   changeDir();
-
-  // check colour support
-  _COLOUR_SUPPORT = has_colors();
-  if (_COLOUR_SUPPORT == FALSE) {
-    printf("warning: this terminal does not support colour\n");
-    printw("\n");
-  }
-
-  // initialise shell with config settings and shell variables described in
-  // config and environment files.
-  initShellVariables();
-  initEnvironmentVariables();
-
-  // recommended environment variables
-  char *editor = getenv("EDITOR");
-  if (editor == nullptr) {
-    printw("warning: no EDITOR environment variable is set.");
-    printw("\n");
-  }
-
-  bell();
 }
 
 int ScreenShell::initShellVariables() {
@@ -199,10 +176,6 @@ int ScreenShell::initEnvironmentVariables() {
 }
 
 void ScreenShell::displayPrompt() {
-  if (_TTY_FLAG_FALLBACK) {
-    system("stty -echo -icanon");
-    _TTY_FLAG_FALLBACK = 0;
-  }
 
   curs_set(_CURSOR);
   char buf[MAX_ARGS];
@@ -212,7 +185,7 @@ void ScreenShell::displayPrompt() {
   std::string prompt = buf;
   prompt = "Tr " + prompt + "> ";
   _promptLen = prompt.length();
-  printw(prompt.c_str());
+  printf(prompt.c_str());
   logCursorPosition();
 }
 
@@ -238,15 +211,15 @@ int ScreenShell::configureShell(std::string const &argv1,
       value = std::stoi(argv2);
     } catch (...) {
 
-      printw(errorMessage.c_str());
-      printw("\n");
+      printf(errorMessage.c_str());
+      printf("\n");
       logCursorPosition();
       return 1;
     }
     if (value < 0 || value > 2) {
 
-      printw(errorMessage.c_str());
-      printw("\n");
+      printf(errorMessage.c_str());
+      printf("\n");
       logCursorPosition();
       return 1;
     }
@@ -281,15 +254,15 @@ int ScreenShell::configureShell(std::string const &argv1,
             "could not assign delete key to this value: " +
             std::to_string(value) +
             "\n2nd argument must be in range: 0 < [arg2] < 127";
-        printw(errorMessage.c_str());
-        printw("\n");
+        printf(errorMessage.c_str());
+        printf("\n");
         return 1;
       }
 
       if (value == 10 /*Enter*/ || value == 35 /*Space*/) {
         // may need to specify more reserved values.
-        printw("this key is reserved.");
-        printw("\n");
+        printf("this key is reserved.");
+        printf("\n");
         return 1;
       }
       _DELETE = value;
@@ -297,8 +270,8 @@ int ScreenShell::configureShell(std::string const &argv1,
       // parse character
 
       if (argv2.length() != 1) {
-        printw(errorMessage.c_str());
-        printw("\n");
+        printf(errorMessage.c_str());
+        printf("\n");
         return 1;
       }
 
@@ -306,8 +279,8 @@ int ScreenShell::configureShell(std::string const &argv1,
       if (std::isprint(static_cast<unsigned char>(c))) {
         _DELETE = (int)c;
       } else {
-        printw("2nd argument is not a printable character.");
-        printw("\n");
+        printf("2nd argument is not a printable character.");
+        printf("\n");
       }
     }
   }
@@ -319,8 +292,8 @@ int ScreenShell::configureShell(std::string const &argv1,
     if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
           argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
       std::string message = "2nd argument " + argv2 + " is not a valid colour.";
-      printw(message.c_str());
-      printw("\n");
+      printf(message.c_str());
+      printf("\n");
       return 1;
     }
 
@@ -333,8 +306,8 @@ int ScreenShell::configureShell(std::string const &argv1,
     if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
           argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
       std::string message = "2nd argument " + argv2 + " is not a valid colour.";
-      printw(message.c_str());
-      printw("\n");
+      printf(message.c_str());
+      printf("\n");
       return 1;
     }
 
@@ -377,8 +350,8 @@ int ScreenShell::configureShell(std::string const &argv1,
     if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
           argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
       std::string message = "2nd argument " + argv2 + " is not a valid colour.";
-      printw(message.c_str());
-      printw("\n");
+      printf(message.c_str());
+      printf("\n");
       return 1;
     }
 
@@ -418,79 +391,82 @@ int ScreenShell::configureShell(std::string const &argv1,
     _USING_COLOR_FLAG = 1;
   } else {
     std::string message = "Shell variable " + argv1 + " is unrecognised.";
-    printw(message.c_str());
-    printw("\n");
+    printf(message.c_str());
+    printf("\n");
     logCursorPosition();
     return 1;
   }
   return 0;
 }
 
+void ScreenShell::moveCursor(int y, int x) { printf("\033[%d;%dH", y, x); }
+
 void ScreenShell::resetArgs() {
   _ARGV.clear();
   _ARGC = 0;
 }
-
-int ScreenShell::readArgs() {
-  keypad(stdscr, TRUE);
-  std::string line;
+int ScreenShell::getCharacter() {
   char ch;
-  do {
-    ch = getch();
+  tcgetattr(STDIN_FILENO, &_OLDT); /*store old settings */
+  _NEWT = _OLDT;                   /* copy old settings to new settings */
+  _NEWT.c_lflag &=
+      ~(ICANON | ECHO); /* make one change to old settings in new settings */
+  tcsetattr(STDIN_FILENO, TCSANOW,
+            &_NEWT); /*apply the new settings immediatly */
+  std::cin.get(ch);  /* standard getchar call */
+  tcsetattr(STDIN_FILENO, TCSANOW, &_OLDT); /*reapply the old settings */
+  return ch;                                /*return received char */
+}
+
+void ScreenShell::readArgs() {
+  std::string line;
+  int ch;
+
+  // Read in arguments till the user hits enter
+  while (ch = getCharacter()) {
+
     if (ch == '\n') {
       break;
     } else if ((_DELETE > 0 && (int)ch == _DELETE) || (int)ch == 8 ||
-               (int)ch == KEY_BACKSPACE || (int)ch == KEY_DC ||
                (int)ch == 127) {
-      logCursorPosition();
-      if (_cursorX > _promptLen) {
-        printw("\b");
-        delch();
-        refresh();
-      }
+
+      printf("\b \b");
+      // TODO: keymap with callable functions
       if (!line.empty()) {
         line.pop_back();
       }
-    } else if ((int)ch == 27 || (int)ch == KEY_UP || (int)ch == 3) {
-      printw("\n");
-      refresh();
-      return UserInput::UP;
-    } else if ((int)ch == KEY_LEFT || (int)ch == 4) {
-      logCursorPosition();
-      if (_cursorX > _promptLen) {
-        printw("\b");
-        refresh();
-      }
-    } else if ((int)ch == KEY_RIGHT || (int)ch == 5) {
-      auto const termSz = DisplayKernel::TERMINAL_SIZE();
-      size_t const COLS = termSz[1];
-      logCursorPosition();
-      if (_cursorX < COLS) {
-        move(_cursorY, _cursorX + 1);
-        refresh();
-      }
-    } else if ((int)ch == KEY_DOWN || (int)ch == 2) {
-      printw("\n");
-      refresh();
-      return UserInput::DOWN;
+    } else if ((int)ch == 27 || (int)ch == 3) {
+      printf("UP");
+    } else if ((int)ch == 4) {
+
+      printf("LEFT");
+
+    } else if ((int)ch == 5) {
+
+      printf("RIGHT");
+
+    } else if ((int)ch == 2) {
+      printf("DOWN");
+
     } else {
-      addch(ch);
-      logCursorPosition();
-      refresh();
+      printf("%c", ch);
       line += ch;
     }
-
-  } while (1);
+  }
 
   // tokenize the string
   std::stringstream ss(line);
   std::string item;
 
-  while (std::getline(ss, item, ' '))
+  while (std::getline(ss, item, ' ')) {
     _ARGV.push_back(item);
+  }
   _ARGC = _ARGV.size();
-  printw("\n");
+  printf("\n");
+}
 
+int ScreenShell::exitShell() {
+  exit(1);
   return 0;
 }
 
@@ -505,8 +481,6 @@ int ScreenShell::execute() {
     (this->*(x->second))(); // call using pointer
     return 0;
   } else {
-    system("stty sane");
-    _TTY_FLAG_FALLBACK = 1;
     return 1;
   }
 }
@@ -515,7 +489,11 @@ int ScreenShell::execute() {
 // this will fork a new process and run those arguments.
 // Thanks to http://tldp.org/LDP/lpg/node11.html for their tutorial on pipes
 // in C, which allowed me to handle user input with ampersands.
-void ScreenShell::runCommand(std::vector<std::string> const &argv) {
+void ScreenShell::runCommand() {
+
+  if (_ARGC == 0)
+    return;
+
   int result;
 
   pid_t pid;
@@ -524,8 +502,9 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
 
     // Fork our process
     pid = fork();
+
     char **argvA;
-    vectorToNullArray(argv, argvA);
+    vectorToNullArray(_ARGV, argvA);
 
     // error
     if (pid < 0)
@@ -533,8 +512,6 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
 
     // child process
     else if (pid == 0) {
-
-      std::cout << "\n";
 
       char cmd[100];
       strcpy(cmd, "/usr/bin/");
@@ -548,8 +525,8 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
 
     } else if (pid > 0) {
       // parent
+      waitpid(pid, NULL, 0);
     }
-    waitpid(pid, NULL, 0);
   }
 }
 

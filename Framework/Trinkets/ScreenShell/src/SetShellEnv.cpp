@@ -26,7 +26,7 @@ namespace Trinkets {
 
 int ScreenShell::setShellEnv() {
   if (_ARGC != 3) {
-    printw("Usage:\n"
+    printf("Usage:\n"
            "set <ENV> <value>\n");
     return 1;
   }
