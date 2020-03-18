@@ -70,7 +70,8 @@ enum RESULT {
   SUCCESS = 0,    // return function succeeded
   FAILURE,        // return function failed
   BAD_USAGE,      // return bad user input
-  NO_INPUT        // no user input
+  NO_INPUT,       // no user input
+  END_OF_PROCESS  // process has ended
 };
 enum class USER_INPUT { UP = -2, DOWN }; // TODO: LEFT RIGHT ESC ETC.
 enum standardColours {
@@ -97,6 +98,7 @@ using Window_sptr = std::shared_ptr<DisplayKernel::Window>;
 
 Screen_sptr generateScreen();
 Window_sptr generateWindow();
+std::vector<char *> nullTerminatedArgV(std::vector<std::string> const &);
 void vectorToNullArray(std::vector<std::string> const &v, char **a);
 
 class ScreenShell {
@@ -124,7 +126,7 @@ public:
   int initShellVariables();
   ///
   void resetArgs();
-
+  ///
   std::vector<std::string> argv() const;
   ///
   int initEnvironmentVariables();
@@ -138,7 +140,7 @@ public:
   int openWithTextEditor(std::string const &);
   ///
   void splashScreen(std::vector<std::string> const &argv);
-
+  ///
   int getCharacter();
 
   /// Native commands

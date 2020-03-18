@@ -36,7 +36,7 @@ int main() {
   while (1) {
     shell.displayPrompt();
     shell.readArgs();
-    shell.runCommand(); // neither
+    shell.runCommand();
     shell.resetArgs();
   }
 

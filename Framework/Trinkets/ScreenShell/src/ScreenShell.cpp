@@ -37,16 +37,13 @@ Window_sptr generateWindow() {
   return window;
 }
 
-void vectorToNullArray(std::vector<std::string> const &v, char **a) {
-  int i = 0;
-  while (i < v.size()) {
-    std::string str = v[i];
-    char *cstr = new char[str.size() + 1];
-    strcpy(cstr, str.c_str());
-    a[i] = cstr;
-    i++;
+std::vector<char *> nullTerminatedArgV(std::vector<std::string> const &v) {
+  std::vector<char *> result;
+  for (auto const &s : v) {
+    result.push_back(const_cast<char *>(s.c_str()));
   }
-  a[i] = nullptr;
+  result.push_back(nullptr);
+  return result;
 }
 
 int ScreenShell::bell() {
@@ -490,11 +487,8 @@ int ScreenShell::execute() {
 // Thanks to http://tldp.org/LDP/lpg/node11.html for their tutorial on pipes
 // in C, which allowed me to handle user input with ampersands.
 void ScreenShell::runCommand() {
-
   if (_ARGC == 0)
     return;
-
-  int result;
 
   pid_t pid;
 
@@ -503,37 +497,29 @@ void ScreenShell::runCommand() {
     // Fork our process
     pid = fork();
 
-    char **argvA;
-    vectorToNullArray(_ARGV, argvA);
+    std::vector<char *> argv = nullTerminatedArgV(_ARGV);
+    char **command = argv.data();
 
     // error
-    if (pid < 0)
+    if (pid < 0) {
       perror("Error (pid < 0)");
+    } else if (pid == 0) {
 
-    // child process
-    else if (pid == 0) {
-
-      char cmd[100];
+      char cmd[MAX_ARGS];
       strcpy(cmd, "/usr/bin/");
-      strcat(cmd, argvA[0]);
-      int result = execvp(cmd, argvA);
+      strcat(cmd, command[0]);
+      int status = execvp(cmd, command);
       perror("Fallback Shell");
 
-      if (result != 0) {
-        exit(3); // duplicate child process is created.
-      }
+      exit(RESULT::END_OF_PROCESS);
 
     } else if (pid > 0) {
-      // parent
       waitpid(pid, NULL, 0);
     }
   }
-}
+} // namespace Trinkets
 
-ScreenShell::~ScreenShell() {
-  _display->setWin(0);
-  std::cout << "\nexited Tr.\n";
-}
+ScreenShell::~ScreenShell() { _display->setWin(0); }
 
 } // namespace Trinkets
 } // namespace BlackOS
