@@ -505,7 +505,14 @@ int ScreenShell::execute() {
     (this->*(x->second))(); // call using pointer
     return 0;
   } else {
-    system("stty sane");
+    tcgetattr(STDIN_FILENO, &_oldt); /*store old settings */
+    _newt = _oldt;                   /* copy old settings to new settings */
+    _newt.c_oflag |= (ONLCR);
+    _newt.c_lflag &=
+        ~(ICANON | ECHO |
+          ONLCR); /* make one change to old settings in new settings */
+    tcsetattr(STDIN_FILENO, TCSANOW,
+              &_newt); /*apply the new settings immediatly */
     _TTY_FLAG_FALLBACK = 1;
     return 1;
   }
@@ -542,14 +549,16 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
       int result = execvp(cmd, argvA);
       perror("Fallback Shell");
 
-      if (result != 0) {
-        exit(3); // duplicate child process is created.
-      }
+      exit(3); // duplicate child process is created.
 
     } else if (pid > 0) {
       // parent
+      waitpid(pid, NULL, 0);
+      printw("%s\n", "Fallback Shell: process complete.");
+      tcsetattr(STDIN_FILENO, TCSANOW, &_oldt); /*reapply the old settings */
+      _display->pause();
+      bell();
     }
-    waitpid(pid, NULL, 0);
   }
 }
 

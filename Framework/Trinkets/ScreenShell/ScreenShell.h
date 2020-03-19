@@ -43,6 +43,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <termios.h>
 #include <unistd.h>
 #include <vector>
 
@@ -160,6 +161,8 @@ private:
   size_t _promptLen;
   size_t _termSzY;
   size_t _termSzX;
+  struct termios _oldt;
+  struct termios _newt;
 
   // environment variables
   std::string _PATH;
