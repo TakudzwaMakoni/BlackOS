@@ -49,7 +49,7 @@ int main() {
       if (firstArg == "exit" || firstArg == "quit")
         break;
 
-      shell.runCommand(argv); // neither
+      shell.runCommand(); // neither
       shell.logResult();
       shell.resetArgs();
     }

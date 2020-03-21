@@ -18,7 +18,6 @@ find_package(fmt) # ListChildren, NavigateDir
             ../helpers/PathController.cpp
             src/ClearScreen.cpp
             src/ChangeDir.cpp
-            src/ConfigureShell.cpp
             src/ListChildren.cpp
             src/ListConfigVariables.cpp
             src/NavigateDir.cpp

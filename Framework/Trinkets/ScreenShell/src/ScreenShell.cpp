@@ -24,11 +24,13 @@
 namespace BlackOS {
 namespace Trinkets {
 
+/// generates a shared pointer to DisplayKernel Screen instance.
 Screen_sptr generateScreen() {
   auto screen = std::make_shared<DisplayKernel::Screen>();
   return screen;
 }
 
+/// generates a shared pointer to DisplayKernel Window instance.
 Window_sptr generateWindow() {
   auto const termSz = DisplayKernel::TERMINAL_SIZE();
   size_t const ROWS = termSz[0];
@@ -37,6 +39,7 @@ Window_sptr generateWindow() {
   return window;
 }
 
+/// convert a vectot of std::string arguments to  char**
 void vectorToNullArray(std::vector<std::string> const &v, char **a) {
   int i = 0;
   while (i < v.size()) {
@@ -49,6 +52,7 @@ void vectorToNullArray(std::vector<std::string> const &v, char **a) {
   a[i] = nullptr;
 }
 
+/// executes the visual bell in screen
 int ScreenShell::bell() {
 
   start_color();
@@ -84,53 +88,110 @@ int ScreenShell::bell() {
   return 0;
 }
 
-ScreenShell::ScreenShell(Screen_sptr &display) {
-
-  // required environment variables
-  char *path = getenv("PATH");
-  char *term = getenv("TERM");
-  char *shell = getenv("SHELL");
-  char *home = getenv("HOME");
-
-  if (path == nullptr) {
-    std::cout << "no PATH environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
+int ScreenShell::configTheme() {
+  if (_ARGC != 3) {
+    printw("not enough arguments!\n");
+    return 1;
   }
-  if (term == nullptr) {
-    std::cout << "no TERM environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
+  std::string theme = _ARGV[2];
+
+  command_map::const_iterator x;
+  x = _THEME_MAP.find(theme);
+
+  if (x != _THEME_MAP.end()) {
+    (this->*(x->second))(); // call using pointer
+    return 0;
+  } else {
+    std::string message = "theme " + theme + " is unrecognised.";
+    printw(message.c_str());
+    printw("\n");
+    logCursorPosition();
+    return 1;
   }
-  if (shell == nullptr) {
-    std::cout << "no SHELL environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
-  }
-  if (home == nullptr) {
-    std::cout << "no HOME environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
-  }
-
-  _PATH = path;
-  _TERM = term;
-  _SHELL = shell;
-  _HOME = home;
-
-  _CONFIG_FILE = _HOME + "/.tr/config.txt";
-  _SHELL_ENV_FILE = _HOME + "/.tr/environment.txt";
-  _SHORTCUTS_FILE = _HOME + "/.tr/shortcuts.txt";
-  _HISTORY_FILE = _HOME + "/.tr/history.txt";
-
-  // refresh history on startup
-  std::ofstream outfile;
-  outfile.open(_HISTORY_FILE, std::ios_base::trunc);
-  outfile.close();
-
-  auto const termSz = DisplayKernel::TERMINAL_SIZE();
-
-  _DISPLAY = display;
-  _TERM_SIZE_Y = termSz[0];
-  _TERM_SIZE_X = termSz[1];
+  return 0;
 }
 
+int ScreenShell::configThemeInvader() {
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  std::string argv1 = _ARGV[1];
+  std::string argv2 = _ARGV[2];
+
+  _FOREGROUND = COLOR_GREEN;
+  _BACKGROUND = COLOR_BLACK;
+  _CURSOR_COLOUR = "green";
+
+  printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
+  fflush(stdout);
+
+  init_pair(1, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+
+  refresh();
+
+  return 0;
+}
+
+int ScreenShell::configThemeIre() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  std::string argv1 = _ARGV[1];
+  std::string argv2 = _ARGV[2];
+
+  _FOREGROUND = COLOR_RED;
+  _BACKGROUND = COLOR_BLACK;
+  _CURSOR_COLOUR = "red";
+
+  printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
+  fflush(stdout);
+
+  init_pair(1, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+
+  refresh();
+
+  return 0;
+}
+
+int ScreenShell::configThemeNeptune() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  std::string argv1 = _ARGV[1];
+  std::string argv2 = _ARGV[2];
+
+  _FOREGROUND = COLOR_WHITE;
+  _BACKGROUND = COLOR_BLUE;
+  _CURSOR_COLOUR = "white";
+
+  printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
+  fflush(stdout);
+
+  init_pair(1, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+
+  refresh();
+
+  return 0;
+}
+
+/// alternate colours in screen
 int ScreenShell::rainbow() {
   auto start = std::chrono::system_clock::now();
   auto end = std::chrono::system_clock::now();
@@ -169,6 +230,7 @@ int ScreenShell::rainbow() {
   return 0;
 }
 
+/// append data to file.
 void ScreenShell::appendTofile(std::filesystem::path const &path,
                                std::string const &data) {
   std::ofstream outfile;
@@ -177,6 +239,7 @@ void ScreenShell::appendTofile(std::filesystem::path const &path,
   outfile.close();
 }
 
+/// load the shell to screen
 void ScreenShell::initShell() {
   _DISPLAY->setWin(1);
 
@@ -208,7 +271,10 @@ void ScreenShell::initShell() {
   // initialise shell with config settings and shell variables described in
   // config and environment files.
   initShellVariables();
+  resetArgs();
+
   initEnvironmentVariables();
+  resetArgs();
 
   // recommended environment variables
   char *editor = getenv("EDITOR");
@@ -220,15 +286,19 @@ void ScreenShell::initShell() {
   bell();
 }
 
+/// load shell configuration variables from config.txt file
 int ScreenShell::initShellVariables() {
   std::ifstream infile(_CONFIG_FILE);
   std::string a, b;
   while (infile >> a >> b) {
-    configureShell(a, b);
+    if (a == "!" || a.empty())
+      continue;
+    configure(a, b);
   }
   return 0;
 }
 
+/// open text file with EDITOR environment variable
 int ScreenShell::openWithTextEditor(std::string const &path) {
   char *editor = getenv("EDITOR");
   if (editor == NULL)
@@ -239,15 +309,19 @@ int ScreenShell::openWithTextEditor(std::string const &path) {
   return 0;
 }
 
+/// load environment variables from environment.txt file
 int ScreenShell::initEnvironmentVariables() {
   std::ifstream infile(_SHELL_ENV_FILE);
   std::string a, b;
   while (infile >> a >> b) {
+    if (a == "!" || a.empty())
+      continue;
     setenv(a.c_str(), b.c_str(), 1);
   }
   return 0;
 }
 
+/// log last command and result to memory cache
 void ScreenShell::logResult() {
 
   // log last command to history file
@@ -261,6 +335,7 @@ void ScreenShell::logResult() {
     _COMMAND_HISTORY.push_front(_LAST_COMMAND);
 }
 
+/// print the prompt to the screen
 void ScreenShell::displayPrompt() {
 
   curs_set(_CURSOR);
@@ -275,206 +350,32 @@ void ScreenShell::displayPrompt() {
   logCursorPosition();
 }
 
-size_t ScreenShell::cursorY() const { return _CURSOR_Y; }
+/// return cursor y position
+size_t ScreenShell::cursorY() {
+  logCursorPosition();
+  return _CURSOR_Y;
+}
 
-size_t ScreenShell::cursorX() const { return _CURSOR_Y; }
+/// return cursor x position
+size_t ScreenShell::cursorX() {
+  logCursorPosition();
+  return _CURSOR_X;
+}
 
+/// update log entry for cursor position in Screen
 void ScreenShell::logCursorPosition() { getsyx(_CURSOR_Y, _CURSOR_X); }
 
-int ScreenShell::configureShell(std::string const &argv1,
-                                std::string const &argv2) {
+/// apply configurations to ScreenShell
+int ScreenShell::configure() {
 
-  /**
-   * CONFIG CURSOR
-   *
-   */
-  if (argv1 == "CURSOR") {
-    int value;
-    std::string errorMessage =
-        "could not assign cursor to this value: " + argv2 +
-        "\n2nd argument must be in range: 0 <= [arg2] <= 2";
-    try {
-      value = std::stoi(argv2);
-    } catch (...) {
+  std::string argv1 = _ARGV[1];
 
-      printw(errorMessage.c_str());
-      printw("\n");
-      logCursorPosition();
-      return 1;
-    }
-    if (value < 0 || value > 2) {
+  command_map::const_iterator x;
+  x = _SHELL_CONFIG_MAP.find(argv1);
 
-      printw(errorMessage.c_str());
-      printw("\n");
-      logCursorPosition();
-      return 1;
-    }
-
-    _CURSOR = value;
-    curs_set(_CURSOR); // TODO: extra arg to save preference to config file?
-
-  }
-  /**
-   * CONFIG DELETE
-   *
-   */
-  else if (argv1 == "DELETE") {
-    // linux TERM environment variable does not seem to read regular backspace.
-    // allow the user to specify which key is delete.
-    std::string errorMessage =
-        "could not assign delete key to this value: " + argv2 +
-        "\nexpected a single character, or number in range " +
-        "0-127, or 'unset' to unset.";
-
-    if (argv2 == "unset") {
-      _DELETE = -1;
-      return 1;
-    }
-
-    try {
-
-      int value = std::stoi(argv2);
-
-      if (value > 127 || value < 0) {
-        std::string errorMessage =
-            "could not assign delete key to this value: " +
-            std::to_string(value) +
-            "\n2nd argument must be in range: 0 < [arg2] < 127";
-        printw(errorMessage.c_str());
-        printw("\n");
-        return 1;
-      }
-
-      if (value == 10 /*Enter*/ || value == 35 /*Space*/) {
-        // may need to specify more reserved values.
-        printw("this key is reserved.");
-        printw("\n");
-        return 1;
-      }
-      _DELETE = value;
-    } catch (...) {
-      // parse character
-
-      if (argv2.length() != 1) {
-        printw(errorMessage.c_str());
-        printw("\n");
-        return 1;
-      }
-
-      char c = argv2[0];
-      if (std::isprint(static_cast<unsigned char>(c))) {
-        _DELETE = (int)c;
-      } else {
-        printw("2nd argument is not a printable character.");
-        printw("\n");
-      }
-    }
-  }
-  /**
-   * CONFIG CURSOR_COLOUR
-   *
-   */
-  else if (argv1 == "CURSOR_COLOUR") {
-    if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
-          argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
-      std::string message = "2nd argument " + argv2 + " is not a valid colour.";
-      printw(message.c_str());
-      printw("\n");
-      return 1;
-    }
-
-    // TODO: check if Background is the same colour and warn invisibility
-
-    printf("\e]12;%s\a", argv2.c_str());
-    fflush(stdout);
-  } else if (argv1 == "BACKGROUND" || argv1 == "BG") {
-
-    if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
-          argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
-      std::string message = "2nd argument " + argv2 + " is not a valid colour.";
-      printw(message.c_str());
-      printw("\n");
-      return 1;
-    }
-
-    if (argv2 == "black") {
-      _BACKGROUND = COLOR_BLACK;
-      _STD_BG = standardColours::BLACK;
-    }
-    if (argv2 == "white") {
-      _BACKGROUND = COLOR_WHITE;
-      _STD_BG = standardColours::WHITE;
-    }
-    if (argv2 == "red") {
-      _BACKGROUND = COLOR_RED;
-      _STD_BG = standardColours::RED;
-    }
-    if (argv2 == "blue") {
-      _BACKGROUND = COLOR_BLUE;
-      _STD_BG = standardColours::BLUE;
-    }
-    if (argv2 == "yellow") {
-      _BACKGROUND = COLOR_YELLOW;
-      _STD_BG = standardColours::YELLOW;
-    }
-    if (argv2 == "green") {
-      _BACKGROUND = COLOR_GREEN;
-      _STD_BG = standardColours::GREEN;
-    }
-
-    start_color();
-    // TODO: check if Foreground is the same colour and warn invisibility/deny
-    init_pair(1 /*1 reserved for BG/FG pair*/, _FOREGROUND, _BACKGROUND);
-    bkgd(COLOR_PAIR(1));
-    refresh();
-
-    printf("\e[%im\e[%im", _STD_FG, _STD_BG + 10);
-
-    _USING_COLOR_FLAG = 1;
-  } else if (argv1 == "FOREGROUND" || argv1 == "FG") {
-
-    if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
-          argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
-      std::string message = "2nd argument " + argv2 + " is not a valid colour.";
-      printw(message.c_str());
-      printw("\n");
-      return 1;
-    }
-
-    if (argv2 == "black") {
-      _FOREGROUND = COLOR_BLACK;
-      _STD_FG = standardColours::BLACK;
-    }
-    if (argv2 == "white") {
-      _FOREGROUND = COLOR_WHITE;
-      _STD_FG = standardColours::WHITE;
-    }
-    if (argv2 == "red") {
-      _FOREGROUND = COLOR_RED;
-      _STD_FG = standardColours::RED;
-    }
-    if (argv2 == "blue") {
-      _FOREGROUND = COLOR_BLUE;
-      _STD_FG = standardColours::BLUE;
-    }
-    if (argv2 == "yellow") {
-      _FOREGROUND = COLOR_YELLOW;
-      _STD_FG = standardColours::YELLOW;
-    }
-    if (argv2 == "green") {
-      _FOREGROUND = COLOR_GREEN;
-      _STD_FG = standardColours::GREEN;
-    }
-
-    start_color();
-    // TODO: check if Foreground is the same colour and warn invisibility/deny
-    init_pair(1 /*1 reserved for BG/FG pair*/, _FOREGROUND, _BACKGROUND);
-    bkgd(COLOR_PAIR(1));
-    refresh();
-
-    printf("\e[%im\e[%im", _STD_FG, _STD_BG + 10);
-
-    _USING_COLOR_FLAG = 1;
+  if (x != _SHELL_CONFIG_MAP.end()) {
+    (this->*(x->second))(); // call using pointer
+    return 0;
   } else {
     std::string message = "Shell variable " + argv1 + " is unrecognised.";
     printw(message.c_str());
@@ -485,11 +386,285 @@ int ScreenShell::configureShell(std::string const &argv1,
   return 0;
 }
 
+int ScreenShell::configure(std::string const &argv1, std::string const &argv2) {
+
+  // borrow _ARGV
+  resetArgs();
+  _ARGV.push_back("configure");
+  _ARGV.push_back(argv1);
+  _ARGV.push_back(argv2);
+  _ARGC = 3;
+
+  command_map::const_iterator x;
+  x = _SHELL_CONFIG_MAP.find(argv1);
+
+  if (x != _SHELL_CONFIG_MAP.end()) {
+    (this->*(x->second))(); // call using pointer
+    return 0;
+  } else {
+    std::string message = "Shell variable " + argv1 + " is unrecognised.";
+    printw(message.c_str());
+    printw("\n");
+    logCursorPosition();
+    return 1;
+  }
+
+  resetArgs();
+  return 0;
+}
+
+int ScreenShell::configCursor() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  std::string argv1 = _ARGV[1];
+  std::string argv2 = _ARGV[2];
+
+  int value;
+  std::string errorMessage =
+      "could not assign cursor to this value: " + argv2 +
+      "\n2nd argument must be in range: 0 <= [arg2] <= 2";
+  try {
+    value = std::stoi(argv2);
+  } catch (...) {
+
+    printw(errorMessage.c_str());
+    printw("\n");
+    logCursorPosition();
+    return 1;
+  }
+  if (value < 0 || value > 2) {
+
+    printw(errorMessage.c_str());
+    printw("\n");
+    logCursorPosition();
+    return 1;
+  }
+
+  _CURSOR = value;
+  curs_set(_CURSOR); // TODO: extra arg to save preference to config file?
+  return 0;
+}
+
+int ScreenShell::configCursorColour() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  std::string argv1 = _ARGV[1];
+  std::string argv2 = _ARGV[2];
+
+  if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
+        argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
+
+    std::string message = "2nd argument " + argv2 + " is not a valid colour.";
+
+    printw(message.c_str());
+    printw("\n");
+    return 1;
+  }
+
+  // TODO: check if Background is the same colour and warn invisibility
+
+  printf("\e]12;%s\a", argv2.c_str());
+  fflush(stdout);
+  return 0;
+}
+
+int ScreenShell::configDeleteKey() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  std::string argv1 = _ARGV[1];
+  std::string argv2 = _ARGV[2];
+
+  // linux TERM environment variable does not seem to read regular backspace.
+  // allow the user to specify which key is delete.
+  std::string errorMessage =
+      "could not assign delete key to this value: " + argv2 +
+      "\nexpected a single character, or number in range " +
+      "0-127, or 'unset' to unset.";
+
+  if (argv2 == "unset") {
+    _DELETE = -1;
+    return 1;
+  }
+
+  try {
+
+    int value = std::stoi(argv2);
+
+    if (value > 127 || value < 0) {
+      std::string errorMessage =
+          "could not assign delete key to this value: " +
+          std::to_string(value) +
+          "\n2nd argument must be in range: 0 < [arg2] < 127";
+      printw(errorMessage.c_str());
+      printw("\n");
+      return 1;
+    }
+
+    if (value == 10 /*Enter*/ || value == 35 /*Space*/) {
+      // may need to specify more reserved values.
+      printw("this key is reserved.");
+      printw("\n");
+      return 1;
+    }
+    _DELETE = value;
+  } catch (...) {
+    // parse character
+
+    if (argv2.length() != 1) {
+      printw(errorMessage.c_str());
+      printw("\n");
+      return 1;
+    }
+
+    char c = argv2[0];
+    if (std::isprint(static_cast<unsigned char>(c))) {
+      _DELETE = (int)c;
+    } else {
+      printw("2nd argument is not a printable character.");
+      printw("\n");
+    }
+  }
+  return 0;
+}
+
+int ScreenShell::configBackgroundColour() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  std::string argv1 = _ARGV[1];
+  std::string argv2 = _ARGV[2];
+
+  if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
+        argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
+    std::string message = "2nd argument " + argv2 + " is not a valid colour.";
+    printw(message.c_str());
+    printw("\n");
+    return 1;
+  }
+
+  if (argv2 == "black") {
+    _BACKGROUND = COLOR_BLACK;
+    _STD_BG = standardColours::BLACK;
+  }
+  if (argv2 == "white") {
+    _BACKGROUND = COLOR_WHITE;
+    _STD_BG = standardColours::WHITE;
+  }
+  if (argv2 == "red") {
+    _BACKGROUND = COLOR_RED;
+    _STD_BG = standardColours::RED;
+  }
+  if (argv2 == "blue") {
+    _BACKGROUND = COLOR_BLUE;
+    _STD_BG = standardColours::BLUE;
+  }
+  if (argv2 == "yellow") {
+    _BACKGROUND = COLOR_YELLOW;
+    _STD_BG = standardColours::YELLOW;
+  }
+  if (argv2 == "green") {
+    _BACKGROUND = COLOR_GREEN;
+    _STD_BG = standardColours::GREEN;
+  }
+
+  start_color();
+  // TODO: check if Foreground is the same colour and warn invisibility/deny
+  init_pair(1 /*1 reserved for BG/FG pair*/, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+  refresh();
+
+  // printf("\e[%im\e[%im", _STD_FG, _STD_BG + 10);
+
+  _USING_COLOR_FLAG = 1;
+  return 0;
+}
+
+int ScreenShell::configForegroundColour() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+  std::string argv1 = _ARGV[1];
+  std::string argv2 = _ARGV[2];
+
+  if (!(argv2 == "red" || argv2 == "black" || argv2 == "white" ||
+        argv2 == "blue" || argv2 == "green" || argv2 == "yellow")) {
+    std::string message = "2nd argument " + argv2 + " is not a valid colour.";
+    printw(message.c_str());
+    printw("\n");
+    return 1;
+  }
+
+  if (argv2 == "black") {
+    _FOREGROUND = COLOR_BLACK;
+    _STD_FG = standardColours::BLACK;
+  }
+  if (argv2 == "white") {
+    _FOREGROUND = COLOR_WHITE;
+    _STD_FG = standardColours::WHITE;
+  }
+  if (argv2 == "red") {
+    _FOREGROUND = COLOR_RED;
+    _STD_FG = standardColours::RED;
+  }
+  if (argv2 == "blue") {
+    _FOREGROUND = COLOR_BLUE;
+    _STD_FG = standardColours::BLUE;
+  }
+  if (argv2 == "yellow") {
+    _FOREGROUND = COLOR_YELLOW;
+    _STD_FG = standardColours::YELLOW;
+  }
+  if (argv2 == "green") {
+    _FOREGROUND = COLOR_GREEN;
+    _STD_FG = standardColours::GREEN;
+  }
+
+  start_color();
+  // TODO: check if Foreground is the same colour and warn invisibility/deny
+  init_pair(1 /*1 reserved for BG/FG pair*/, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+  refresh();
+
+  printf("\e[%im\e[%im", _STD_FG, _STD_BG + 10);
+
+  _USING_COLOR_FLAG = 1;
+  return 0;
+}
+
+/// reset _ARGV and _ARGC
 void ScreenShell::resetArgs() {
-  _ARGV.clear();
+  _ARGV = {};
   _ARGC = 0;
 }
 
+/// read in user arguments
 int ScreenShell::readArgs() {
   keypad(stdscr, TRUE);
   std::string line;
@@ -591,9 +766,11 @@ int ScreenShell::readArgs() {
   return 0;
 }
 
+/// returns _ARGV
 std::vector<std::string> ScreenShell::argv() const { return _ARGV; }
 
-int ScreenShell::memoryHistory() {
+/// print to screen the virutal memory history
+int ScreenShell::printMemoryHistory() {
   if (!_COMMAND_HISTORY.empty()) {
     for (std::deque<std::string>::const_iterator command =
              _COMMAND_HISTORY.end();
@@ -604,9 +781,10 @@ int ScreenShell::memoryHistory() {
   return 0;
 }
 
+/// attempt to execute natively
 int ScreenShell::execute() {
 
-  cmap::const_iterator x;
+  command_map::const_iterator x;
   x = _COMMAND_MAP.find(_ARGV[0]);
 
   if (x != _COMMAND_MAP.end()) {
@@ -625,11 +803,7 @@ int ScreenShell::execute() {
   }
 }
 
-// Given the number of arguments (argc) and an array of arguments (argv),
-// this will fork a new process and run those arguments.
-// Thanks to http://tldp.org/LDP/lpg/node11.html for their tutorial on pipes
-// in C, which allowed me to handle user input with ampersands.
-void ScreenShell::runCommand(std::vector<std::string> const &argv) {
+void ScreenShell::runCommand() {
   int result;
 
   pid_t pid;
@@ -639,7 +813,7 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
     // Fork our process
     pid = fork();
     char **argvA;
-    vectorToNullArray(argv, argvA);
+    vectorToNullArray(_ARGV, argvA);
 
     // error
     if (pid < 0)
@@ -664,6 +838,53 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
       tcsetattr(STDIN_FILENO, TCSANOW, &_OLDT); /*reapply the old settings */
     }
   }
+}
+
+ScreenShell::ScreenShell(Screen_sptr &display) {
+
+  // required environment variables
+  char *path = getenv("PATH");
+  char *term = getenv("TERM");
+  char *shell = getenv("SHELL");
+  char *home = getenv("HOME");
+
+  if (path == nullptr) {
+    std::cout << "no PATH environment variable is set." << std::endl;
+    exit(ExitStatus::ERROR);
+  }
+  if (term == nullptr) {
+    std::cout << "no TERM environment variable is set." << std::endl;
+    exit(ExitStatus::ERROR);
+  }
+  if (shell == nullptr) {
+    std::cout << "no SHELL environment variable is set." << std::endl;
+    exit(ExitStatus::ERROR);
+  }
+  if (home == nullptr) {
+    std::cout << "no HOME environment variable is set." << std::endl;
+    exit(ExitStatus::ERROR);
+  }
+
+  _PATH = path;
+  _TERM = term;
+  _SHELL = shell;
+  _HOME = home;
+
+  _CONFIG_FILE = _HOME + "/.tr/config.txt";
+  _SHELL_ENV_FILE = _HOME + "/.tr/environment.txt";
+  _SHORTCUTS_FILE = _HOME + "/.tr/shortcuts.txt";
+  _HISTORY_FILE = _HOME + "/.tr/history.txt";
+
+  // refresh history on startup
+  std::ofstream outfile;
+  outfile.open(_HISTORY_FILE, std::ios_base::trunc);
+  outfile.close();
+
+  auto const termSz = DisplayKernel::TERMINAL_SIZE();
+
+  _DISPLAY = display;
+  _TERM_SIZE_Y = termSz[0];
+  _TERM_SIZE_X = termSz[1];
 }
 
 ScreenShell::~ScreenShell() {

@@ -62,7 +62,7 @@ typedef int (ScreenShell::*command)(void);
 /// command map
 typedef std::pair<std::string, command> pair;
 /// command map
-typedef std::map<std::string, command> cmap;
+typedef std::map<std::string, command> command_map;
 
 enum class PipeRedirect { PIPE, REDIRECT, NEITHER };
 enum ExitStatus { ERROR = -1, USER_EXIT };
@@ -103,9 +103,9 @@ public:
   ///
   void logCursorPosition();
   ///
-  size_t cursorY() const;
+  size_t cursorY();
   ///
-  size_t cursorX() const;
+  size_t cursorX();
   /// initialise the shell
   void initShell();
   /// Reads input from the user into the given array and returns the number of
@@ -113,7 +113,7 @@ public:
   int readArgs();
   /// Given the number of arguments and an array of arguments, this will execute
   /// those arguments.  The first argument in the array should be a command.
-  void runCommand(std::vector<std::string> const &);
+  void runCommand();
   ///
   int initShellVariables();
   ///
@@ -125,7 +125,7 @@ public:
   ///
   int rainbow();
   ///
-  int memoryHistory();
+  int printMemoryHistory();
   ///
   std::vector<std::string> argv() const;
   ///
@@ -133,7 +133,7 @@ public:
   ///
   void displayPrompt();
   ///
-  int configureShell(std::string const &, std::string const &);
+  int configure(std::string const &, std::string const &);
   ///
   int openWithTextEditor(std::string const &);
   ///
@@ -148,7 +148,7 @@ public:
   ///
   int listConfigVariables();
   ///
-  int configureShell();
+  int configure();
   ///
   int setShellEnv();
   ///
@@ -159,6 +159,27 @@ public:
   int navigateDir();
   ///
   int shortcut();
+
+  /// configurations
+
+  ///
+  int configCursor();
+  ///
+  int configCursorColour();
+  ///
+  int configDeleteKey();
+  ///
+  int configBackgroundColour();
+  ///
+  int configForegroundColour();
+  ///
+  int configTheme();
+  ///
+  int configThemeInvader();
+  ///
+  int configThemeIre();
+  ///
+  int configThemeNeptune();
 
   ~ScreenShell();
 
@@ -206,19 +227,33 @@ private:
   std::vector<std::string> _ARGV;
   std::deque<std::string> _COMMAND_HISTORY;
   int _ARGC;
-  cmap _COMMAND_MAP{pair("bell", &ScreenShell::bell),
-                    pair("cd", &ScreenShell::changeDir),
-                    pair("clear", &ScreenShell::clearScreen),
-                    pair("configure", &ScreenShell::configureShell),
-                    pair("config", &ScreenShell::configureShell),
-                    pair("ls", &ScreenShell::listChildren),
-                    pair("lsconfig", &ScreenShell::listConfigVariables),
-                    pair("nd", &ScreenShell::navigateDir),
-                    pair("ndir", &ScreenShell::navigateDir),
-                    pair("rainbow", &ScreenShell::rainbow),
-                    pair("sc", &ScreenShell::shortcut),
-                    pair("shortcut", &ScreenShell::shortcut),
-                    pair("memory", &ScreenShell::memoryHistory)};
+  command_map _COMMAND_MAP{
+      pair("bell", &ScreenShell::bell),
+      pair("cd", &ScreenShell::changeDir),
+      pair("clear", &ScreenShell::clearScreen),
+      pair("configure", &ScreenShell::configure),
+      pair("config", &ScreenShell::configure),
+      pair("ls", &ScreenShell::listChildren),
+      pair("lsconfig", &ScreenShell::listConfigVariables),
+      pair("nd", &ScreenShell::navigateDir),
+      pair("ndir", &ScreenShell::navigateDir),
+      pair("rainbow", &ScreenShell::rainbow),
+      pair("sc", &ScreenShell::shortcut),
+      pair("shortcut", &ScreenShell::shortcut),
+      pair("memory", &ScreenShell::printMemoryHistory),
+  };
+
+  command_map _SHELL_CONFIG_MAP{
+      pair("BG", &ScreenShell::configBackgroundColour),
+      pair("CURSOR", &ScreenShell::configCursor),
+      pair("CURSCOL", &ScreenShell::configCursorColour),
+      pair("DELETE", &ScreenShell::configDeleteKey),
+      pair("FG", &ScreenShell::configForegroundColour),
+      pair("THEME", &ScreenShell::configTheme)};
+
+  command_map _THEME_MAP{pair("invader", &ScreenShell::configThemeInvader),
+                         pair("ire", &ScreenShell::configThemeIre),
+                         pair("neptune", &ScreenShell::configThemeNeptune)};
 };
 
 } // namespace Trinkets
