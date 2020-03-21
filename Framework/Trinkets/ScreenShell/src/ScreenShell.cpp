@@ -257,7 +257,7 @@ void ScreenShell::logResult() {
     _COMMAND_HISTORY.pop_front();
 
   // add to virtual history buffer;
-  if (!_LAST_COMMAND.empty())
+  if (!_LAST_COMMAND.empty() && _LAST_COMMAND != "memory")
     _COMMAND_HISTORY.push_front(_LAST_COMMAND);
 }
 
@@ -595,8 +595,10 @@ std::vector<std::string> ScreenShell::argv() const { return _ARGV; }
 
 int ScreenShell::memoryHistory() {
   if (!_COMMAND_HISTORY.empty()) {
-    for (auto const &command : _COMMAND_HISTORY) {
-      printw("%s\n", command.c_str());
+    for (std::deque<std::string>::const_iterator command =
+             _COMMAND_HISTORY.end();
+         command != _COMMAND_HISTORY.begin(); command--) {
+      printw("%s\n", command->c_str());
     }
   }
   return 0;
