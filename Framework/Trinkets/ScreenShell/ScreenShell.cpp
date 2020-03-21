@@ -55,5 +55,5 @@ int main() {
     }
   }
 
-  return ExitStatus::USER_EXIT;
+  return RESULT::EXIT;
 }

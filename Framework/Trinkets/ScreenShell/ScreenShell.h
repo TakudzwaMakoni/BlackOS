@@ -65,7 +65,18 @@ typedef std::pair<std::string, command> pair;
 typedef std::map<std::string, command> command_map;
 
 enum class PipeRedirect { PIPE, REDIRECT, NEITHER };
-enum ExitStatus { ERROR = -1, USER_EXIT };
+
+enum RESULT {
+  LAUNCH_FAILURE, // program failed to launch
+  ABORT,          // call to abort program
+  EXIT,           // user call to end program
+  SUCCESS = 0,    // return function succeeded
+  FAILURE,        // return function failed
+  BAD_USAGE,      // return bad user input
+  NO_INPUT,       // no user input
+  END_OF_PROCESS  // process has ended
+};
+
 enum UserInput { UP = -2, DOWN };
 enum standardColours {
   BLACK = 30,
@@ -91,7 +102,7 @@ using Window_sptr = std::shared_ptr<DisplayKernel::Window>;
 
 Screen_sptr generateScreen();
 Window_sptr generateWindow();
-void vectorToNullArray(std::vector<std::string> const &v, char **a);
+std::vector<char *> nullTerminatedArgV(std::vector<std::string> const &v);
 
 class ScreenShell {
 
@@ -180,6 +191,14 @@ public:
   int configThemeIre();
   ///
   int configThemeNeptune();
+  ///
+  int configThemeClassic();
+  ///
+  int configThemeThinkPad();
+  ///
+  int configThemeAntiClassic();
+  ///
+  int configThemeSystem();
 
   ~ScreenShell();
 
@@ -251,9 +270,14 @@ private:
       pair("FG", &ScreenShell::configForegroundColour),
       pair("THEME", &ScreenShell::configTheme)};
 
-  command_map _THEME_MAP{pair("invader", &ScreenShell::configThemeInvader),
-                         pair("ire", &ScreenShell::configThemeIre),
-                         pair("neptune", &ScreenShell::configThemeNeptune)};
+  command_map _THEME_MAP{
+      pair("invader", &ScreenShell::configThemeInvader),
+      pair("ire", &ScreenShell::configThemeIre),
+      pair("neptune", &ScreenShell::configThemeNeptune),
+      pair("classic", &ScreenShell::configThemeClassic),
+      pair("anticlassic", &ScreenShell::configThemeAntiClassic),
+      pair("thinkpad", &ScreenShell::configThemeThinkPad),
+      pair("system", &ScreenShell::configThemeSystem)};
 };
 
 } // namespace Trinkets

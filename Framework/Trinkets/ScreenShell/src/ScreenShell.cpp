@@ -39,17 +39,13 @@ Window_sptr generateWindow() {
   return window;
 }
 
-/// convert a vectot of std::string arguments to  char**
-void vectorToNullArray(std::vector<std::string> const &v, char **a) {
-  int i = 0;
-  while (i < v.size()) {
-    std::string str = v[i];
-    char *cstr = new char[str.size() + 1];
-    strcpy(cstr, str.c_str());
-    a[i] = cstr;
-    i++;
+std::vector<char *> nullTerminatedArgV(std::vector<std::string> const &v) {
+  std::vector<char *> result;
+  for (auto const &s : v) {
+    result.push_back(const_cast<char *>(s.c_str()));
   }
-  a[i] = nullptr;
+  result.push_back(nullptr);
+  return result;
 }
 
 /// executes the visual bell in screen
@@ -119,9 +115,6 @@ int ScreenShell::configThemeInvader() {
     return 1;
   }
 
-  std::string argv1 = _ARGV[1];
-  std::string argv2 = _ARGV[2];
-
   _FOREGROUND = COLOR_GREEN;
   _BACKGROUND = COLOR_BLACK;
   _CURSOR_COLOUR = "green";
@@ -131,6 +124,8 @@ int ScreenShell::configThemeInvader() {
 
   init_pair(1, _FOREGROUND, _BACKGROUND);
   bkgd(COLOR_PAIR(1));
+
+  _USING_COLOR_FLAG = 1;
 
   refresh();
 
@@ -146,9 +141,6 @@ int ScreenShell::configThemeIre() {
     return 1;
   }
 
-  std::string argv1 = _ARGV[1];
-  std::string argv2 = _ARGV[2];
-
   _FOREGROUND = COLOR_RED;
   _BACKGROUND = COLOR_BLACK;
   _CURSOR_COLOUR = "red";
@@ -158,6 +150,86 @@ int ScreenShell::configThemeIre() {
 
   init_pair(1, _FOREGROUND, _BACKGROUND);
   bkgd(COLOR_PAIR(1));
+
+  _USING_COLOR_FLAG = 1;
+
+  refresh();
+
+  return 0;
+}
+
+int ScreenShell::configThemeClassic() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  _FOREGROUND = COLOR_WHITE;
+  _BACKGROUND = COLOR_BLACK;
+  _CURSOR_COLOUR = "white";
+
+  printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
+  fflush(stdout);
+
+  init_pair(1, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+
+  _USING_COLOR_FLAG = 1;
+
+  refresh();
+
+  return 0;
+}
+
+int ScreenShell::configThemeThinkPad() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  _FOREGROUND = COLOR_WHITE;
+  _BACKGROUND = COLOR_BLACK;
+  _CURSOR_COLOUR = "red";
+
+  printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
+  fflush(stdout);
+
+  init_pair(1, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+
+  _USING_COLOR_FLAG = 1;
+
+  refresh();
+
+  return 0;
+}
+
+int ScreenShell::configThemeAntiClassic() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  _FOREGROUND = COLOR_BLACK;
+  _BACKGROUND = COLOR_WHITE;
+  _CURSOR_COLOUR = "black";
+
+  printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
+  fflush(stdout);
+
+  init_pair(1, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+
+  _USING_COLOR_FLAG = 1;
 
   refresh();
 
@@ -173,9 +245,6 @@ int ScreenShell::configThemeNeptune() {
     return 1;
   }
 
-  std::string argv1 = _ARGV[1];
-  std::string argv2 = _ARGV[2];
-
   _FOREGROUND = COLOR_WHITE;
   _BACKGROUND = COLOR_BLUE;
   _CURSOR_COLOUR = "white";
@@ -185,6 +254,33 @@ int ScreenShell::configThemeNeptune() {
 
   init_pair(1, _FOREGROUND, _BACKGROUND);
   bkgd(COLOR_PAIR(1));
+
+  _USING_COLOR_FLAG = 1;
+
+  refresh();
+
+  return 0;
+}
+
+int ScreenShell::configThemeSystem() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  _FOREGROUND = -1;
+  _BACKGROUND = -1;
+  _CURSOR_COLOUR = "white";
+
+  printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
+  fflush(stdout);
+
+  bkgd(COLOR_PAIR(0));
+
+  _USING_COLOR_FLAG = 0;
 
   refresh();
 
@@ -812,8 +908,9 @@ void ScreenShell::runCommand() {
 
     // Fork our process
     pid = fork();
-    char **argvA;
-    vectorToNullArray(_ARGV, argvA);
+
+    std::vector<char *> argv = nullTerminatedArgV(_ARGV);
+    char **command = argv.data();
 
     // error
     if (pid < 0)
@@ -826,11 +923,11 @@ void ScreenShell::runCommand() {
 
       char cmd[100];
       strcpy(cmd, "/usr/bin/");
-      strcat(cmd, argvA[0]);
-      int result = execvp(cmd, argvA);
+      strcat(cmd, command[0]);
+      int result = execvp(cmd, command);
       perror("Fallback Shell");
 
-      exit(3); // duplicate child process is created.
+      exit(RESULT::END_OF_PROCESS); // duplicate child process is created.
 
     } else if (pid > 0) {
       // parent
@@ -850,19 +947,19 @@ ScreenShell::ScreenShell(Screen_sptr &display) {
 
   if (path == nullptr) {
     std::cout << "no PATH environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
+    exit(RESULT::LAUNCH_FAILURE);
   }
   if (term == nullptr) {
     std::cout << "no TERM environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
+    exit(RESULT::LAUNCH_FAILURE);
   }
   if (shell == nullptr) {
     std::cout << "no SHELL environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
+    exit(RESULT::LAUNCH_FAILURE);
   }
   if (home == nullptr) {
     std::cout << "no HOME environment variable is set." << std::endl;
-    exit(ExitStatus::ERROR);
+    exit(RESULT::LAUNCH_FAILURE);
   }
 
   _PATH = path;
