@@ -64,22 +64,23 @@ void ScreenShell::splashScreen(std::vector<std::string> const &argv) {
   author = argv[6] + spc;
   git = argv[7] + spc;
 
-  std::string pushDown((_termSzY - 8 /*banner height*/) / 2, '\n');
+  std::string pushDown((_TERM_SIZE_Y - 8 /*banner height*/) / 2, '\n');
   printw(pushDown.c_str());
 
-  printw(produceBanner(marginline, _termSzX).c_str());
-  printw("\n");
-  printw(produceBanner(title + "v" + version + ", " + repo, _termSzX).c_str());
+  printw(produceBanner(marginline, _TERM_SIZE_X).c_str());
   printw("\n");
   printw(
-      produceBanner(license + year + ", " + "written in " + language, _termSzX)
-          .c_str());
+      produceBanner(title + "v" + version + ", " + repo, _TERM_SIZE_X).c_str());
   printw("\n");
-  printw(produceBanner("by " + author, _termSzX).c_str());
+  printw(produceBanner(license + year + ", " + "written in " + language,
+                       _TERM_SIZE_X)
+             .c_str());
   printw("\n");
-  printw(produceBanner("git: " + git, _termSzX).c_str());
+  printw(produceBanner("by " + author, _TERM_SIZE_X).c_str());
   printw("\n");
-  printw(produceBanner(marginline, _termSzX).c_str());
+  printw(produceBanner("git: " + git, _TERM_SIZE_X).c_str());
+  printw("\n");
+  printw(produceBanner(marginline, _TERM_SIZE_X).c_str());
   printw("\n");
 }
 

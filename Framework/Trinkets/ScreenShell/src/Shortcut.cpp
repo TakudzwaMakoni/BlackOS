@@ -34,10 +34,10 @@ int ScreenShell::shortcut() {
 
   int y, x;
 
-  if (_cursorY < 0 || _cursorY > _termSzY - 10)
-    y = _termSzY / 2;
+  if (_CURSOR_Y < 0 || _CURSOR_Y > _TERM_SIZE_Y - 10)
+    y = _TERM_SIZE_Y / 2;
   else
-    y = _cursorY;
+    y = _CURSOR_Y;
 
   // uncomment if using externally specified window position
 
@@ -53,7 +53,8 @@ int ScreenShell::shortcut() {
   std::string hiddenAttribute = "showing hidden paths: ";
 
   // create menu object
-  BlackOS::DisplayKernel::Menu ShortcutMenu(_termSzY - y, _termSzX, y, 0);
+  BlackOS::DisplayKernel::Menu ShortcutMenu(_TERM_SIZE_Y - y, _TERM_SIZE_X, y,
+                                            0);
 
   // load shortcuts
   int maxNameLen = 0;
@@ -104,13 +105,13 @@ int ScreenShell::shortcut() {
     ShortcutMenu.refresh(); // present message to screen
     ShortcutMenu.pause();
     ShortcutMenu.setWin(0);
-    move(_cursorY, 0);
+    move(_CURSOR_Y, 0);
     refresh();
     return 0;
   }
 
   menuWidth = maxDirLen + maxNameLen + 1;
-  menuHeight = _termSzY - y - 2;
+  menuHeight = _TERM_SIZE_Y - y - 2;
   pagination = menuHeight - 1;
 
   ShortcutMenu.loadTitle(title, BlackOS::DisplayKernel::TextStyle::underline);
@@ -137,7 +138,7 @@ int ScreenShell::shortcut() {
     ShortcutMenu.clear();
     ShortcutMenu.refresh();
     ShortcutMenu.setWin(0);
-    move(_cursorY, 0);
+    move(_CURSOR_Y, 0);
     refresh();
     return 0; // leave here
   } else if (lastKey == (int)'d' /*begin navigateDir into dir*/) {
@@ -149,7 +150,7 @@ int ScreenShell::shortcut() {
     _ARGV = {"nd", chosenPath};
     _ARGC = 2;
     navigateDir();
-    move(_cursorY, 0);
+    move(_CURSOR_Y, 0);
     refresh();
     return 0;
   } else {
@@ -161,7 +162,7 @@ int ScreenShell::shortcut() {
     _ARGV = {"cd", chosenPath};
     _ARGC = 2;
     changeDir();
-    move(_cursorY, 0);
+    move(_CURSOR_Y, 0);
     refresh();
     return 0;
   }

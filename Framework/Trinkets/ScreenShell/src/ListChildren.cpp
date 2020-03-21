@@ -28,9 +28,9 @@ namespace Trinkets {
 
 namespace {
 void usageListChildren() {
-  std::cout << "Usage:\n"
-            << "ls [options] <path>\n"
-            << "options:\n'-a' : show hidden\n";
+  printw("Usage:\n"
+         "ls [options] <path>\n"
+         "options:\n'-a' : show hidden\n");
 }
 } // namespace
 
@@ -114,7 +114,6 @@ int ScreenShell::listChildren() {
   }
   printw("\n");
   refresh();
-
   return 0;
 }
 } // namespace Trinkets

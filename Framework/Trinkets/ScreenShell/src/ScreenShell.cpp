@@ -117,18 +117,68 @@ ScreenShell::ScreenShell(Screen_sptr &display) {
   _CONFIG_FILE = _HOME + "/.tr/config.txt";
   _SHELL_ENV_FILE = _HOME + "/.tr/environment.txt";
   _SHORTCUTS_FILE = _HOME + "/.tr/shortcuts.txt";
+  _HISTORY_FILE = _HOME + "/.tr/history.txt";
+
+  // refresh history on startup
+  std::ofstream outfile;
+  outfile.open(_HISTORY_FILE, std::ios_base::trunc);
+  outfile.close();
 
   auto const termSz = DisplayKernel::TERMINAL_SIZE();
 
-  _display = display;
-  _termSzY = termSz[0];
-  _termSzX = termSz[1];
+  _DISPLAY = display;
+  _TERM_SIZE_Y = termSz[0];
+  _TERM_SIZE_X = termSz[1];
 }
 
-void clearDisplay() {}
+int ScreenShell::rainbow() {
+  auto start = std::chrono::system_clock::now();
+  auto end = std::chrono::system_clock::now();
+  while (
+      (std::chrono::duration_cast<std::chrono::seconds>(end - start).count() !=
+       1)) {
+    end = std::chrono::system_clock::now();
+    init_pair(1, COLOR_BLACK, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+    usleep(50000);
+    init_pair(1, COLOR_WHITE, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+    usleep(50000);
+    init_pair(1, COLOR_RED, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+    usleep(50000);
+    init_pair(1, COLOR_GREEN, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+    usleep(50000);
+    init_pair(1, COLOR_YELLOW, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+    usleep(50000);
+    init_pair(1, COLOR_BLUE, _BACKGROUND);
+    bkgd(COLOR_PAIR(1));
+    refresh();
+  }
+
+  init_pair(1, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+
+  return 0;
+}
+
+void ScreenShell::appendTofile(std::filesystem::path const &path,
+                               std::string const &data) {
+  std::ofstream outfile;
+  outfile.open(path, std::ios_base::app);
+  outfile << data + '\n';
+  outfile.close();
+}
 
 void ScreenShell::initShell() {
-  _display->setWin(1);
+  _DISPLAY->setWin(1);
 
   noecho();
   scrollok(stdscr, TRUE);
@@ -198,29 +248,38 @@ int ScreenShell::initEnvironmentVariables() {
   return 0;
 }
 
+void ScreenShell::logResult() {
+
+  // log last command to history file
+  appendTofile(_HISTORY_FILE, _LAST_COMMAND);
+
+  if (_COMMAND_HISTORY.size() == _MAX_MEMORY_HISTORY - 1)
+    _COMMAND_HISTORY.pop_front();
+
+  // add to virtual history buffer;
+  if (!_LAST_COMMAND.empty())
+    _COMMAND_HISTORY.push_front(_LAST_COMMAND);
+}
+
 void ScreenShell::displayPrompt() {
-  if (_TTY_FLAG_FALLBACK) {
-    system("stty -echo -icanon");
-    _TTY_FLAG_FALLBACK = 0;
-  }
 
   curs_set(_CURSOR);
-  char buf[MAX_ARGS];
+  char buf[_MAX_ARGS];
   getcwd(buf, sizeof buf);
   noecho();
 
   std::string prompt = buf;
   prompt = "Tr " + prompt + "> ";
-  _promptLen = prompt.length();
+  _PROMPT_LEN = prompt.length();
   printw(prompt.c_str());
   logCursorPosition();
 }
 
-size_t ScreenShell::cursorY() const { return _cursorY; }
+size_t ScreenShell::cursorY() const { return _CURSOR_Y; }
 
-size_t ScreenShell::cursorX() const { return _cursorY; }
+size_t ScreenShell::cursorX() const { return _CURSOR_Y; }
 
-void ScreenShell::logCursorPosition() { getsyx(_cursorY, _cursorX); }
+void ScreenShell::logCursorPosition() { getsyx(_CURSOR_Y, _CURSOR_X); }
 
 int ScreenShell::configureShell(std::string const &argv1,
                                 std::string const &argv2) {
@@ -434,7 +493,12 @@ void ScreenShell::resetArgs() {
 int ScreenShell::readArgs() {
   keypad(stdscr, TRUE);
   std::string line;
+  std::string userLine;
+
   char ch;
+  int memorySz = _COMMAND_HISTORY.size();
+  int historyCounter = -1;
+
   do {
     ch = getch();
     if (ch == '\n') {
@@ -443,7 +507,7 @@ int ScreenShell::readArgs() {
                (int)ch == KEY_BACKSPACE || (int)ch == KEY_DC ||
                (int)ch == 127) {
       logCursorPosition();
-      if (_cursorX > _promptLen) {
+      if (_CURSOR_X > _PROMPT_LEN) {
         printw("\b");
         delch();
         refresh();
@@ -452,12 +516,22 @@ int ScreenShell::readArgs() {
         line.pop_back();
       }
     } else if ((int)ch == 27 || (int)ch == KEY_UP || (int)ch == 3) {
-      printw("\n");
-      refresh();
-      return UserInput::UP;
+      if (!_COMMAND_HISTORY.empty()) {
+        if (historyCounter + 1 < memorySz) {
+          historyCounter++;
+          logCursorPosition();
+          std::string fromMemory = _COMMAND_HISTORY[historyCounter];
+          _DISPLAY->erase(_CURSOR_Y, _PROMPT_LEN, _CURSOR_Y, _TERM_SIZE_X - 1);
+          _DISPLAY->insert(fromMemory, _CURSOR_Y, _PROMPT_LEN);
+
+          line = fromMemory;
+
+          refresh();
+        }
+      }
     } else if ((int)ch == KEY_LEFT || (int)ch == 4) {
       logCursorPosition();
-      if (_cursorX > _promptLen) {
+      if (_CURSOR_X > _PROMPT_LEN) {
         printw("\b");
         refresh();
       }
@@ -465,22 +539,45 @@ int ScreenShell::readArgs() {
       auto const termSz = DisplayKernel::TERMINAL_SIZE();
       size_t const COLS = termSz[1];
       logCursorPosition();
-      if (_cursorX < COLS) {
-        move(_cursorY, _cursorX + 1);
+      if (_CURSOR_X < COLS) {
+        move(_CURSOR_Y, _CURSOR_X + 1);
         refresh();
       }
     } else if ((int)ch == KEY_DOWN || (int)ch == 2) {
-      printw("\n");
-      refresh();
-      return UserInput::DOWN;
+      if (!_COMMAND_HISTORY.empty()) {
+        logCursorPosition();
+
+        if (historyCounter >= 0) {
+          historyCounter--;
+          std::string fromMemory = _COMMAND_HISTORY[historyCounter];
+          _DISPLAY->erase(_CURSOR_Y, _PROMPT_LEN, _CURSOR_Y, _TERM_SIZE_X - 1);
+          _DISPLAY->insert(fromMemory, _CURSOR_Y, _PROMPT_LEN);
+
+          line = fromMemory;
+
+          refresh();
+        } else if (historyCounter < 0) {
+          historyCounter = -1;
+          _DISPLAY->erase(_CURSOR_Y, _PROMPT_LEN, _CURSOR_Y, _TERM_SIZE_X - 1);
+          _DISPLAY->insert(userLine, _CURSOR_Y, _PROMPT_LEN);
+
+          line = userLine;
+
+          refresh();
+        }
+      }
     } else {
       addch(ch);
       logCursorPosition();
       refresh();
       line += ch;
+      userLine = line;
     }
 
   } while (1);
+
+  // store last command entered.
+  _LAST_COMMAND = line;
 
   // tokenize the string
   std::stringstream ss(line);
@@ -496,6 +593,15 @@ int ScreenShell::readArgs() {
 
 std::vector<std::string> ScreenShell::argv() const { return _ARGV; }
 
+int ScreenShell::memoryHistory() {
+  if (!_COMMAND_HISTORY.empty()) {
+    for (auto const &command : _COMMAND_HISTORY) {
+      printw("%s\n", command.c_str());
+    }
+  }
+  return 0;
+}
+
 int ScreenShell::execute() {
 
   cmap::const_iterator x;
@@ -505,15 +611,14 @@ int ScreenShell::execute() {
     (this->*(x->second))(); // call using pointer
     return 0;
   } else {
-    tcgetattr(STDIN_FILENO, &_oldt); /*store old settings */
-    _newt = _oldt;                   /* copy old settings to new settings */
-    _newt.c_oflag |= (ONLCR);
-    _newt.c_lflag &=
-        ~(ICANON | ECHO |
-          ONLCR); /* make one change to old settings in new settings */
-    tcsetattr(STDIN_FILENO, TCSANOW,
-              &_newt); /*apply the new settings immediatly */
-    _TTY_FLAG_FALLBACK = 1;
+    tcgetattr(STDIN_FILENO, &_OLDT); /*store old settings */
+    //_NEWT = _OLDT;                   /* copy old settings to new settings */
+    //_NEWT.c_oflag |= (ONLCR);
+    //_NEWT.c_lflag &= ~(ICANON | ECHO); /* make one change to old
+    //                 settings in new settings */
+    // tcsetattr(STDIN_FILENO, TCSANOW,
+    //          &_NEWT); /*apply the new settings immediatly */
+    system("stty sane");
     return 1;
   }
 }
@@ -554,16 +659,13 @@ void ScreenShell::runCommand(std::vector<std::string> const &argv) {
     } else if (pid > 0) {
       // parent
       waitpid(pid, NULL, 0);
-      printw("%s\n", "Fallback Shell: process complete.");
-      tcsetattr(STDIN_FILENO, TCSANOW, &_oldt); /*reapply the old settings */
-      _display->pause();
-      bell();
+      tcsetattr(STDIN_FILENO, TCSANOW, &_OLDT); /*reapply the old settings */
     }
   }
 }
 
 ScreenShell::~ScreenShell() {
-  _display->setWin(0);
+  _DISPLAY->setWin(0);
   std::cout << "\nexited Tr.\n";
 }
 

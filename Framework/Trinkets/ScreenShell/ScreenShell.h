@@ -25,10 +25,12 @@
 #include "Screen.h"
 #include "Window.h"
 
-//#include <../../External/inc/pstream.h>
 #include <cctype>
 #include <cerrno>
+#include <chrono>
+#include <condition_variable>
 #include <cstring>
+#include <deque>
 #include <fcntl.h>
 #include <filesystem>
 #include <fstream>
@@ -44,6 +46,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <termios.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 
@@ -52,7 +55,6 @@ namespace Trinkets {
 
 class ScreenShell;
 
-int const MAX_ARGS = 1024;
 static char const *CLEAR_SCREEN_ANSI = "\e[0;0H\e[2J";
 
 /// command type
@@ -116,7 +118,15 @@ public:
   int initShellVariables();
   ///
   void resetArgs();
-
+  ///
+  void appendTofile(std::filesystem::path const &, std::string const &);
+  ///
+  void logResult();
+  ///
+  int rainbow();
+  ///
+  int memoryHistory();
+  ///
   std::vector<std::string> argv() const;
   ///
   int initEnvironmentVariables();
@@ -153,16 +163,19 @@ public:
   ~ScreenShell();
 
 private:
+  // constants
+  int const _MAX_ARGS = 1024;
+  int const _MAX_MEMORY_HISTORY = 50;
+
   // display variables
-  Screen_sptr _display;
-  std::string _displayType;
-  size_t _cursorY = 0;
-  size_t _cursorX = 0;
-  size_t _promptLen;
-  size_t _termSzY;
-  size_t _termSzX;
-  struct termios _oldt;
-  struct termios _newt;
+  Screen_sptr _DISPLAY;
+  size_t _CURSOR_Y = 0;
+  size_t _CURSOR_X = 0;
+  size_t _PROMPT_LEN;
+  size_t _TERM_SIZE_Y;
+  size_t _TERM_SIZE_X;
+  struct termios _OLDT;
+  struct termios _NEWT;
 
   // environment variables
   std::string _PATH;
@@ -183,10 +196,15 @@ private:
   std::filesystem::path _CONFIG_FILE;
   std::filesystem::path _SHELL_ENV_FILE;
   std::filesystem::path _SHORTCUTS_FILE;
+  std::filesystem::path _HISTORY_FILE;
   bool _TTY_FLAG_FALLBACK = 0;
   bool _USING_COLOR_FLAG = 0;
   bool _COLOUR_SUPPORT;
+  std::string _LAST_COMMAND;
+  std::string _TIME_OF_LAST_COMMAND;
+  std::string _RESULT_OF_LAST_COMMAND;
   std::vector<std::string> _ARGV;
+  std::deque<std::string> _COMMAND_HISTORY;
   int _ARGC;
   cmap _COMMAND_MAP{pair("bell", &ScreenShell::bell),
                     pair("cd", &ScreenShell::changeDir),
@@ -197,8 +215,10 @@ private:
                     pair("lsconfig", &ScreenShell::listConfigVariables),
                     pair("nd", &ScreenShell::navigateDir),
                     pair("ndir", &ScreenShell::navigateDir),
+                    pair("rainbow", &ScreenShell::rainbow),
                     pair("sc", &ScreenShell::shortcut),
-                    pair("shortcut", &ScreenShell::shortcut)};
+                    pair("shortcut", &ScreenShell::shortcut),
+                    pair("memory", &ScreenShell::memoryHistory)};
 };
 
 } // namespace Trinkets

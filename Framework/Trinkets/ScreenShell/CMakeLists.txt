@@ -37,3 +37,4 @@ find_package(fmt) # ListChildren, NavigateDir
             )
         target_link_libraries(Tr DisplayKernel)
         target_link_libraries(Tr fmt::fmt)
+        target_link_libraries(Tr pthread)

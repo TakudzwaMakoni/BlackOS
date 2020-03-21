@@ -33,6 +33,7 @@ int main() {
 
   // use stdscreen
   auto display = generateScreen();
+  display->hideBorder();
 
   ScreenShell shell(display);
   shell.initShell();
@@ -49,6 +50,7 @@ int main() {
         break;
 
       shell.runCommand(argv); // neither
+      shell.logResult();
       shell.resetArgs();
     }
   }

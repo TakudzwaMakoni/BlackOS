@@ -30,9 +30,9 @@ namespace Trinkets {
 namespace {
 
 void usageNavigateDir() {
-  std::cout << "Usage:\n"
-            << "ndir [options] <path>\n"
-            << "options:\n'-a' : show hidden\n";
+  printw("Usage:\n"
+         "ndir [options] <path>\n"
+         "options:\n'-a' : show hidden\n");
 }
 } // namespace
 
@@ -45,10 +45,10 @@ int ScreenShell::navigateDir() {
 
   int y, x;
 
-  if (_cursorY < 0 || _cursorY > _termSzY - 10)
-    y = _termSzY / 2;
+  if (_CURSOR_Y < 0 || _CURSOR_Y > _TERM_SIZE_Y - 10)
+    y = _TERM_SIZE_Y / 2;
   else
-    y = _cursorY;
+    y = _CURSOR_Y;
 
   // uncomment if using externally specified window position
 
@@ -68,7 +68,7 @@ int ScreenShell::navigateDir() {
         initPath = std::filesystem::current_path();
       } else {
         usageNavigateDir();
-        move(_cursorY, 0);
+        move(_CURSOR_Y, 0);
         refresh();
         return 2;
       }
@@ -126,10 +126,11 @@ int ScreenShell::navigateDir() {
   std::string hiddenAttribute = "showing hidden paths: ";
 
   // create menu object
-  BlackOS::DisplayKernel::Menu NavigationMenu(_termSzY - y, _termSzX, y, 0);
+  BlackOS::DisplayKernel::Menu NavigationMenu(_TERM_SIZE_Y - y, _TERM_SIZE_X, y,
+                                              0);
 
   // create new window object
-  BlackOS::DisplayKernel::Window CurrentDirWindow(1, _termSzX, y, 0);
+  BlackOS::DisplayKernel::Window CurrentDirWindow(1, _TERM_SIZE_X, y, 0);
 
   // create path navigator object;
   PathController pathController;
@@ -157,7 +158,7 @@ int ScreenShell::navigateDir() {
         // user initialised parent directory without access
         NavigationMenu.setWin(0);
         CurrentDirWindow.setWin(0);
-        move(_cursorY, 0);
+        move(_CURSOR_Y, 0);
         refresh();
         return -1; // leave here TODO: exit codes
       } else {
@@ -175,11 +176,11 @@ int ScreenShell::navigateDir() {
 
     // include 1 additional space.
     menuWidth = title.length() + 1;
-    menuHeight = _termSzY - y - 2;
+    menuHeight = _TERM_SIZE_Y - y - 2;
     pagination = menuHeight - 3;
 
     NavigationMenu.resize(menuHeight, menuWidth);
-    NavigationMenu.reposition(y + 2 /*maintain cursor _cursorY position*/,
+    NavigationMenu.reposition(y + 2 /*maintain cursor _CURSOR_Y position*/,
                               0 /*left of screen*/);
 
     if (fieldSz == 0) {
@@ -240,7 +241,7 @@ int ScreenShell::navigateDir() {
       CurrentDirWindow.clear();
       NavigationMenu.setWin(0);
       CurrentDirWindow.setWin(0);
-      move(_cursorY, 0);
+      move(_CURSOR_Y, 0);
       refresh();
       return 0; // leave here
     } else if (lastKey == (int)'a' /*out of directory*/) {
@@ -296,7 +297,7 @@ int ScreenShell::navigateDir() {
       _ARGV = {"sc"};
       _ARGC = 1;
       shortcut();
-      move(_cursorY, 0);
+      move(_CURSOR_Y, 0);
       refresh();
       return 0;
     } else {
@@ -325,7 +326,7 @@ int ScreenShell::navigateDir() {
       }
     }
   }
-  move(_cursorY, 0);
+  move(_CURSOR_Y, 0);
   refresh();
   return 0;
 }
