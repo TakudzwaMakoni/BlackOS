@@ -1,7 +1,3 @@
-![](media/BlackOSLogo.png)
-
-BlackOS (C) is an ODH project which attempts to make the terminal more UI friendly. It introduces packages such as DisplayKernel and Trinkets, The former is an API for developing a Text based UI using the DisplayKernel Library, the latter is a feature rich C++ shell superposed onto the default shell. Both projects are open source and available via GPL v3.0.
-
 # Trinkets
 
 ![](media/TrLogo.png)
