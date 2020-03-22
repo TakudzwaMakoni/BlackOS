@@ -1,2 +1,4 @@
 theme: jekyll-theme-minimal
 title: BlackOS Info Page
+timezone: Europe/london
+future: true
