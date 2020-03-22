@@ -14,7 +14,7 @@ start the Tr shell
 
 ![](media/tr-ls.gif)
 
-listed items in aperent directory with file information
+listed items in a parent directory with file information
 
 ![](media/nd-cd.gif)
 
