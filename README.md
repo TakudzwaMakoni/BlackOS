@@ -32,4 +32,4 @@ configure shell settings on startup
 
 ![](change-themes.gif)
 
-customize the terminal
+customise the terminal

@@ -198,6 +198,8 @@ public:
   ///
   int configThemeAntiClassic();
   ///
+  int configThemeUgly();
+  ///
   int configThemeSystem();
 
   ~ScreenShell();
@@ -277,7 +279,8 @@ private:
       pair("classic", &ScreenShell::configThemeClassic),
       pair("anticlassic", &ScreenShell::configThemeAntiClassic),
       pair("thinkpad", &ScreenShell::configThemeThinkPad),
-      pair("system", &ScreenShell::configThemeSystem)};
+      pair("system", &ScreenShell::configThemeSystem),
+      pair("ugly", &ScreenShell::configThemeUgly)};
 };
 
 } // namespace Trinkets

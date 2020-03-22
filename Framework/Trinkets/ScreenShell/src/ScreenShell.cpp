@@ -287,6 +287,32 @@ int ScreenShell::configThemeSystem() {
   return 0;
 }
 
+int ScreenShell::configThemeUgly() {
+
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "config/configure <arg1> <arg2>\n"
+           "options:\n'CURSOR' [int: 0 - 2]\n'DELETE' [int 0-127]\n");
+    return 1;
+  }
+
+  _FOREGROUND = COLOR_BLACK;
+  _BACKGROUND = COLOR_YELLOW;
+  _CURSOR_COLOUR = "black";
+
+  printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
+  fflush(stdout);
+
+  init_pair(1, _FOREGROUND, _BACKGROUND);
+  bkgd(COLOR_PAIR(1));
+
+  _USING_COLOR_FLAG = 1;
+
+  refresh();
+
+  return 0;
+}
+
 /// alternate colours in screen
 int ScreenShell::rainbow() {
   auto start = std::chrono::system_clock::now();
