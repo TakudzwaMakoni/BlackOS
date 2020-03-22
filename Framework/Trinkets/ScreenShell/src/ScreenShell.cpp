@@ -340,6 +340,8 @@ void ScreenShell::initShell() {
   _DISPLAY->setWin(1);
 
   noecho();
+  noraw();
+  cbreak();
   scrollok(stdscr, TRUE);
   curs_set(_CURSOR);
 
