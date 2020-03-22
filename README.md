@@ -1,3 +1,7 @@
+![](media/BlackOSLogo.png)
+
+BlackOS is an ODH project which attempts to make shellsurfing more UI friendly. It introduces a collection of methods for developing a Text based UI in the DisplayKernel Library, available open source via GPL v3. DisplayKernel used by the Trinkets shell to integrate some Ncurses based UI features into a c++ shell.
+
 ![](media/start-tr.gif)
 
 start the Tr shell
