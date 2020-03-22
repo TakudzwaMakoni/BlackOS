@@ -43,3 +43,8 @@ configure shell settings on startup
 ![](media/change-themes.gif)
 
 customise the terminal
+
+![](media/DisplayKernelLogo.png)
+
+The DisplayKernel (C) API features Methods for creating c++ programs with a terminal-based User Interface.
+
