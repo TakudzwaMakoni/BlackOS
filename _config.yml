@@ -1,2 +1,4 @@
 theme: jekyll-theme-minimal
 logo: BlackOSLogo.png
+title: Operation Dark Horse (ODH)
+description: Operation Dark Horse is a project containing a series of terminal programs written in C++, including BlackOS, DisplayKernel, and Trinkets
