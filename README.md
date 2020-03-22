@@ -25,3 +25,11 @@ navigate through many files within a path with pagination feature
 ![](sc-add.gif)
 
 create shortcut paths to jump to using shortcut command
+
+![](configure-on-startup.gif)
+
+configure shell settings on startup
+
+![](change-themes.gif)
+
+customize the terminal
