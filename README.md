@@ -1,3 +1,6 @@
+BlackOS is currently comprised of the Trinkets shell and the DisplayKernel library detailed below, but there are other ideas that i want to entertain (so if you would like to collaborate, let me know please). That aside, there are many features and fixes to be added to both (so if you would like to collaborate: please, let me know).
+
+Every once in a while i get an idea i want to try in some language. I had started calling them silly things like "Operation Dark Horse", which is really just the name handle for "cool stuff you can do in the terminal with C++". Operation Dark Horse is the successor to Operation FreedomFighter (OFF), the name handle for "cool stuff you can do with python". Originally i would just call projects freedomfighter and dark horse, though i started prepending "operation" to them, it will surely motivate me to actually try the ideas i come up with instead of never getting around to it (Now i use the code to distract myself from other important things), as well as it being my continued contribution to the ongoing commitment to lighten up. 
 ![](media/TrLogo.png)
 
 # ScreenShell
@@ -21,7 +24,7 @@ the built in command nd opens a UI window so that the user can navigate the file
 ![](media/nd-edit-files.gif)
 
 ### switch on 'show hidden items' option 
-![](media/d-hidden.gif)
+![](media/nd-hidden.gif)
 
 ### large number of files are automatically paginated
 ![](media/nd-paginate.gif)
