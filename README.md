@@ -1,8 +1,6 @@
-# Trinkets
-
 ![](media/TrLogo.png)
 
-## ScreenShell
+# ScreenShell
 
 Trinkets ScreenShell (C) is a fullscreen Trinkets shell which uses the DisplayKernel API to develop a powerful shellsurfing UI and a feature rich Terminal Shell superposed onto the default shell.
 
@@ -42,7 +40,6 @@ configure shell settings on startup
 
 customise the terminal
 
-# DisplayKernel
 
 ![](media/DisplayKernelLogo.png)
 
