@@ -4,20 +4,20 @@ Every once in a while i get an idea i want to try in some language. I had starte
 
 Projects like these help to keep me busy, because i have to do a little research, try new languages/features/packages, plan how im going to implement it, think of a name and make the logo etc. In short it's a very effective distraction. I mention that to clarify that this isnt by any means meant to be professional software developed for purpose by an experienced Engineer or Computer Scientist. The GPL v3 license may state it more explicitly:
 
-```
-  This Program is free software: you can redistribute
-  it and/or modify it under the terms of the GNU General Public
-  License as published by the Free Software Foundation, either
-  version 3 of the License, or (at your option) any later version.
- 
-  This Program is distributed in the hope that it will
-  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-  of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
- 
-  You should have received a copy of the GNU General Public License
-  along with This Program. If not, see <http://www.gnu.org/licenses/>.
- ```
+
+>  This Program is free software: you can redistribute
+>  it and/or modify it under the terms of the GNU General Public
+>  License as published by the Free Software Foundation, either
+>  version 3 of the License, or (at your option) any later version.
+> 
+>  This Program is distributed in the hope that it will
+>  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+>  of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+>  GNU General Public License for more details.
+> 
+>  You should have received a copy of the GNU General Public License
+>  along with This Program. If not, see <http://www.gnu.org/licenses/>.
+
 That being said, i do attempt to use the best practices possible with the knowledge and resources at my disposal, and i would welcome a contributor, or a constructive code review.
 
 ![](media/TrLogo.png)
