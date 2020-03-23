@@ -18,6 +18,7 @@ Projects like these help to keep me busy, because i have to do a little research
   You should have received a copy of the GNU General Public License
   along with This Program. If not, see <http://www.gnu.org/licenses/>.
  ```
+That being said, i do attempt to use the best practices possible with the knowledge and resources at my disposal, and i would welcome a contributor, or a constructive code review.
 
 ![](media/TrLogo.png)
 
