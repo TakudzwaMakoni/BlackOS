@@ -4,7 +4,7 @@ Every once in a while i get an idea i want to try in some language. I had starte
 
 Projects like these help to keep me busy, because i have to do a little research, try new languages/features/packages, plan how im going to implement it, think of a name and make the logo etc. In short it's a very effective distraction. I mention that to clarify that this isnt by any means meant to be professional software developed for purpose by an experienced Engineer or Computer Scientist. The GPL v3 license may state it more explicitly:
 
-"""
+```
   This Program is free software: you can redistribute
   it and/or modify it under the terms of the GNU General Public
   License as published by the Free Software Foundation, either
@@ -17,7 +17,7 @@ Projects like these help to keep me busy, because i have to do a little research
  
   You should have received a copy of the GNU General Public License
   along with This Program. If not, see <http://www.gnu.org/licenses/>.
- """
+ ```
 
 ![](media/TrLogo.png)
 
