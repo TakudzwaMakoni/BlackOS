@@ -1,11 +1,11 @@
-BlackOS is currently comprised of the Trinkets shell and the DisplayKernel library detailed below, there are other projects that i want to entertain in the future which i hope to add to ODH. That aside, there are many features and fixes to be added the existing projects (so if you would like to collaborate: please, let me know).
+BlackOS is currently comprised of the Trinkets shell and the DisplayKernel library detailed below, there are other projects that i want to entertain in the future which i hope to add to ODH. That aside, there are many features and fixes to be added to the existing projects.
 
 Every once in a while i get an idea i want to try in some language. I had started calling them silly things like "Operation Dark Horse", which is really just the name handle for "cool stuff you can do in the terminal with C++". Operation Dark Horse is the successor to Operation FreedomFighter (OFF), the name handle for "cool stuff you can do in the terminal with python". Originally i would just call projects freedomfighter and dark horse, though i started prepending "operation" to them, it will surely motivate me to actually try the ideas i come up with instead of never getting around to it (Now i use the code to distract myself from other important things), as well as it being my continued contribution to the ongoing commitment to lighten up. 
 ![](media/TrLogo.png)
 
 # ScreenShell
 
-Trinkets ScreenShell (C) is a fullscreen shell which uses the DisplayKernel API to develop a powerful shellsurfing UI and a feature rich Terminal Shell superposed onto the default shell. It is based on an earler project which was essentially a few bash and python shortcuts and tools while using the terminal.
+Trinkets ScreenShell (C) is a shell which uses the DisplayKernel API to develop a powerful shellsurfing UI and a feature rich Terminal Shell superposed onto the default shell. It is based on an earler project which was essentially a few bash and python shortcuts and tools while using the terminal. I hope to develop an equivalent WindowShell which can be used to create a subwindow shell, and an even lighter LineShell, which allows commands to be executed from within an entirely different BlackOS program. My intention is that the three implementations form as a whole the Trinkets SuperShell project.
 
 ## starting the shell
 After building from source, you can start the Trinkets Screenshell by running the binary Tr in Framework/Trinkets/ScreenShell.
