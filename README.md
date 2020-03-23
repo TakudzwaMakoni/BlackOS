@@ -1,6 +1,24 @@
 BlackOS is currently comprised of the Trinkets shell and the DisplayKernel library detailed below, there are other projects that i want to entertain in the future which i hope to add to ODH. That aside, there are many features and fixes to be added to the existing projects.
 
 Every once in a while i get an idea i want to try in some language. I had started calling them silly things like "Operation Dark Horse", which is really just the name handle for "cool stuff you can do in the terminal with C++". Operation Dark Horse is the successor to Operation FreedomFighter (OFF), the name handle for "cool stuff you can do in the terminal with python". Originally i would just call projects freedomfighter and dark horse, though i started prepending "operation" to them, it will surely motivate me to actually try the ideas i come up with instead of never getting around to it (Now i use the code to distract myself from other important things), as well as it being my continued contribution to the ongoing commitment to lighten up. 
+
+Projects like these help to keep me busy, because i have to do a little research, try new languages/features/packages, plan how im going to implement it, think of a name and make the logo etc. In short it's a very effective distraction. I mention that to clarify that this isnt by any means meant to be professional software developed for purpose by an experienced Engineer or Computer Scientist. The GPL v3 license may state it more explicitly:
+
+"""
+  This Program is free software: you can redistribute
+  it and/or modify it under the terms of the GNU General Public
+  License as published by the Free Software Foundation, either
+  version 3 of the License, or (at your option) any later version.
+ 
+  This Program is distributed in the hope that it will
+  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+  of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with This Program. If not, see <http://www.gnu.org/licenses/>.
+ """
+
 ![](media/TrLogo.png)
 
 # ScreenShell
