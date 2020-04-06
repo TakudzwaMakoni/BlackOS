@@ -1,5 +1,5 @@
 /**
- * Tr ScreenShell Clear
+ * Tr Shell
  *
  * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,14 +19,17 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../ScreenShell.h"
+#include "../Shell.h"
 
 namespace BlackOS {
 namespace Trinkets {
-int ScreenShell::clearScreen() {
-  clear();
-  move(0, 0);
+int Shell::listConfigVariables() {
+  printw("Background: %i\nForeground: %i\nCursor mode: %i\nCursor colour: "
+         "%s\nDelete: %i\n",
+         _BACKGROUND, _FOREGROUND, _CURSOR, _CURSOR_COLOUR.c_str(), _DELETE);
+
   return 0;
 }
+
 } // namespace Trinkets
 } // namespace BlackOS

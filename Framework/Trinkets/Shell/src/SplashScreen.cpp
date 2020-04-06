@@ -1,5 +1,5 @@
 /**
- * Tr ScreenShell
+ * Tr Shell
  *
  * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,7 +19,7 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../ScreenShell.h"
+#include "../Shell.h"
 
 namespace BlackOS {
 namespace Trinkets {
@@ -35,7 +35,7 @@ std::string produceBanner(std::string const &str, int winwidth) {
 
 } // namespace
 
-void ScreenShell::splashScreen(std::vector<std::string> const &argv) {
+void Shell::splashScreen(std::vector<std::string> const &argv) {
 
   std::string spc = " "; // space string for easier reading.
   std::string marginline =
@@ -64,24 +64,25 @@ void ScreenShell::splashScreen(std::vector<std::string> const &argv) {
   author = argv[6] + spc;
   git = argv[7] + spc;
 
-  std::string pushDown((_TERM_SIZE_Y - 8 /*banner height*/) / 2, '\n');
-  printw(pushDown.c_str());
+  for (int i = 0; i < (_TERM_SIZE_Y - 8 /*banner height*/) / 2; ++i)
+    _DISPLAY->newLine();
 
-  printw(produceBanner(marginline, _TERM_SIZE_X).c_str());
-  printw("\n");
-  printw(
+  _DISPLAY->print(produceBanner(marginline, _TERM_SIZE_X).c_str());
+  _DISPLAY->newLine();
+  _DISPLAY->print(
       produceBanner(title + "v" + version + ", " + repo, _TERM_SIZE_X).c_str());
-  printw("\n");
-  printw(produceBanner(license + year + ", " + "written in " + language,
-                       _TERM_SIZE_X)
-             .c_str());
-  printw("\n");
-  printw(produceBanner("by " + author, _TERM_SIZE_X).c_str());
-  printw("\n");
-  printw(produceBanner("git: " + git, _TERM_SIZE_X).c_str());
-  printw("\n");
-  printw(produceBanner(marginline, _TERM_SIZE_X).c_str());
-  printw("\n");
+  _DISPLAY->newLine();
+  _DISPLAY->print(
+      produceBanner(license + year + ", " + "written in " + language,
+                    _TERM_SIZE_X)
+          .c_str());
+  _DISPLAY->newLine();
+  _DISPLAY->print(produceBanner("by " + author, _TERM_SIZE_X).c_str());
+  _DISPLAY->newLine();
+  _DISPLAY->print(produceBanner("git: " + git, _TERM_SIZE_X).c_str());
+  _DISPLAY->newLine();
+  _DISPLAY->print(produceBanner(marginline, _TERM_SIZE_X).c_str());
+  _DISPLAY->newLine();
 }
 
 } // namespace Trinkets

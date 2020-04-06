@@ -78,8 +78,6 @@ size_t Menu::winSzX() const { return _winSzX; }
 
 size_t Menu::page() const { return _page; }
 
-size_t Menu::pages() const { return _p(); }
-
 size_t Menu::winPosY() const { return _winPosY; }
 
 size_t Menu::winPosX() const { return _winPosX; }
@@ -119,52 +117,27 @@ std::vector<size_t> Menu::maxSize() const {
   return termSz;
 }
 
-char Menu::getCharFromUser() const { return wgetch(_win); }
+wchar_t Menu::getCharFromUser() const { return wgetch(_win); }
 
 void Menu::insert(std::string const &str, size_t const y, size_t const x,
-                  TextStyle style) {
-  if (style == TextStyle::highlight) {
-    wattron(_win, A_REVERSE);
-    mvwprintw(_win, y, x, str.c_str());
-    wattroff(_win, A_REVERSE);
-  } else if (style == TextStyle::underline) {
-    wattron(_win, A_UNDERLINE);
-    mvwprintw(_win, y, x, str.c_str());
-    wattroff(_win, A_UNDERLINE);
-  } else /*none*/ {
-    mvwprintw(_win, y, x, str.c_str());
-  }
+                  attr_t style) {
+  attron(style);
+  mvprintw(y, x, str.c_str());
+  attroff(style);
 }
 
 void Menu::insert(char const *ch, size_t const y, size_t const x,
-                  TextStyle style) {
-  if (style == TextStyle::highlight) {
-    wattron(_win, A_REVERSE);
-    mvwprintw(_win, y, x, ch);
-    wattroff(_win, A_REVERSE);
-  } else if (style == TextStyle::underline) {
-    wattron(_win, A_UNDERLINE);
-    mvwprintw(_win, y, x, ch);
-    wattroff(_win, A_UNDERLINE);
-  } else /*none*/ {
-    mvwprintw(_win, y, x, ch);
-  }
+                  attr_t style) {
+  attron(style);
+  mvprintw(y, x, ch);
+  attroff(style);
 }
 
-void Menu::insert(char const ch, size_t const y, size_t const x,
-                  TextStyle style) {
+void Menu::insert(char const ch, size_t const y, size_t const x, attr_t style) {
   char const *chstr = &ch;
-  if (style == TextStyle::highlight) {
-    wattron(_win, A_REVERSE);
-    mvwprintw(_win, y, x, chstr);
-    wattroff(_win, A_REVERSE);
-  } else if (style == TextStyle::underline) {
-    wattron(_win, A_UNDERLINE);
-    mvwprintw(_win, y, x, chstr);
-    wattroff(_win, A_UNDERLINE);
-  } else /*none*/ {
-    mvwprintw(_win, y, x, chstr);
-  }
+  attron(style);
+  mvprintw(y, x, chstr);
+  attroff(style);
 }
 
 /// MUTATOR RETROACTIVE
@@ -185,7 +158,7 @@ void Menu::borderStyle(int const L, int const R, int const T, int const B,
 bool Menu::windowSet() const { return _win != nullptr; }
 
 void Menu::_updateF() {
-  size_t p = _p();
+  size_t p = numPages();
   size_t pRem = _pRem();
   size_t pCoeff = _pCoeff();
   if (_page == (p - 1) && pRem != 0)
@@ -195,7 +168,7 @@ void Menu::_updateF() {
 }
 
 /// MUTATOR RETROACTIVE
-void Menu::loadFields(std::vector<std::string> const &fields) {
+void Menu::initFields(std::vector<std::string> const &fields) {
   _fields = fields;
   _fieldSz = fields.size();
 
@@ -307,7 +280,7 @@ void Menu::_checkRange(size_t const y, size_t const x) const {
   }
 }
 
-void Menu::_loadFields() {
+void Menu::loadFields() {
 
   _updateF();
   std::vector<std::string> subFields = _loadPage();
@@ -317,8 +290,8 @@ void Menu::_loadFields() {
   size_t correction = _showBorder;
 
   if (_entriesPerPage <= _fieldSz && _showPages) {
-    std::string pageInfo =
-        " page: " + std::to_string(_page + 1) + " of " + std::to_string(_p());
+    std::string pageInfo = " page: " + std::to_string(_page + 1) + " of " +
+                           std::to_string(numPages());
     insert(pageInfo, _winSzY - 1 - correction,
            _winSzX - correction - pageInfo.length(), _titleStyle);
   }
@@ -393,7 +366,7 @@ size_t Menu::_pRem() const {
   size_t pRem = (size_t)(_fieldSz % _pCoeff());
   return pRem;
 }
-size_t Menu::_p() const {
+size_t Menu::numPages() const {
   size_t p = _pQuot() + (_pRem() != 0);
   return p;
 }
@@ -415,12 +388,12 @@ void Menu::hideBorder() {
 /// sets the title for the window with an optional style option (default none).
 /// This will not show the title to screen on window refresh if the the tite is
 /// hidden.
-void Menu::loadTitle(std::string const &title, TextStyle const style) {
+void Menu::loadTitle(std::string const &title, attr_t const style) {
   _title = title;
   _titleStyle = style;
 }
 
-void Menu::loadTitleStyle(TextStyle style) { _titleStyle = style; }
+void Menu::loadTitleStyle(attr_t style) { _titleStyle = style; }
 
 void Menu::showTitle() {
 
@@ -577,28 +550,24 @@ void Menu::eraseExcept(std::vector<size_t> const &elements) {
 
 void Menu::refresh() { wrefresh(_win); }
 
-/// MF ACTIVE
-void Menu::label(std::string const &label) const {
-  size_t labellocy = _winSzY - 1;
-  size_t labellocx = _winSzX - (3 + (size_t)label.length());
-  mvwaddstr(_win, labellocy, labellocx, label.c_str());
-}
+void Menu::setWin(WIN_SET_CODE const init) {
 
-/// MF ACTIVE
-void Menu::setWin(bool const init) {
-  if (init == 1) {
-
+  if (init == WIN_SET_CODE::INIT_PARENT) {
     initscr();
-    cbreak();
-    noecho();
     curs_set(0);
-
     _win = newwin(0, 0, 0, 0);
     wresize(_win, _winSzY, _winSzX);
     mvwin(_win, _winPosY, _winPosX);
-  } else if (init == 0) {
+  } else if (init == WIN_SET_CODE::INIT_CHILD) {
+    _win = newwin(0, 0, 0, 0);
+    wresize(_win, _winSzY, _winSzX);
+    mvwin(_win, _winPosY, _winPosX);
+  } else if (init == WIN_SET_CODE::KILL_PARENT) {
     delwin(_win);
     endwin();
+    _win = nullptr;
+  } else if (init == WIN_SET_CODE::KILL_CHILD) {
+    delwin(_win);
     _win = nullptr;
   }
 }
@@ -617,46 +586,66 @@ int Menu::reposition(size_t const y, size_t const x) {
   return 1;
 }
 
-/// MF ACTIVE
+void Menu::setKeypad(bool x) { keypad(_win, x); }
+
+void Menu::resetHighlighted() { _highlighted = 0; }
+
+void Menu::backPage() {
+  _page--;
+  resetHighlighted();
+};
+
+void Menu::forwardPage() {
+  _page++;
+  resetHighlighted();
+};
+
+void Menu::moveHighlightDown() { _highlighted++; }
+
+void Menu::moveHighlightUp() { _highlighted--; }
+
+size_t Menu::numFieldsThisPage() const { return _f; }
+
+size_t Menu::highlighted() const { return _highlighted; }
+
 void Menu::display(std::vector<int> const &breakConditions,
                    std::vector<size_t> const &ignoreBlocks) {
-  keypad(_win, true);
+  setKeypad(true); // enaable keypad
   int selection;
-  _highlighted = 0;
+  resetHighlighted();
 
   while (true) {
 
-    _loadFields();
+    loadFields(); // <-
     // refresh before getch
-    wrefresh(_win);
-    selection = wgetch(_win);
-    _lastKeyPressed = selection;
-
+    wrefresh(_win);              // <- refresh
+    selection = wgetch(_win);    // getCharFromUser()
+    _lastKeyPressed = selection; // external
     switch (selection) {
     case KEY_LEFT:
-      if (_page != 0) {
-        _page--;
-        _highlighted = 0;
+      if (_page != 0) {   // page()
+        _page--;          // backPage()
+        _highlighted = 0; // part of backPage()
         eraseExcept(ignoreBlocks);
       }
       break;
     case KEY_RIGHT:
-      if (_page != _p() - 1) {
-        _page++;
-        _highlighted = 0;
-
+      if (_page != numPages() - 1) { // page() numPartitions()
+        _page++;                     // forwardPage()
+        _highlighted = 0;            // part of forwardPage
         eraseExcept(ignoreBlocks);
       }
       break;
     case KEY_UP:
-      if (_highlighted != 0) {
-        _highlighted--;
+      _highlighted--;
+      if (_highlighted < 0) { // highlighted() NOT highlighted map
+        _highlighted++;       // moveHighlightUp()
       }
       break;
     case KEY_DOWN:
-      _highlighted++;
-      if (_highlighted == _f) {
-        _highlighted--;
+      _highlighted++;           // moveHighlightDown()
+      if (_highlighted == _f) { // numFieldsThisPage()
+        _highlighted--;         // moveHighlightUp()
       }
       break;
     default:
@@ -680,7 +669,7 @@ std::vector<std::string> Menu::_loadPage() {
 
   if (_fieldSz == 0)
     throw std::runtime_error("No fields were set.");
-  if (_p() == 1)
+  if (numPages() == 1)
     return _fields;
 
   std::vector<std::string>::const_iterator first_iterator;
@@ -719,8 +708,9 @@ std::vector<std::string> Menu::_loadPage() {
 }
 
 Menu::~Menu() {
+  // TODO: store init mode and kill correspondingly
   if (windowSet())
-    setWin(0);
+    setWin(WIN_SET_CODE::KILL_PARENT);
 }
 
 } // namespace DisplayKernel

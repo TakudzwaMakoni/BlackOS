@@ -1,5 +1,5 @@
 /**
- * Tr(inkets) ScreenShell NavigateDir
+ * Tr(inkets) Shell NavigateDir
  *
  * Copyright (C) 2020 by Takudzwa Makoni
  * <https://github.com/TakudzwaMakoni>
@@ -21,20 +21,12 @@
  */
 
 #include "../../helpers/PathController.h"
-#include "../ScreenShell.h"
+#include "../Shell.h"
 
 namespace BlackOS {
 namespace Trinkets {
 
-namespace {
-void usageListChildren() {
-  printw("Usage:\n"
-         "ls [options] <path>\n"
-         "options:\n'-a' : show hidden\n");
-}
-} // namespace
-
-int ScreenShell::listChildren() {
+int Shell::listChildren() {
 
   bool withHidden;
   std::string initPath;
@@ -54,7 +46,9 @@ int ScreenShell::listChildren() {
         withHidden = 1;
         initPath = std::filesystem::current_path();
       } else {
-        usageListChildren();
+        _DISPLAY->print("Usage:\n"
+                        "ls [options] <path>\n"
+                        "options:\n'-a' : show hidden\n");
         return 2;
       }
     } else {
@@ -66,13 +60,17 @@ int ScreenShell::listChildren() {
     // argument must be a path
     std::string argv1 = _ARGV[1];
     if (argv1 != "-a") {
-      usageListChildren();
+      _DISPLAY->print("Usage:\n"
+                      "ls [options] <path>\n"
+                      "options:\n'-a' : show hidden\n");
       return 2;
     }
     withHidden = 1;
     initPath = _ARGV[2];
   } else {
-    usageListChildren();
+    _DISPLAY->print("Usage:\n"
+                    "ls [options] <path>\n"
+                    "options:\n'-a' : show hidden\n");
     return 2;
   }
 
@@ -102,18 +100,16 @@ int ScreenShell::listChildren() {
   title = pathController.generateTitle();
   fields = pathController.generateFields();
 
-  printw("\n");
-  attron(A_UNDERLINE);
-  printw(title.c_str());
-  attroff(A_UNDERLINE);
-  printw("\n");
+  _DISPLAY->newLine();
+  _DISPLAY->print(title.c_str(), A_UNDERLINE);
+  _DISPLAY->newLine();
 
   for (std::string const &field : fields) {
-    printw(field.c_str());
-    printw("\n");
+    _DISPLAY->print(field.c_str());
+    _DISPLAY->newLine();
   }
-  printw("\n");
-  refresh();
+  _DISPLAY->newLine();
+  _DISPLAY->refresh();
   return 0;
 }
 } // namespace Trinkets

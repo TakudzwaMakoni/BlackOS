@@ -52,11 +52,12 @@ int main(int argc, const char *argv[]) {
   std::string mainMenuName = "BlackOS version 1.0 ";
   Menu main_menu(termSz[0], termSz[1], 0, 0);
 
-  main_menu.loadTitle(mainMenuName, TextStyle::highlight);
+  main_menu.loadTitle(mainMenuName, A_REVERSE);
   main_menu.loadFieldAlignment(-1, 1);
-  main_menu.loadFields(test_fields);
+  main_menu.initFields(test_fields);
 
-  main_menu.setWin(1); // must set the window!
+  main_menu.setWin(WIN_SET_CODE::INIT_PARENT); // must set the window!
+  main_menu.setKeypad(true);                   // enable keypad
 
   main_menu.hideBorder();
   // main_menu.hideTitle();
@@ -70,8 +71,65 @@ int main(int argc, const char *argv[]) {
 
   main_menu.paginate(pagination, 1);
 
-  main_menu.display();
+  // main_menu.display();
+  // manual display implementation:
 
+  std::vector<int> const breakConditions = {(int)'q', 10 /*ENTER key*/,
+                                            27 /*ESC key*/};
+  std::vector<size_t> const ignoreBlocks = {};
+
+  int selection;
+  int lastKeyPressed;
+  int currentPage;
+  main_menu.resetHighlighted();
+
+  while (true) {
+
+    main_menu.loadFields();                  // <-
+    main_menu.refresh();                     // <- refresh
+    selection = main_menu.getCharFromUser(); // getCharFromUser()
+    lastKeyPressed = selection;              // external
+    currentPage = main_menu.page();
+    switch (selection) {
+    case KEY_LEFT:
+      if (currentPage != 0) { // page()
+        main_menu.backPage(); // backPage()
+        main_menu.eraseExcept(ignoreBlocks);
+      }
+      break;
+    case KEY_RIGHT:
+      if (currentPage != main_menu.numPages() - 1) { // page() numPartitions()
+        main_menu.forwardPage();
+        main_menu.eraseExcept(ignoreBlocks);
+      }
+      break;
+    case KEY_UP:
+      if (main_menu.highlighted() != 0) { // highlighted() NOT highlighted map
+        main_menu.moveHighlightUp();      // moveHighlightUp()
+      }
+      break;
+    case KEY_DOWN:
+      if (main_menu.highlighted() !=
+          main_menu.numFieldsThisPage() - 1) { // numFieldsThisPage()
+        main_menu.moveHighlightDown();         // moveHighlightUp()
+      }
+      break;
+    default:
+      break;
+    }
+
+    bool exitStatus = 0;
+    for (const int i : breakConditions) {
+      if (selection == i) {
+        exitStatus = 1;
+      }
+    }
+    if (exitStatus) {
+      break;
+    }
+  }
+
+  // end of manual display mode
   std::string message;
   size_t winSzY = main_menu.winSzY();
   size_t winSzX = main_menu.winSzX();
@@ -93,7 +151,7 @@ int main(int argc, const char *argv[]) {
   main_menu.refresh();
   main_menu.pause();
 
-  main_menu.setWin(0);
+  main_menu.setWin(WIN_SET_CODE::KILL_PARENT);
   return 0;
 }
 //} // namespace DisplayKernel

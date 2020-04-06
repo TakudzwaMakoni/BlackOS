@@ -1,5 +1,5 @@
 /**
- * Tr(inkets) ScreenShell NavigateDir
+ * Tr(inkets) Shell NavigateDir
  *
  * Copyright (C) 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,25 +19,20 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../ScreenShell.h"
+#include "../Shell.h"
 
 namespace BlackOS {
 namespace Trinkets {
 
-int ScreenShell::changeDir() {
-  if (_ARGC == 1) {
-    char const *homeDir = getenv("HOME");
-    chdir(homeDir);
-  } else if (_ARGC == 2) {
-
-    std::string const &path = _ARGV[1];
-    if (chdir(path.c_str()) != 0) {
-      char errStr[256] = "cd: ";
-      perror(strcat(errStr, path.c_str()));
-      return 1;
-    }
+int Shell::setShellEnv() {
+  if (_ARGC != 3) {
+    printw("Usage:\n"
+           "set <ENV> <value>\n");
+    return 1;
   }
+  setenv(_ARGV[1].c_str(), _ARGV[2].c_str(), 1);
   return 0;
 }
+
 } // namespace Trinkets
 } // namespace BlackOS

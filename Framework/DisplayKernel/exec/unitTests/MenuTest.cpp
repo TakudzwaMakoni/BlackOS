@@ -57,10 +57,10 @@ TEST_CASE("test window is resized to initialised menu size after call setWin",
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(ROWS, COLS, 0, 0);
 
-    menu->setWin(1);
+    menu->setWin(WIN_SET_CODE::INIT_PARENT);
     size_t y = menu->winSzY();
     size_t x = menu->winSzX();
-    menu->setWin(0);
+    menu->setWin(WIN_SET_CODE::KILL_PARENT);
     return y == ROWS && x == COLS;
   };
 
@@ -76,10 +76,10 @@ TEST_CASE("test window is repositioned to initialised menu position after call "
   auto glambda = []() {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(0, 0, 10, 20);
-    menu->setWin(1);
+    menu->setWin(WIN_SET_CODE::INIT_PARENT);
     size_t y = menu->winPosY();
     size_t x = menu->winPosX();
-    menu->setWin(0);
+    menu->setWin(WIN_SET_CODE::KILL_PARENT);
 
     return y == 10 && x == 20;
   };
@@ -94,8 +94,8 @@ TEST_CASE("test window is unset on call setWin with empty parameters",
   // in curses mode.
   auto glambda = []() {
     auto const &menu = TestHelpers::testMenu();
-    menu->setWin(1);
-    menu->setWin(0);
+    menu->setWin(WIN_SET_CODE::INIT_PARENT);
+    menu->setWin(WIN_SET_CODE::KILL_PARENT);
     return !menu->windowSet();
   };
 
@@ -113,7 +113,7 @@ TEST_CASE("test menu is filled excluding title bar", "[window]") {
 
     auto const &menu = TestHelpers::testMenu();
     menu->loadTitle("test_menu_title");
-    menu->setWin(1);
+    menu->setWin(WIN_SET_CODE::INIT_PARENT);
     menu->fill('w', true);
 
     bool filled = true;
@@ -130,7 +130,7 @@ TEST_CASE("test menu is filled excluding title bar", "[window]") {
       if (menu->getCharFromWin(1, j, false) == 'w')
         titleBar_preserved = false;
     }
-    menu->setWin(0);
+    menu->setWin(WIN_SET_CODE::KILL_PARENT);
     return filled && titleBar_preserved;
   };
 
@@ -148,7 +148,7 @@ TEST_CASE("test menu is filled including title bar", "[window]") {
 
     auto const &menu = TestHelpers::testMenu();
     menu->loadTitle("test_menu_title");
-    menu->setWin(1);
+    menu->setWin(WIN_SET_CODE::INIT_PARENT);
     menu->fill('w', false);
 
     bool filled = true;
@@ -160,7 +160,7 @@ TEST_CASE("test menu is filled including title bar", "[window]") {
           filled = false;
       }
     }
-    menu->setWin(0);
+    menu->setWin(WIN_SET_CODE::KILL_PARENT);
     return filled;
   };
 
@@ -175,7 +175,7 @@ TEST_CASE("test erase call erases horizontal block", "[member_functions]") {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
     menu->loadTitle("test_menu_title");
-    menu->setWin(1);
+    menu->setWin(WIN_SET_CODE::INIT_PARENT);
     menu->fill('w', false);
     // erase from y = 0  and x = (3,5)
     menu->erase(1, 3, 1, 5);
@@ -184,7 +184,7 @@ TEST_CASE("test erase call erases horizontal block", "[member_functions]") {
     bool isBlank2 = menu->getCharFromWin(1, 4) == ' ';
     bool isBlank3 = menu->getCharFromWin(1, 5) == ' ';
 
-    menu->setWin(0);
+    menu->setWin(WIN_SET_CODE::KILL_PARENT);
     return isBlank1 && isBlank2 && isBlank3;
   };
 
@@ -200,7 +200,7 @@ TEST_CASE("test eraseExcept call excepts horizontal block",
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
     menu->loadTitle("test_menu_title");
-    menu->setWin(1);
+    menu->setWin(WIN_SET_CODE::INIT_PARENT);
     menu->fill('w', false);
     // erase from y = 0  and x = (3,5)
     menu->eraseExcept(1, 3, 1, 5);
@@ -214,7 +214,7 @@ TEST_CASE("test eraseExcept call excepts horizontal block",
     bool isBlank2 = menu->getCharFromWin(1, 7) == ' ';
     bool isBlank3 = menu->getCharFromWin(1, 8) == ' ';
 
-    menu->setWin(0);
+    menu->setWin(WIN_SET_CODE::KILL_PARENT);
     return notBlank1 && notBlank2 && notBlank3 && isBlank1 && isBlank2 &&
            isBlank3;
   };
@@ -230,7 +230,7 @@ TEST_CASE("test erase call erases vertical block", "[member_functions]") {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
     menu->loadTitle("test_menu_title");
-    menu->setWin(1);
+    menu->setWin(WIN_SET_CODE::INIT_PARENT);
     menu->fill('w', false);
 
     // erase from y = (3,5) and x = 0
@@ -240,7 +240,7 @@ TEST_CASE("test erase call erases vertical block", "[member_functions]") {
     bool isBlank2 = menu->getCharFromWin(4, 1) == ' ';
     bool isBlank3 = menu->getCharFromWin(5, 1) == ' ';
 
-    menu->setWin(0);
+    menu->setWin(WIN_SET_CODE::KILL_PARENT);
     return isBlank1 && isBlank2 && isBlank3;
   };
 
@@ -255,7 +255,7 @@ TEST_CASE("test erase call erases square block", "[member_functions]") {
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 1, 1);
     menu->loadTitle("test_menu_title");
-    menu->setWin(1);
+    menu->setWin(WIN_SET_CODE::INIT_PARENT);
     menu->fill('w', false);
     // erase from y = (0,2) and x = (0,2) i.e 3x3 block
     menu->erase(1, 1, 2, 2);
@@ -270,7 +270,7 @@ TEST_CASE("test erase call erases square block", "[member_functions]") {
     bool isBlank8 = menu->getCharFromWin(2, 1) == ' ';
     bool isBlank9 = menu->getCharFromWin(2, 2) == ' ';
 
-    menu->setWin(0);
+    menu->setWin(WIN_SET_CODE::KILL_PARENT);
     return isBlank1 && isBlank2 && isBlank3 && isBlank4 && isBlank5 &&
            isBlank6 && isBlank7 && isBlank8 && isBlank9;
   };
@@ -287,7 +287,7 @@ TEST_CASE("test erase call erases multiple square blocks",
     auto const &menu =
         TestHelpers::testMenuInitialisedWithSizeAndPos(40, 40, 0, 0);
     menu->loadTitle("test_menu_title");
-    menu->setWin(1);
+    menu->setWin(WIN_SET_CODE::INIT_PARENT);
     menu->fill('w', false);
     // erase from y = (0,2) and x = (0,5) i.e 3x6 block
     menu->erase({1, 1, 2, 2, 1, 3, 2, 5});
@@ -312,7 +312,7 @@ TEST_CASE("test erase call erases multiple square blocks",
     bool isBlank17 = menu->getCharFromWin(2, 4) == ' ';
     bool isBlank18 = menu->getCharFromWin(2, 5) == ' ';
 
-    menu->setWin(0);
+    menu->setWin(WIN_SET_CODE::KILL_PARENT);
     return isBlank1 && isBlank2 && isBlank3 && isBlank4 && isBlank5 &&
            isBlank6 && isBlank7 && isBlank8 && isBlank9 && isBlank10 &&
            isBlank11 && isBlank12 && isBlank13 && isBlank14 && isBlank15 &&

@@ -29,11 +29,7 @@
 namespace BlackOS {
 namespace DisplayKernel {
 
-enum class TextStyle : int {
-  underline = A_UNDERLINE,
-  highlight = A_REVERSE,
-  none = A_NORMAL
-};
+enum class WIN_SET_CODE { KILL_CHILD, KILL_PARENT, INIT_CHILD, INIT_PARENT };
 
 class DisplayObject {
 public:
@@ -41,10 +37,9 @@ public:
   virtual void borderStyle(int const L, int const R, int const T, int const B,
                            int const TL, int const TR, int const BL,
                            int const BR) = 0;
-  virtual void label(std::string const &label) const = 0;
   virtual std::vector<size_t> maxSize() const = 0;
   virtual std::string winType() const = 0;
-  virtual void setWin(bool const init) = 0;
+  virtual void setWin(WIN_SET_CODE const code) = 0;
   virtual void erase(size_t const y1, size_t const x1, size_t const y2,
                      size_t const x2) = 0;
   virtual void eraseExcept(size_t const y1, size_t const x1, size_t const y2,
@@ -56,11 +51,11 @@ public:
                               bool const preserve_cursor_pos) const = 0;
   virtual void fill(char ch, bool titleBar = false) = 0;
   virtual void insert(std::string const &str, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) = 0;
+                      attr_t style = A_NORMAL) = 0;
   virtual void insert(char const *ch, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) = 0;
+                      attr_t style = A_NORMAL) = 0;
   virtual void insert(char const ch, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) = 0;
+                      attr_t style = A_NORMAL) = 0;
   virtual void pause() const = 0;
   virtual bool windowSet() const = 0;
 };

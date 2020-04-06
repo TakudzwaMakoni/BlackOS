@@ -44,10 +44,9 @@ public:
   virtual void borderStyle(int const L, int const R, int const T, int const B,
                            int const TL, int const TR, int const BL,
                            int const BR) override;
-  virtual void label(std::string const &label) const override;
   virtual std::vector<size_t> maxSize() const override;
   virtual std::string winType() const override;
-  virtual void setWin(bool const init) override;
+  virtual void setWin(WIN_SET_CODE const init) override;
   virtual void erase(size_t const y1, size_t const x1, size_t const y2,
                      size_t const x2) override;
   virtual void erase(bool titleBar) override;
@@ -59,11 +58,11 @@ public:
                               bool const save_cursor = true) const override;
   virtual void fill(char const ch, bool const titleBar = false) override;
   virtual void insert(std::string const &str, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) override;
+                      attr_t style = A_NORMAL) override;
   virtual void insert(char const *ch, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) override;
+                      attr_t style = A_NORMAL) override;
   virtual void insert(char const ch, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) override;
+                      attr_t style = A_NORMAL) override;
   virtual void pause() const override;
   virtual bool windowSet() const override;
 
@@ -73,18 +72,29 @@ public:
   size_t winPosX() const;
   void hideBorder();
   void hideTitle();
-  void loadTitle(std::string const &title,
-                 TextStyle const titleStyle = TextStyle::none);
-  void loadTitleStyle(TextStyle style);
+  void loadTitle(std::string const &title, attr_t const titleStyle = A_NORMAL);
+  void loadTitleStyle(attr_t style);
   void showTitle();
   int lastKeyPressed() const;
   void clear();
   void refresh();
-  char getCharFromUser() const;
+  wchar_t getCharFromUser() const;
   int resize(size_t const y, size_t const x);
   int reposition(size_t const y, size_t const x);
-  std::vector<int> cursorPosition() const;
+  void cursorPosition(int &, int &) const;
   void bgfg(int const fg, int const bg); // TODO: rename
+
+  void newLine(bool newlineAtBeginning = true);
+  void newLines(int n, bool newlineAtBeginning = true);
+  void print(std::string const &str, attr_t style = A_NORMAL);
+  void print(std::string const &format, std::string const &str,
+             attr_t style = A_NORMAL);
+  std::vector<std::string> splitString(std::string, std::string const &);
+  std::vector<std::string> splitString(std::string, char const);
+  void printLines(std::string const &str, bool newlineAtBeginning = true);
+  void addChar(char const);
+  void deleteChar();
+  void moveCursor(int, int);
 
   ~Window();
 
@@ -95,10 +105,10 @@ private:
   size_t _winPosY;
   size_t _winPosX;
   std::string _title;
-  bool _showTitle = 1;
-  bool _showBorder = 1;
+  bool _showTitle = 0;
+  bool _showBorder = 0;
   int _lastKeyPressed;
-  TextStyle _titleStyle;
+  attr_t _titleStyle;
 
   void _checkRange(size_t const y1, size_t const x1, size_t const y2,
                    size_t const x2) const;

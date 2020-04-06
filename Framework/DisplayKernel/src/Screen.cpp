@@ -23,7 +23,6 @@
 
 namespace {
 
-/// SUBROUTINE ANONYMOUS
 std::vector<size_t> blocksFound(size_t const yValue,
                                 std::vector<size_t> const &elements) {
   size_t numOfBlocks = elements.size() / 4; /*two coordinates per block*/
@@ -39,7 +38,6 @@ std::vector<size_t> blocksFound(size_t const yValue,
   return _linesUnclear;
 }
 
-/// SUBROUTINE ANONYMOUS
 bool inBlocks(size_t const xValue, std::vector<size_t> const &blocks,
               std::vector<size_t> const &elements) {
   for (const size_t block : blocks) {
@@ -71,7 +69,7 @@ std::string Screen::winType() const { return "Screen"; }
 std::vector<size_t> Screen::maxSize() const { return TERMINAL_SIZE(); }
 
 void Screen::insert(std::string const &str, size_t const y, size_t const x,
-                    TextStyle style) {
+                    attr_t style) {
   attron(style);
   mvprintw(y, x, str.c_str());
   attroff(style);
@@ -83,18 +81,10 @@ void Screen::setCursorColour(char const *colour) {
 }
 
 void Screen::insert(char const *ch, size_t const y, size_t const x,
-                    TextStyle style) {
-  if (style == TextStyle::highlight) {
-    attron(A_REVERSE);
-    mvprintw(y, x, ch);
-    attroff(A_REVERSE);
-  } else if (style == TextStyle::underline) {
-    attron(A_UNDERLINE);
-    mvprintw(y, x, ch);
-    attroff(A_UNDERLINE);
-  } else /*none*/ {
-    mvprintw(y, x, ch);
-  }
+                    attr_t style) {
+  attron(style);
+  mvprintw(y, x, ch);
+  attroff(style);
 }
 
 std::vector<int> Screen::cursorPosition() const {
@@ -107,19 +97,11 @@ std::vector<int> Screen::cursorPosition() const {
 char Screen::getCharFromUser() const { return getch(); }
 
 void Screen::insert(char const ch, size_t const y, size_t const x,
-                    TextStyle style) {
+                    attr_t style) {
   char const *chstr = &ch;
-  if (style == TextStyle::highlight) {
-    attron(A_REVERSE);
-    mvprintw(y, x, chstr);
-    attroff(A_REVERSE);
-  } else if (style == TextStyle::underline) {
-    attron(A_UNDERLINE);
-    mvprintw(y, x, chstr);
-    attroff(A_UNDERLINE);
-  } else /*none*/ {
-    mvprintw(y, x, chstr);
-  }
+  attron(style);
+  mvprintw(y, x, chstr);
+  attroff(style);
 }
 
 /// MUTATOR RETROACTIVE
@@ -259,12 +241,12 @@ void Screen::hideBorder() {
 /// sets the title for the window with an optional style option (default none).
 /// This will not show the title to screen on window refresh if the the tite is
 /// hidden.
-void Screen::loadTitle(std::string const &title, TextStyle const style) {
+void Screen::loadTitle(std::string const &title, attr_t const style) {
   _title = title;
   _titleStyle = style;
 }
 
-void Screen::loadTitleStyle(TextStyle style) { _titleStyle = style; }
+void Screen::loadTitleStyle(attr_t style) { _titleStyle = style; }
 
 void Screen::showTitle() {
 
@@ -403,34 +385,27 @@ void Screen::eraseExcept(std::vector<size_t> const &elements) {
 }
 
 /// MF ACTIVE
-void Screen::label(std::string const &label) const {
-  size_t labellocy = _termSzY - 1;
-  size_t labellocx = _termSzX - (3 + (size_t)label.length());
-  mvaddstr(labellocy, labellocx, label.c_str());
-}
+void Screen::setWin(WIN_SET_CODE const init) {
 
-/// MF ACTIVE
-void Screen::setWin(bool const init) {
-  if (init == 1) {
+  if (init == WIN_SET_CODE::INIT_PARENT) {
     initscr();
     cbreak();
     noecho();
     curs_set(0);
-    auto termSz = TERMINAL_SIZE();
-    _termSzY = termSz[0];
-    _termSzX = termSz[1];
-    _screenInitialised = 1;
 
-  } else if (init == 0) {
-    _screenInitialised = 0;
+  } else if (init == WIN_SET_CODE::INIT_CHILD) {
+    // stdscr child init here
+  } else if (init == WIN_SET_CODE::KILL_PARENT) {
     endwin();
+  } else if (init == WIN_SET_CODE::KILL_CHILD) {
+    // stdscr chill end here
   }
 }
 
 Screen::~Screen() {
-  // if last screen state was initialised
+  // TODO: store init mode and kill correspondingly
   if (windowSet())
-    setWin(0);
+    setWin(WIN_SET_CODE::KILL_PARENT);
 }
 
 } // namespace DisplayKernel

@@ -38,8 +38,8 @@ int main(int argc, const char *argv[]) {
   size_t termSzY = termSz[0];
   size_t termSzX = termSz[1];
 
-  screen.setWin(1);
-  screen.loadTitle("test screen", TextStyle::highlight);
+  screen.setWin(WIN_SET_CODE::INIT_PARENT);
+  screen.loadTitle("test screen", A_REVERSE);
 
   screen.hideBorder();
   screen.showTitle();
@@ -56,7 +56,7 @@ int main(int argc, const char *argv[]) {
   }
 
   screen.pause();
-  screen.setWin(0);
+  screen.setWin(WIN_SET_CODE::KILL_PARENT);
 
   return 0;
 }

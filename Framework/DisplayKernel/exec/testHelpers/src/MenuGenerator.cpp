@@ -58,7 +58,7 @@ Menu_sptr testMenuWithEightPaginatedFields(int pagination) {
   std::vector<std::string> test_fields = {fname0, fname1, fname2, fname3,
                                           fname4, fname5, fname6, fname7};
 
-  menu->loadFields(test_fields);
+  menu->initFields(test_fields);
   menu->fieldStyle("!TEST!");
   menu->loadFieldAlignment(0, 0);
   menu->borderStyle('!', '!', '!', '!', '!', '!', '!', '!');

@@ -22,9 +22,8 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "DisplayObject.h"
-//#include "ncurses.h"
 #include "DisplayHelpers.h"
+#include "DisplayObject.h"
 
 #include <algorithm>
 #include <memory>
@@ -45,10 +44,9 @@ public:
   virtual void borderStyle(int const L, int const R, int const T, int const B,
                            int const TL, int const TR, int const BL,
                            int const BR) override;
-  virtual void label(std::string const &label) const override;
   virtual std::vector<size_t> maxSize() const override;
   virtual std::string winType() const override;
-  virtual void setWin(bool const init) override;
+  virtual void setWin(WIN_SET_CODE const init) override;
   virtual void erase(size_t const y1, size_t const x1, size_t const y2,
                      size_t const x2) override;
   virtual void erase(bool titleBar) override;
@@ -62,11 +60,11 @@ public:
                               bool const save_cursor = true) const override;
   virtual void fill(char const ch, bool const titleBar = false) override;
   virtual void insert(std::string const &str, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) override;
+                      attr_t style = A_NORMAL) override;
   virtual void insert(char const *ch, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) override;
+                      attr_t style = A_NORMAL) override;
   virtual void insert(char const ch, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) override;
+                      attr_t style = A_NORMAL) override;
   virtual void pause() const override;
   virtual bool windowSet() const override;
 
@@ -74,37 +72,43 @@ public:
   int reposition(size_t const y, size_t const x);
   void clear();
   void refresh();
-
+  void setKeypad(bool);
   void display(std::vector<int> const &breakConditions = {(int)'q',
                                                           10 /*ENTER key*/,
                                                           27 /*ESC key*/},
                std::vector<size_t> const &ignoreBlocks = {});
-  virtual void loadFields(std::vector<std::string> const &fields);
-  virtual std::string selectedField() const;
+
+  void initFields(std::vector<std::string> const &fields);
+  void loadFields();
+  std::string selectedField() const;
   size_t selectedFieldIndex() const;
 
   void loadFieldAlignment(int const x, int const y);
   void fieldStyle(std::string const &style);
   void paginate(size_t const entriesPerPage, bool showPages = 1);
-
+  void resetHighlighted();
+  void backPage();
+  void forwardPage();
+  void moveHighlightUp();
+  void moveHighlightDown();
+  size_t numFieldsThisPage() const;
+  size_t highlighted() const;
   std::vector<std::string> fields() const;
-
   size_t winSzY() const;
   size_t winSzX() const;
   size_t winPosY() const;
   size_t winPosX() const;
-  char getCharFromUser() const;
+  wchar_t getCharFromUser() const;
   size_t page() const;
-  size_t pages() const;
   void hideBorder();
   void hideTitle();
-  void loadTitle(std::string const &title,
-                 TextStyle const titleStyle = TextStyle::none);
-  void loadTitleStyle(TextStyle style);
+  void loadTitle(std::string const &title, attr_t const titleStyle = A_NORMAL);
+  void loadTitleStyle(attr_t style);
   void showTitle();
   int lastKeyPressed() const;
   std::vector<int> cursorPosition() const;
   void bgfg(int const fg, int const bg); // TODO: rename
+  size_t numPages() const;               // total number of pages
 
   ~Menu();
 
@@ -129,15 +133,13 @@ private:
   bool _showTitle = 1;
   bool _showBorder = 1;
   int _lastKeyPressed;
-  TextStyle _titleStyle;
+  attr_t _titleStyle;
 
   size_t _pCoeff() const; // typical fields per page
   size_t _pQuot() const;  // quotient
   size_t _pRem() const;   // remainder
-  size_t _p() const;      // total number of partitions
   std::vector<std::string> _loadPage();
   std::string _addFieldPadding(std::string const &fieldName);
-  void _loadFields();
   void _updateF();
   void _updateM();
   size_t _highlightedMap() const;

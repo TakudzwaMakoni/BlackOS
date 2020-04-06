@@ -1,5 +1,5 @@
 /**
- * Tr(inkets) ScreenShell NavigateDir
+ * Tr(inkets) Shell NavigateDir
  *
  * Copyright (C) 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -19,7 +19,7 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../ScreenShell.h"
+#include "../Shell.h"
 #include "Menu.h"
 #include "Window.h"
 
@@ -28,9 +28,9 @@
 namespace BlackOS {
 namespace Trinkets {
 
-int ScreenShell::shortcut() {
+int Shell::shortcut() {
 
-  logCursorPosition();
+  _DISPLAY->cursorPosition(_CURSOR_Y, _CURSOR_X);
 
   int y, x;
 
@@ -53,7 +53,7 @@ int ScreenShell::shortcut() {
   std::string hiddenAttribute = "showing hidden paths: ";
 
   // create menu object
-  BlackOS::DisplayKernel::Menu ShortcutMenu(_TERM_SIZE_Y - y, _TERM_SIZE_X, y,
+  BlackOS::DisplayKernel::Menu ShortcutMenu(_TERM_SIZE_Y - y, _TERM_SIZE_Y, y,
                                             0);
 
   // load shortcuts
@@ -92,7 +92,7 @@ int ScreenShell::shortcut() {
   }
 
   fieldSz = fields.size();
-  ShortcutMenu.setWin(1);
+  ShortcutMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::INIT_CHILD);
 
   if (_USING_COLOR_FLAG) {
     ShortcutMenu.bgfg(_FOREGROUND, _BACKGROUND);
@@ -104,9 +104,9 @@ int ScreenShell::shortcut() {
     ShortcutMenu.insert(message.c_str(), 0, 0);
     ShortcutMenu.refresh(); // present message to screen
     ShortcutMenu.pause();
-    ShortcutMenu.setWin(0);
-    move(_CURSOR_Y, 0);
-    refresh();
+    ShortcutMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+    _DISPLAY->moveCursor(_CURSOR_Y, 0);
+    _DISPLAY->refresh();
     return 0;
   }
 
@@ -114,8 +114,8 @@ int ScreenShell::shortcut() {
   menuHeight = _TERM_SIZE_Y - y - 2;
   pagination = menuHeight - 1;
 
-  ShortcutMenu.loadTitle(title, BlackOS::DisplayKernel::TextStyle::underline);
-  ShortcutMenu.loadFields(fields);
+  ShortcutMenu.loadTitle("title", A_UNDERLINE);
+  ShortcutMenu.initFields(fields);
   ShortcutMenu.loadFieldAlignment(-1, 1);
   ShortcutMenu.paginate(pagination, pagination <= fieldSz);
 
@@ -137,33 +137,33 @@ int ScreenShell::shortcut() {
     // user exited program
     ShortcutMenu.clear();
     ShortcutMenu.refresh();
-    ShortcutMenu.setWin(0);
-    move(_CURSOR_Y, 0);
-    refresh();
+    ShortcutMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+    _DISPLAY->moveCursor(_CURSOR_Y, 0);
+    _DISPLAY->refresh();
     return 0; // leave here
   } else if (lastKey == (int)'d' /*begin navigateDir into dir*/) {
     // user navigated up a directory
     ShortcutMenu.clear(); // clear previous output
     ShortcutMenu.refresh();
-    ShortcutMenu.setWin(0);
+    ShortcutMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
     std::string chosenPath = directories[selected];
     _ARGV = {"nd", chosenPath};
     _ARGC = 2;
     navigateDir();
-    move(_CURSOR_Y, 0);
-    refresh();
+    _DISPLAY->moveCursor(_CURSOR_Y, 0);
+    _DISPLAY->refresh();
     return 0;
   } else {
     // enter was pressed
     ShortcutMenu.clear(); // clear previous output
     ShortcutMenu.refresh();
-    ShortcutMenu.setWin(0);
+    ShortcutMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
     std::string chosenPath = directories[selected];
     _ARGV = {"cd", chosenPath};
     _ARGC = 2;
     changeDir();
-    move(_CURSOR_Y, 0);
-    refresh();
+    _DISPLAY->moveCursor(_CURSOR_Y, 0);
+    _DISPLAY->refresh();
     return 0;
   }
 }

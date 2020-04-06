@@ -14,7 +14,7 @@ find_package(fmt) # ListChildren, NavigateDir
         set(CMAKE_CXX_EXTENSIONS OFF)
 
         add_executable(Tr
-            ScreenShell.cpp
+            Shell.cpp
             ../helpers/PathController.cpp
             src/ClearScreen.cpp
             src/ChangeDir.cpp
@@ -24,7 +24,7 @@ find_package(fmt) # ListChildren, NavigateDir
             src/SetShellEnv.cpp
             src/Shortcut.cpp
             src/SplashScreen.cpp
-            src/ScreenShell.cpp
+            src/Shell.cpp
             )
         target_link_directories(Tr
             PRIVATE

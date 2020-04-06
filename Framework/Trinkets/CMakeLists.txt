@@ -4,4 +4,4 @@
 
 project (Trinkets LANGUAGES CXX)
 
-add_subdirectory(ScreenShell)
+add_subdirectory(Shell)

@@ -41,7 +41,7 @@ int main(int argc, const char *argv[]) {
 
   window.hideTitle();
   window.hideBorder();
-  window.setWin(1);
+  window.setWin(WIN_SET_CODE::INIT_PARENT);
 
   window.fill('x', 0);
   window.refresh();
@@ -55,7 +55,7 @@ int main(int argc, const char *argv[]) {
   }
 
   window.pause();
-  window.setWin(0);
+  window.setWin(WIN_SET_CODE::KILL_PARENT);
 
   return 0;
 }

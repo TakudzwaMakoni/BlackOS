@@ -41,10 +41,9 @@ public:
   virtual void borderStyle(int const L, int const R, int const T, int const B,
                            int const TL, int const TR, int const BL,
                            int const BR) override;
-  virtual void label(std::string const &label) const override;
   virtual std::vector<size_t> maxSize() const override;
   virtual std::string winType() const override;
-  virtual void setWin(bool const init) override;
+  virtual void setWin(WIN_SET_CODE const init) override;
   virtual void erase(size_t const y1, size_t const x1, size_t const y2,
                      size_t const x2) override;
   virtual void erase(bool titleBar) override;
@@ -56,11 +55,11 @@ public:
                               bool const save_cursor = true) const override;
   virtual void fill(char const ch, bool const titleBar = false) override;
   virtual void insert(std::string const &str, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) override;
+                      attr_t style = A_NORMAL) override;
   virtual void insert(char const *ch, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) override;
+                      attr_t style = A_NORMAL) override;
   virtual void insert(char const ch, size_t const y, size_t const x,
-                      TextStyle style = TextStyle::none) override;
+                      attr_t style = A_NORMAL) override;
   virtual void pause() const override;
   virtual bool windowSet() const override;
 
@@ -71,9 +70,8 @@ public:
   size_t winPosX() const;
   void hideBorder();
   void hideTitle();
-  void loadTitle(std::string const &title,
-                 TextStyle const titleStyle = TextStyle::none);
-  void loadTitleStyle(TextStyle style);
+  void loadTitle(std::string const &title, attr_t const titleStyle = A_NORMAL);
+  void loadTitleStyle(attr_t style);
   void showTitle();
   int lastKeyPressed() const;
   std::vector<int> cursorPosition() const;
@@ -90,7 +88,7 @@ private:
   bool _showTitle = 1;
   bool _showBorder = 1;
   int _lastKeyPressed;
-  TextStyle _titleStyle;
+  attr_t _titleStyle;
 
   void _checkRange(size_t const y1, size_t const x1, size_t const y2,
                    size_t const x2) const;

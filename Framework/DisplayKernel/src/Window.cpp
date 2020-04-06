@@ -24,7 +24,6 @@
 
 namespace {
 
-/// SUBROUTINE ANONYMOUS
 std::vector<size_t> blocksFound(size_t const yValue,
                                 std::vector<size_t> const &elements) {
   size_t numOfBlocks = elements.size() / 4; /*two coordinates per block*/
@@ -40,7 +39,6 @@ std::vector<size_t> blocksFound(size_t const yValue,
   return _linesUnclear;
 }
 
-/// SUBROUTINE ANONYMOUS
 bool inBlocks(size_t const xValue, std::vector<size_t> const &blocks,
               std::vector<size_t> const &elements) {
   for (const size_t block : blocks) {
@@ -85,67 +83,52 @@ std::vector<size_t> Window::maxSize() const {
   return termSz;
 }
 
+void Window::moveCursor(int y, int x) {
+  int Y, X;
+  getmaxyx(_win, Y, X);
+  if (y == 0)
+    y += _showTitle + _showBorder;
+  if (x == 0)
+    x += _showBorder;
+
+  if (y == Y)
+    Y -= _showBorder;
+  if (x == X)
+    X -= _showBorder;
+  wmove(_win, y, x);
+}
+
 void Window::bgfg(int const fg, int const bg) {
-  start_color();
   // TODO: check if Foreground is the same colour and warn invisibility/deny
   init_pair(1 /*1 reserved for BG/FG pair*/, fg, bg);
   wbkgd(_win, COLOR_PAIR(1));
-  wclear(_win);
+  // wclear(_win);
 }
 
-std::vector<int> Window::cursorPosition() const {
-  int x, y;
-  getyx(_win, y, x);
-  std::vector<int> v{x, y};
-  return v;
-}
+void Window::cursorPosition(int &y, int &x) const { getyx(_win, y, x); }
 
-char Window::getCharFromUser() const { return wgetch(_win); }
+wchar_t Window::getCharFromUser() const { return wgetch(_win); }
 
 void Window::insert(std::string const &str, size_t const y, size_t const x,
-                    TextStyle style) {
-  if (style == TextStyle::highlight) {
-    wattron(_win, A_REVERSE);
-    mvwprintw(_win, y, x, str.c_str());
-    wattroff(_win, A_REVERSE);
-  } else if (style == TextStyle::underline) {
-    wattron(_win, A_UNDERLINE);
-    mvwprintw(_win, y, x, str.c_str());
-    wattroff(_win, A_UNDERLINE);
-  } else /*none*/ {
-    mvwprintw(_win, y, x, str.c_str());
-  }
+                    attr_t style) {
+  wattron(_win, style);
+  mvwprintw(_win, y, x, str.c_str());
+  wattroff(_win, style);
 }
 
 void Window::insert(char const *ch, size_t const y, size_t const x,
-                    TextStyle style) {
-  if (style == TextStyle::highlight) {
-    wattron(_win, A_REVERSE);
-    mvwprintw(_win, y, x, ch);
-    wattroff(_win, A_REVERSE);
-  } else if (style == TextStyle::underline) {
-    wattron(_win, A_UNDERLINE);
-    mvwprintw(_win, y, x, ch);
-    wattroff(_win, A_UNDERLINE);
-  } else /*none*/ {
-    mvwprintw(_win, y, x, ch);
-  }
+                    attr_t style) {
+  wattron(_win, style);
+  mvwprintw(_win, y, x, ch);
+  wattroff(_win, style);
 }
 
 void Window::insert(char const ch, size_t const y, size_t const x,
-                    TextStyle style) {
+                    attr_t style) {
   char const *chstr = &ch;
-  if (style == TextStyle::highlight) {
-    wattron(_win, A_REVERSE);
-    mvwprintw(_win, y, x, chstr);
-    wattroff(_win, A_REVERSE);
-  } else if (style == TextStyle::underline) {
-    wattron(_win, A_UNDERLINE);
-    mvwprintw(_win, y, x, chstr);
-    wattroff(_win, A_UNDERLINE);
-  } else /*none*/ {
-    mvwprintw(_win, y, x, chstr);
-  }
+  wattron(_win, style);
+  mvwprintw(_win, y, x, chstr);
+  wattroff(_win, style);
 }
 
 /// MUTATOR RETROACTIVE
@@ -280,15 +263,113 @@ void Window::hideBorder() {
   _showBorder = 0;
 }
 
+std::vector<std::string> Window::splitString(std::string str,
+                                             std::string const &delimiter) {
+  size_t pos = 0;
+  std::string token;
+  std::vector<std::string> words;
+  while ((pos = str.find(delimiter)) != std::string::npos) {
+    token = str.substr(0, pos);
+    words.push_back(token);
+    str = str.substr(pos + delimiter.length());
+  }
+  words.push_back(str);
+  return words;
+}
+
+std::vector<std::string> Window::splitString(std::string str,
+                                             char const delimiter) {
+  std::string delimStr;
+  delimStr += delimiter;
+  auto const words = splitString(str, delimStr);
+  return words;
+}
+
+void Window::newLine(bool newlineAtBeginning) {
+  int x;
+  int y;
+  getyx(_win, y, x);
+  if (newlineAtBeginning) {
+    x = 0;
+  }
+  wmove(_win, y + 1, x);
+  wrefresh(_win);
+}
+
+void Window::newLines(int n, bool newlineAtBeginning) {
+
+  int x;
+  int y;
+  getyx(_win, y, x);
+  if (newlineAtBeginning) {
+    x = 0;
+  }
+
+  for (int i = 1; i <= n; i++)
+    wmove(_win, y + i, x);
+  wrefresh(_win);
+}
+
+void Window::addChar(char const ch) { waddch(_win, ch); }
+void Window::deleteChar() { wdelch(_win); }
+
+void Window::printLines(std::string const &str, bool newlineAtBeginning) {
+  auto const &words = splitString(str, "\n");
+  if (words.empty()) {
+    wprintw(_win, str.c_str());
+    return;
+  }
+  for (auto const &word : words) {
+    wprintw(_win, word.c_str());
+    newLine(newlineAtBeginning);
+  }
+}
+
+void Window::print(std::string const &str, attr_t style) {
+  int y, x, Y, X;
+  getyx(_win, y, x);
+  getmaxyx(_win, Y, X);
+
+  if (y == 0)
+    y += _showTitle + _showBorder;
+  if (x == 0)
+    x += _showBorder;
+
+  if (y == Y)
+    Y -= _showBorder;
+  if (x == X)
+    X -= _showBorder;
+
+  wmove(_win, y, x);
+  wattron(_win, style);
+  wprintw(_win, str.c_str());
+  wattroff(_win, style);
+}
+void Window::print(std::string const &format, std::string const &str,
+                   attr_t style) {
+  int y, x;
+  getyx(_win, y, x);
+
+  if (y == 0)
+    y += _showTitle + _showBorder;
+  if (x == 0)
+    x += _showBorder;
+
+  wmove(_win, y, x);
+  wattron(_win, style);
+  wprintw(_win, format.c_str(), str.c_str());
+  wattroff(_win, style);
+}
+
 /// sets the title for the window with an optional style option (default none).
 /// This will not show the title to screen on window refresh if the the tite is
 /// hidden.
-void Window::loadTitle(std::string const &title, TextStyle const style) {
+void Window::loadTitle(std::string const &title, attr_t const style) {
   _title = title;
   _titleStyle = style;
 }
 
-void Window::loadTitleStyle(TextStyle style) { _titleStyle = style; }
+void Window::loadTitleStyle(attr_t style) { _titleStyle = style; }
 
 void Window::showTitle() {
 
@@ -319,11 +400,10 @@ void Window::showTitle() {
       throw std::runtime_error("title header is longer than window width.");
     }
   }
-
   std::string header(paddingCorrection, ' ');
   header.insert(0, headerTitle);
   insert(header, y, x, _titleStyle);
-};
+}
 
 /// MF
 char Window::getCharFromWin(size_t const y, size_t const x,
@@ -341,7 +421,23 @@ char Window::getCharFromWin(size_t const y, size_t const x,
 void Window::erase(size_t const y1, size_t const x1, size_t const y2,
                    size_t const x2) {
 
-  _checkRange(y1, x1, y2, x2);
+  //_checkRange(y1, x1, y2, x2);
+
+  // TODO: this may replace checkRange()
+  int y, x, Y, X;
+  getyx(_win, y, x);
+  getmaxyx(_win, Y, X);
+
+  if (y1 == 0)
+    y += _showTitle + _showBorder;
+  if (x1 == 0)
+    x += _showBorder;
+
+  if (y2 == Y)
+    Y -= _showBorder;
+  if (x2 == X)
+    X -= _showBorder;
+
   size_t width = x2 - x1 + 1;
   std::string fill(width, ' ');
   for (size_t i = y1; i <= y2; ++i) {
@@ -374,22 +470,37 @@ void Window::fill(char const ch, bool const titleBar) {
 void Window::eraseExcept(size_t const y1, size_t const x1, size_t const y2,
                          size_t const x2) {
 
-  _checkRange(y1, x1, y2, x2);
+  //_checkRange(y1, x1, y2, x2);
 
-  size_t width = _winSzX - 2;
-  size_t height = _winSzY - 2;
+  int y, x, Y, X;
+  getyx(_win, y, x);
+  getmaxyx(_win, Y, X);
+
+  if (y1 == 0)
+    y += _showTitle + _showBorder;
+  if (x1 == 0)
+    x += _showBorder;
+
+  if (y2 == Y)
+    Y -= _showBorder;
+  if (x2 == X)
+    X -= _showBorder;
+
+  size_t start = _showTitle + _showBorder;
+  size_t end = _winSzY - (2 * _showBorder) - _showTitle;
+  size_t width = _winSzX - (2 * _showBorder);
 
   std::string fill(width, ' ');
   std::string space = " ";
-  for (size_t i = 1; i <= height; ++i) {
+  for (size_t i = start; i <= end; ++i) {
     if (i <= y2 && i >= y1) {
-      for (size_t j = 1; j <= width; ++j) {
+      for (size_t j = _showBorder; j <= width; ++j) {
         if (!(j <= x2 && j >= x1)) {
           mvwprintw(_win, i, j, space.c_str());
         }
       }
     } else {
-      mvwprintw(_win, i, 1, fill.c_str());
+      mvwprintw(_win, i, _showBorder, fill.c_str());
     }
   }
   wrefresh(_win);
@@ -411,19 +522,21 @@ void Window::erase(std::vector<size_t> const &elements) {
 
 /// MF ACTIVE
 void Window::eraseExcept(std::vector<size_t> const &elements) {
-  size_t width = _winSzX - 2;
-  size_t height = _winSzY - 2;
+
+  size_t start = _showTitle + _showBorder;
+  size_t end = _winSzY - (2 * _showBorder) - _showTitle;
+  size_t width = _winSzX - (2 * _showBorder);
+
   std::string fill(width, ' ');
-  std::string space = " ";
-  for (size_t i = 1; i <= height; ++i) {
+  for (size_t i = start; i <= end; ++i) {
     std::vector<size_t> blocks = blocksFound(i, elements);
     if (blocks.empty()) {
-      mvwprintw(_win, i, 1, fill.c_str());
+      mvwprintw(_win, i, _showBorder, fill.c_str());
     } else {
-      for (size_t j = 1; j <= width; ++j) {
+      for (size_t j = _showBorder; j <= width; ++j) {
         bool _inBlocks = inBlocks(j, blocks, elements);
         if (!_inBlocks) {
-          mvwprintw(_win, i, j, space.c_str());
+          mvwprintw(_win, i, j, " ");
         }
       }
     }
@@ -434,27 +547,26 @@ void Window::eraseExcept(std::vector<size_t> const &elements) {
 void Window::refresh() { wrefresh(_win); }
 
 /// MF ACTIVE
-void Window::label(std::string const &label) const {
-  size_t labellocy = _winSzY - 1;
-  size_t labellocx = _winSzX - (3 + (size_t)label.length());
-  mvwaddstr(_win, labellocy, labellocx, label.c_str());
-}
+void Window::setWin(WIN_SET_CODE const init) {
 
-/// MF ACTIVE
-void Window::setWin(bool const init) {
-  if (init == 1) {
-
+  if (init == WIN_SET_CODE::INIT_PARENT) {
     initscr();
-    cbreak();
-    noecho();
-    curs_set(0);
+    keypad(_win, TRUE);
+    scrollok(_win, TRUE);
 
     _win = newwin(0, 0, 0, 0);
     wresize(_win, _winSzY, _winSzX);
     mvwin(_win, _winPosY, _winPosX);
-  } else if (init == 0) {
+  } else if (init == WIN_SET_CODE::INIT_CHILD) {
+    _win = newwin(0, 0, 0, 0);
+    wresize(_win, _winSzY, _winSzX);
+    mvwin(_win, _winPosY, _winPosX);
+  } else if (init == WIN_SET_CODE::KILL_PARENT) {
     delwin(_win);
     endwin();
+    _win = nullptr;
+  } else if (init == WIN_SET_CODE::KILL_CHILD) {
+    delwin(_win);
     _win = nullptr;
   }
 }
@@ -474,8 +586,9 @@ int Window::reposition(size_t const y, size_t const x) {
 }
 
 Window::~Window() {
+  // TODO: store init mode and kill correspondingly
   if (windowSet())
-    setWin(0);
+    setWin(WIN_SET_CODE::KILL_PARENT);
 }
 
 } // namespace DisplayKernel

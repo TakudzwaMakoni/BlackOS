@@ -1,5 +1,5 @@
 /**
- * Tr(inkets) ScreenShell NavigateDir
+ * Tr(inkets) Shell NavigateDir
  *
  * Copyright (C) 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
@@ -20,35 +20,27 @@
  */
 
 #include "../../helpers/PathController.h"
-#include "../ScreenShell.h"
+#include "../Shell.h"
 #include "Menu.h"
 #include "Window.h"
+
+namespace DK = BlackOS::DisplayKernel;
 
 namespace BlackOS {
 namespace Trinkets {
 
-namespace {
-
-void usageNavigateDir() {
-  printw("Usage:\n"
-         "ndir [options] <path>\n"
-         "options:\n'-a' : show hidden\n");
-}
-} // namespace
-
-int ScreenShell::navigateDir() {
-
-  logCursorPosition();
+int Shell::navigateDir() {
+  curs_set(0);
+  _DISPLAY->cursorPosition(_CURSOR_Y, _CURSOR_X);
 
   bool withHidden;
   std::string initPath;
 
   int y, x;
-
-  if (_CURSOR_Y < 0 || _CURSOR_Y > _TERM_SIZE_Y - 10)
-    y = _TERM_SIZE_Y / 2;
+  if (_CURSOR_Y < 0 || _CURSOR_Y > _DISPLAY_SIZE_Y - 10)
+    y = _DISPLAY_SIZE_Y / 2;
   else
-    y = _CURSOR_Y;
+    y = _CURSOR_Y + 1;
 
   // uncomment if using externally specified window position
 
@@ -67,9 +59,12 @@ int ScreenShell::navigateDir() {
         withHidden = 1;
         initPath = std::filesystem::current_path();
       } else {
-        usageNavigateDir();
-        move(_CURSOR_Y, 0);
-        refresh();
+        _DISPLAY->print("Usage:\n"
+                        "ndir [options] <path>\n"
+                        "options:\n'-a' : show hidden\n");
+        _DISPLAY->moveCursor(_CURSOR_Y, 0);
+        curs_set(_CURSOR);
+        _DISPLAY->refresh();
         return 2;
       }
     } else {
@@ -81,15 +76,21 @@ int ScreenShell::navigateDir() {
     // argument must be a path
     std::string argv1 = _ARGV[1];
     if (argv1 != "-a") {
-      usageNavigateDir();
-      refresh();
+      _DISPLAY->print("Usage:\n"
+                      "ndir [options] <path>\n"
+                      "options:\n'-a' : show hidden\n");
+      curs_set(_CURSOR);
+      _DISPLAY->refresh();
       return 2;
     }
     withHidden = 1;
     initPath = _ARGV[2];
   } else {
-    usageNavigateDir();
-    refresh();
+    _DISPLAY->print("Usage:\n"
+                    "ndir [options] <path>\n"
+                    "options:\n'-a' : show hidden\n");
+    curs_set(_CURSOR);
+    _DISPLAY->refresh();
     return 2;
   }
 
@@ -126,17 +127,17 @@ int ScreenShell::navigateDir() {
   std::string hiddenAttribute = "showing hidden paths: ";
 
   // create menu object
-  BlackOS::DisplayKernel::Menu NavigationMenu(_TERM_SIZE_Y - y, _TERM_SIZE_X, y,
-                                              0);
+  BlackOS::DisplayKernel::Menu NavigationMenu(_DISPLAY_SIZE_Y - y,
+                                              _DISPLAY_SIZE_X, y, 0);
 
   // create new window object
-  BlackOS::DisplayKernel::Window CurrentDirWindow(1, _TERM_SIZE_X, y, 0);
+  BlackOS::DisplayKernel::Window CurrentDirWindow(1, _DISPLAY_SIZE_X, y, 0);
 
   // create path navigator object;
   PathController pathController;
 
-  NavigationMenu.setWin(1);
-  CurrentDirWindow.setWin(1);
+  NavigationMenu.setWin(DK::WIN_SET_CODE::INIT_CHILD);
+  CurrentDirWindow.setWin(DK::WIN_SET_CODE::INIT_CHILD);
 
   if (_USING_COLOR_FLAG) {
     NavigationMenu.bgfg(_FOREGROUND, _BACKGROUND);
@@ -156,10 +157,12 @@ int ScreenShell::navigateDir() {
       NavigationMenu.pause();
       if (parentPath == initPath) {
         // user initialised parent directory without access
-        NavigationMenu.setWin(0);
-        CurrentDirWindow.setWin(0);
-        move(_CURSOR_Y, 0);
-        refresh();
+        NavigationMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+        CurrentDirWindow.setWin(
+            BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+        _DISPLAY->moveCursor(_CURSOR_Y, 0);
+        curs_set(_CURSOR);
+        _DISPLAY->refresh();
         return -1; // leave here TODO: exit codes
       } else {
         // user navigated into directory without permissions
@@ -176,7 +179,7 @@ int ScreenShell::navigateDir() {
 
     // include 1 additional space.
     menuWidth = title.length() + 1;
-    menuHeight = _TERM_SIZE_Y - y - 2;
+    menuHeight = _DISPLAY_SIZE_X - y - 2;
     pagination = menuHeight - 3;
 
     NavigationMenu.resize(menuHeight, menuWidth);
@@ -201,9 +204,8 @@ int ScreenShell::navigateDir() {
     }
 
     // load all menu attributes first
-    NavigationMenu.loadTitle(title,
-                             BlackOS::DisplayKernel::TextStyle::underline);
-    NavigationMenu.loadFields(fields);
+    NavigationMenu.loadTitle(title, A_UNDERLINE);
+    NavigationMenu.initFields(fields);
     NavigationMenu.loadFieldAlignment(-1, 1);
     NavigationMenu.paginate(pagination, pagination <= fieldSz);
 
@@ -215,14 +217,14 @@ int ScreenShell::navigateDir() {
     size_t attributePosition = menuHeight - 1;
 
     std::string currentDir = parentPath;
-    std::string currentDirMessage = "looking in:";
+    std::string currentDirMessage = "looking in: ";
     currentDir = " " + currentDir;
 
     CurrentDirWindow.resize(1,
                             currentDirMessage.length() + currentDir.length());
-    CurrentDirWindow.insert(currentDirMessage, 0, 0,
-                            BlackOS::DisplayKernel::TextStyle::underline);
-    CurrentDirWindow.insert(currentDir, 0, currentDirMessage.length());
+    CurrentDirWindow.reposition(y, 0);
+    CurrentDirWindow.insert(currentDirMessage, 0, 0, A_UNDERLINE);
+    CurrentDirWindow.print(currentDir);
     CurrentDirWindow.refresh();
 
     std::vector<size_t> ignoreBlocks = {attributePosition, 0, attributePosition,
@@ -230,26 +232,93 @@ int ScreenShell::navigateDir() {
     NavigationMenu.insert(hiddenInfo, attributePosition, 0);
     NavigationMenu.refresh();
 
-    NavigationMenu.display(breakConditions, ignoreBlocks);
+    // NavigationMenu.display(breakConditions, ignoreBlocks);
 
-    // retrieve last key entered by user on exit display call
-    int lastKey = NavigationMenu.lastKeyPressed();
+    int selection;
+    int currentPage;
+    NavigationMenu.resetHighlighted();
+    NavigationMenu.setKeypad(true);
 
-    if (lastKey == (int)'q' || lastKey == 27 /*ESC*/) {
+    while (true) {
+
+      NavigationMenu.loadFields();                  // <-
+      NavigationMenu.refresh();                     // <- refresh
+      selection = NavigationMenu.getCharFromUser(); // getCharFromUser()
+      currentPage = NavigationMenu.page();
+      switch (selection) {
+      case KEY_LEFT:
+        if (currentPage != 0) {      // page()
+          NavigationMenu.backPage(); // backPage()
+          NavigationMenu.eraseExcept(ignoreBlocks);
+        }
+        break;
+      case KEY_RIGHT:
+        if (currentPage !=
+            NavigationMenu.numPages() - 1) { // page() numPartitions()
+          NavigationMenu.forwardPage();
+          NavigationMenu.eraseExcept(ignoreBlocks);
+        }
+        break;
+      case KEY_UP:
+        if (NavigationMenu.highlighted() != 0) {
+          NavigationMenu.moveHighlightUp();
+          if (_LIST_VIEW_ENABLED) {
+            auto listViewPath = children[NavigationMenu.highlighted()];
+            if (pathController.pathType(listViewPath) == "directory")
+              displayListView(listViewPath);
+            else {
+              _LSVIEW->clear();
+              _LSVIEW->print("not a directory!");
+            }
+          }
+        }
+        break;
+      case KEY_DOWN:
+        if (NavigationMenu.highlighted() !=
+            NavigationMenu.numFieldsThisPage() - 1) { // numFieldsThisPage()
+          NavigationMenu.moveHighlightDown();         // moveHighlightUp()
+          if (_LIST_VIEW_ENABLED) {
+            auto listViewPath = children[NavigationMenu.highlighted()];
+            if (pathController.pathType(listViewPath) == "directory")
+              displayListView(listViewPath);
+            else {
+              _LSVIEW->clear();
+              _LSVIEW->print("not a directory!");
+            }
+          }
+        }
+        break;
+      default:
+        break;
+      }
+
+      bool exitStatus = 0;
+      for (const int i : breakConditions) {
+        if (selection == i) {
+          exitStatus = 1;
+        }
+      }
+      if (exitStatus) {
+        break;
+      }
+    }
+
+    if (selection == (int)'q' || selection == 27 /*ESC*/) {
       // user exited program
       NavigationMenu.clear();
       CurrentDirWindow.clear();
-      NavigationMenu.setWin(0);
-      CurrentDirWindow.setWin(0);
-      move(_CURSOR_Y, 0);
-      refresh();
+      NavigationMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+      CurrentDirWindow.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+      _DISPLAY->moveCursor(_CURSOR_Y, 0);
+      curs_set(_CURSOR);
+      _DISPLAY->refresh();
       return 0; // leave here
-    } else if (lastKey == (int)'a' /*out of directory*/) {
+    } else if (selection == (int)'a' /*out of directory*/) {
       // user navigated up a directory
       parentPath = parentPath.parent_path();
       NavigationMenu.clear();
       CurrentDirWindow.clear();
-    } else if (lastKey == (int)'d' /*into dir*/) {
+    } else if (selection == (int)'d' /*into dir*/) {
 
       // user navigated into a child directory
       // get index pertaining to field chosen by user
@@ -267,7 +336,7 @@ int ScreenShell::navigateDir() {
       // clear window for next iteration
       NavigationMenu.clear();
       CurrentDirWindow.clear();
-    } else if (lastKey == (int)'h') {
+    } else if (selection == (int)'h') {
       // toggle hide files
       if (withHidden) {
         withHidden = 0;
@@ -275,7 +344,7 @@ int ScreenShell::navigateDir() {
         withHidden = 1;
       }
       NavigationMenu.clear();
-    } else if (lastKey == (int)'e') {
+    } else if (selection == (int)'e') {
 
       // exit at parent directory
 
@@ -285,20 +354,21 @@ int ScreenShell::navigateDir() {
       changeDir();
       NavigationMenu.clear();
       CurrentDirWindow.clear();
-      NavigationMenu.setWin(0);
-      CurrentDirWindow.setWin(0);
+      NavigationMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+      CurrentDirWindow.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
       break;
-    } else if (lastKey == (int)'s') {
+    } else if (selection == (int)'s') {
 
       NavigationMenu.clear();
       CurrentDirWindow.clear();
-      NavigationMenu.setWin(0);
-      CurrentDirWindow.setWin(0);
+      NavigationMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+      CurrentDirWindow.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
       _ARGV = {"sc"};
       _ARGC = 1;
       shortcut();
-      move(_CURSOR_Y, 0);
-      refresh();
+      _DISPLAY->moveCursor(_CURSOR_Y, 0);
+      curs_set(_CURSOR);
+      _DISPLAY->refresh();
       return 0;
     } else {
 
@@ -312,8 +382,9 @@ int ScreenShell::navigateDir() {
         changeDir();
         NavigationMenu.clear();
         CurrentDirWindow.clear();
-        NavigationMenu.setWin(0);
-        CurrentDirWindow.setWin(0);
+        NavigationMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+        CurrentDirWindow.setWin(
+            BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
         break;
       } else if (chosenPathType == "file") {
         int result = openWithTextEditor(chosenPath);
@@ -326,8 +397,9 @@ int ScreenShell::navigateDir() {
       }
     }
   }
-  move(_CURSOR_Y, 0);
-  refresh();
+  _DISPLAY->moveCursor(_CURSOR_Y, 0);
+  curs_set(_CURSOR);
+  _DISPLAY->refresh();
   return 0;
 }
 } // namespace Trinkets

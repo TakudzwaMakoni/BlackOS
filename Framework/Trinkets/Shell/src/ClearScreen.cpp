@@ -1,7 +1,7 @@
 /**
- * Tr(inkets) ScreenShell NavigateDir
+ * Tr Shell Clear
  *
- * Copyright (C) 2020 by Takudzwa Makoni <https://github.com/TakudzwaMakoni>
+ * Copyright (C) 2020, Takudzwa Makoni <https://github.com/TakudzwaMakoni>
  *
  * This Program is free software: you can redistribute
  * it and/or modify it under the terms of the GNU General Public
@@ -19,20 +19,15 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "../ScreenShell.h"
+#include "../Shell.h"
 
 namespace BlackOS {
 namespace Trinkets {
-
-int ScreenShell::setShellEnv() {
-  if (_ARGC != 3) {
-    printw("Usage:\n"
-           "set <ENV> <value>\n");
-    return 1;
-  }
-  setenv(_ARGV[1].c_str(), _ARGV[2].c_str(), 1);
+int Shell::clearScreen() {
+  //_DISPLAY->newLines(_TERM_SIZE_Y);
+  _DISPLAY->clear();
+  _DISPLAY->moveCursor(0, 0);
   return 0;
 }
-
 } // namespace Trinkets
 } // namespace BlackOS
