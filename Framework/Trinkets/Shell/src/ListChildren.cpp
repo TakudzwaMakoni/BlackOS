@@ -101,7 +101,7 @@ int Shell::listChildren() {
   fields = pathController.generateFields();
 
   _DISPLAY->newLine();
-  _DISPLAY->print(title.c_str(), A_UNDERLINE);
+  _DISPLAY->print(title.c_str(), A_BOLD);
   _DISPLAY->newLine();
 
   for (std::string const &field : fields) {

@@ -29,7 +29,7 @@ namespace BlackOS {
 namespace Trinkets {
 
 int Shell::shortcut() {
-
+  curs_set(0);
   _DISPLAY->cursorPosition(_CURSOR_Y, _CURSOR_X);
 
   int y, x;
@@ -100,7 +100,7 @@ int Shell::shortcut() {
 
   if (fieldSz == 0) {
     std::string message = "no entries to show.";
-    ShortcutMenu.clear(); // clear previous output
+    ShortcutMenu.eraseWin(); // clear previous output
     ShortcutMenu.insert(message.c_str(), 0, 0);
     ShortcutMenu.refresh(); // present message to screen
     ShortcutMenu.pause();
@@ -114,7 +114,7 @@ int Shell::shortcut() {
   menuHeight = _TERM_SIZE_Y - y - 2;
   pagination = menuHeight - 1;
 
-  ShortcutMenu.loadTitle("title", A_UNDERLINE);
+  ShortcutMenu.loadTitle("title", A_BOLD);
   ShortcutMenu.initFields(fields);
   ShortcutMenu.loadFieldAlignment(-1, 1);
   ShortcutMenu.paginate(pagination, pagination <= fieldSz);
@@ -128,22 +128,113 @@ int Shell::shortcut() {
 
   std::vector<int> breakConditions = {(int)'d', (int)'q', 10 /*ENTER*/,
                                       27 /*ESC*/};
-  ShortcutMenu.display(breakConditions);
 
-  int lastKey = ShortcutMenu.lastKeyPressed();
+  int selection;
+  int currentPage;
+  ShortcutMenu.resetHighlighted();
+  ShortcutMenu.setKeypad(true);
+
+  // initial LSVIEW window
+  if (_LIST_VIEW_ENABLED) {
+    auto listViewPath = directories[ShortcutMenu.highlighted()];
+    try {
+      displayListView(listViewPath);
+    } catch (std::filesystem::filesystem_error &e) {
+      _LSVIEW->eraseWin();
+      _LSVIEW->print(e.what());
+      _LSVIEW->refresh();
+    }
+  }
+
+  while (true) {
+
+    ShortcutMenu.loadFields();
+    selection = ShortcutMenu.getCharFromUser(); // calls refresh implicitly
+    currentPage = ShortcutMenu.page();
+    switch (selection) {
+    case KEY_LEFT:
+      if (currentPage != 0) {    // page()
+        ShortcutMenu.backPage(); // backPage()
+        ShortcutMenu.eraseWin();
+      }
+      break;
+    case KEY_RIGHT:
+      if (currentPage !=
+          ShortcutMenu.numPages() - 1) { // page() numPartitions()
+        ShortcutMenu.forwardPage();
+        ShortcutMenu.eraseWin();
+      }
+      break;
+    case KEY_UP:
+      if (ShortcutMenu.highlighted() != 0) {
+        ShortcutMenu.moveHighlightUp();
+        if (_LIST_VIEW_ENABLED) {
+          auto listViewPath = directories[ShortcutMenu.highlighted()];
+          try {
+            displayListView(listViewPath);
+          } catch (std::filesystem::filesystem_error &e) {
+            _LSVIEW->eraseWin();
+            _LSVIEW->print(e.what());
+            _LSVIEW->refresh();
+          }
+        }
+      }
+      break;
+    case KEY_DOWN:
+      if (ShortcutMenu.highlighted() !=
+          ShortcutMenu.numFieldsThisPage() - 1) { // numFieldsThisPage()
+        ShortcutMenu.moveHighlightDown();         // moveHighlightUp()
+        if (_LIST_VIEW_ENABLED) {
+          auto listViewPath = directories[ShortcutMenu.highlighted()];
+          try {
+            displayListView(listViewPath);
+          } catch (std::filesystem::filesystem_error &e) {
+            _LSVIEW->eraseWin();
+            _LSVIEW->print(e.what());
+            _LSVIEW->refresh();
+          }
+        }
+      }
+      break;
+    default:
+      break;
+    }
+
+    bool exitStatus = 0;
+    for (const int i : breakConditions) {
+      if (selection == i) {
+        exitStatus = 1;
+      }
+    }
+    if (exitStatus) {
+      break;
+    }
+  }
+
   size_t selected = ShortcutMenu.selectedFieldIndex();
 
-  if (lastKey == (int)'q' || lastKey == 27 /*ESC*/) {
+  if (selection == (int)'q' || selection == 27 /*ESC*/) {
     // user exited program
-    ShortcutMenu.clear();
+    ShortcutMenu.eraseWin();
     ShortcutMenu.refresh();
     ShortcutMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
     _DISPLAY->moveCursor(_CURSOR_Y, 0);
     _DISPLAY->refresh();
+
+    if (_LIST_VIEW_ENABLED) {
+      try {
+        displayListView(_CURRENT_DIR);
+      } catch (std::filesystem::filesystem_error &e) {
+        _LSVIEW->eraseWin();
+        _LSVIEW->print(e.what());
+        _LSVIEW->refresh();
+      }
+    }
+    curs_set(_CURSOR);
     return 0; // leave here
-  } else if (lastKey == (int)'d' /*begin navigateDir into dir*/) {
+  } else if (selection == (int)'d' /*begin navigateDir into dir*/) {
     // user navigated up a directory
-    ShortcutMenu.clear(); // clear previous output
+    ShortcutMenu.eraseWin(); // clear previous output
     ShortcutMenu.refresh();
     ShortcutMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
     std::string chosenPath = directories[selected];
@@ -155,7 +246,7 @@ int Shell::shortcut() {
     return 0;
   } else {
     // enter was pressed
-    ShortcutMenu.clear(); // clear previous output
+    ShortcutMenu.eraseWin(); // clear previous output
     ShortcutMenu.refresh();
     ShortcutMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
     std::string chosenPath = directories[selected];
@@ -164,6 +255,7 @@ int Shell::shortcut() {
     changeDir();
     _DISPLAY->moveCursor(_CURSOR_Y, 0);
     _DISPLAY->refresh();
+    curs_set(_CURSOR);
     return 0;
   }
 }

@@ -151,7 +151,7 @@ int Shell::navigateDir() {
     try {
       pathController.loadParent(parentPath);
     } catch (std::filesystem::filesystem_error &e) {
-      NavigationMenu.clear();
+      NavigationMenu.eraseWin();
       NavigationMenu.insert(e.what(), 0, 0);
       NavigationMenu.refresh();
       NavigationMenu.pause();
@@ -193,18 +193,18 @@ int Shell::navigateDir() {
       } else {
         message = "no entries to show (excl. hidden paths).";
       }
-      NavigationMenu.clear(); // clear previous output
+      NavigationMenu.eraseWin(); // clear previous output
       NavigationMenu.insert(message.c_str(), 0, 0);
       NavigationMenu.refresh(); // present message to screen
       NavigationMenu.pause();
       // go back up a level and skip iteration.
       parentPath = parentPath.parent_path(); // go up a dir
-      NavigationMenu.clear(); // clear message for next iteration.
+      NavigationMenu.eraseWin(); // clear message for next iteration.
       continue;
     }
 
     // load all menu attributes first
-    NavigationMenu.loadTitle(title, A_UNDERLINE);
+    NavigationMenu.loadTitle(title, A_BOLD);
     NavigationMenu.initFields(fields);
     NavigationMenu.loadFieldAlignment(-1, 1);
     NavigationMenu.paginate(pagination, pagination <= fieldSz);
@@ -239,11 +239,28 @@ int Shell::navigateDir() {
     NavigationMenu.resetHighlighted();
     NavigationMenu.setKeypad(true);
 
+    // initial LSVIEW window
+    if (_LIST_VIEW_ENABLED) {
+      auto listViewPath = children[NavigationMenu.highlighted()];
+      if (pathController.pathType(listViewPath) == "directory") {
+        try {
+          displayListView(listViewPath);
+        } catch (std::filesystem::filesystem_error &e) {
+          _LSVIEW->eraseWin();
+          _LSVIEW->print(e.what());
+          _LSVIEW->refresh();
+        }
+      } else {
+        _LSVIEW->eraseWin();
+        _LSVIEW->print("not a directory!");
+        _LSVIEW->refresh();
+      }
+    }
+
     while (true) {
 
-      NavigationMenu.loadFields();                  // <-
-      NavigationMenu.refresh();                     // <- refresh
-      selection = NavigationMenu.getCharFromUser(); // getCharFromUser()
+      NavigationMenu.loadFields();
+      selection = NavigationMenu.getCharFromUser(); // calls refresh implicitly
       currentPage = NavigationMenu.page();
       switch (selection) {
       case KEY_LEFT:
@@ -264,11 +281,18 @@ int Shell::navigateDir() {
           NavigationMenu.moveHighlightUp();
           if (_LIST_VIEW_ENABLED) {
             auto listViewPath = children[NavigationMenu.highlighted()];
-            if (pathController.pathType(listViewPath) == "directory")
-              displayListView(listViewPath);
-            else {
-              _LSVIEW->clear();
+            if (pathController.pathType(listViewPath) == "directory") {
+              try {
+                displayListView(listViewPath);
+              } catch (std::filesystem::filesystem_error &e) {
+                _LSVIEW->eraseWin();
+                _LSVIEW->print(e.what());
+                _LSVIEW->refresh();
+              }
+            } else {
+              _LSVIEW->eraseWin();
               _LSVIEW->print("not a directory!");
+              _LSVIEW->refresh();
             }
           }
         }
@@ -279,11 +303,18 @@ int Shell::navigateDir() {
           NavigationMenu.moveHighlightDown();         // moveHighlightUp()
           if (_LIST_VIEW_ENABLED) {
             auto listViewPath = children[NavigationMenu.highlighted()];
-            if (pathController.pathType(listViewPath) == "directory")
-              displayListView(listViewPath);
-            else {
-              _LSVIEW->clear();
+            if (pathController.pathType(listViewPath) == "directory") {
+              try {
+                displayListView(listViewPath);
+              } catch (std::filesystem::filesystem_error &e) {
+                _LSVIEW->eraseWin();
+                _LSVIEW->print(e.what());
+                _LSVIEW->refresh();
+              }
+            } else {
+              _LSVIEW->eraseWin();
               _LSVIEW->print("not a directory!");
+              _LSVIEW->refresh();
             }
           }
         }
@@ -305,19 +336,32 @@ int Shell::navigateDir() {
 
     if (selection == (int)'q' || selection == 27 /*ESC*/) {
       // user exited program
-      NavigationMenu.clear();
-      CurrentDirWindow.clear();
+      NavigationMenu.eraseWin();
+      CurrentDirWindow.eraseWin();
+      NavigationMenu.refresh();
+      CurrentDirWindow.refresh();
       NavigationMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
       CurrentDirWindow.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
       _DISPLAY->moveCursor(_CURSOR_Y, 0);
       curs_set(_CURSOR);
       _DISPLAY->refresh();
+
+      if (_LIST_VIEW_ENABLED) {
+        try {
+          displayListView(parentPath);
+        } catch (std::filesystem::filesystem_error &e) {
+          _LSVIEW->eraseWin();
+          _LSVIEW->print(e.what());
+          _LSVIEW->refresh();
+        }
+      }
+
       return 0; // leave here
     } else if (selection == (int)'a' /*out of directory*/) {
       // user navigated up a directory
       parentPath = parentPath.parent_path();
-      NavigationMenu.clear();
-      CurrentDirWindow.clear();
+      NavigationMenu.eraseWin();
+      CurrentDirWindow.eraseWin();
     } else if (selection == (int)'d' /*into dir*/) {
 
       // user navigated into a child directory
@@ -334,8 +378,8 @@ int Shell::navigateDir() {
         parentPath = newPath;
       }
       // clear window for next iteration
-      NavigationMenu.clear();
-      CurrentDirWindow.clear();
+      NavigationMenu.eraseWin();
+      CurrentDirWindow.eraseWin();
     } else if (selection == (int)'h') {
       // toggle hide files
       if (withHidden) {
@@ -343,31 +387,46 @@ int Shell::navigateDir() {
       } else {
         withHidden = 1;
       }
-      NavigationMenu.clear();
+      NavigationMenu.eraseWin();
     } else if (selection == (int)'e') {
 
       // exit at parent directory
+
+      if (_LIST_VIEW_ENABLED) {
+        try {
+          displayListView(parentPath);
+        } catch (std::filesystem::filesystem_error &e) {
+          _LSVIEW->eraseWin();
+          _LSVIEW->print(e.what());
+          _LSVIEW->refresh();
+        }
+      }
 
       std::string parentDir = parentPath;
       _ARGV = {"cd", parentDir};
       _ARGC = 2;
       changeDir();
-      NavigationMenu.clear();
-      CurrentDirWindow.clear();
+      NavigationMenu.eraseWin();
+      CurrentDirWindow.eraseWin();
+      NavigationMenu.refresh();
+      CurrentDirWindow.refresh();
       NavigationMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
       CurrentDirWindow.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+
+      curs_set(_CURSOR);
       break;
     } else if (selection == (int)'s') {
 
-      NavigationMenu.clear();
-      CurrentDirWindow.clear();
+      NavigationMenu.eraseWin();
+      CurrentDirWindow.eraseWin();
+      NavigationMenu.refresh();
+      CurrentDirWindow.refresh();
       NavigationMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
       CurrentDirWindow.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
       _ARGV = {"sc"};
       _ARGC = 1;
       shortcut();
       _DISPLAY->moveCursor(_CURSOR_Y, 0);
-      curs_set(_CURSOR);
       _DISPLAY->refresh();
       return 0;
     } else {
@@ -380,15 +439,15 @@ int Shell::navigateDir() {
         _ARGV = {"cd", chosenPath};
         _ARGC = 2;
         changeDir();
-        NavigationMenu.clear();
-        CurrentDirWindow.clear();
+        NavigationMenu.eraseWin();
+        CurrentDirWindow.eraseWin();
         NavigationMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
         CurrentDirWindow.setWin(
             BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
         break;
       } else if (chosenPathType == "file") {
         int result = openWithTextEditor(chosenPath);
-        NavigationMenu.clear();
+        NavigationMenu.eraseWin();
         if (result == -1) {
           NavigationMenu.insert("no EDITOR environment variable is set.", 0, 0);
           NavigationMenu.refresh();

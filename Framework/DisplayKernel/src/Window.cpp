@@ -455,16 +455,23 @@ void Window::clear() {
 
 /// MF RETROACTIVE
 void Window::fill(char const ch, bool const titleBar) {
-  size_t start = titleBar + _showBorder;
-  size_t end = _winSzY - (2 * _showBorder) - titleBar;
+
+  int y, x;
+  getyx(_win, y, x);
+
+  y += _showTitle + _showBorder;
+  x += _showBorder;
+
   size_t width = _winSzX - (2 * _showBorder);
 
   std::string fillString(width, ch);
-  for (size_t i = start; i <= end; ++i) {
+  for (size_t i = y; i <= _winSzY - _showBorder; ++i) {
     mvwprintw(_win, i, 1, fillString.c_str());
   }
   refresh();
 }
+
+void Window::eraseWin() { werase(_win); }
 
 /// MF ACTIVE
 void Window::eraseExcept(size_t const y1, size_t const x1, size_t const y2,

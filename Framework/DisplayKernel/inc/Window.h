@@ -77,6 +77,7 @@ public:
   void showTitle();
   int lastKeyPressed() const;
   void clear();
+  void eraseWin();
   void refresh();
   wchar_t getCharFromUser() const;
   int resize(size_t const y, size_t const x);

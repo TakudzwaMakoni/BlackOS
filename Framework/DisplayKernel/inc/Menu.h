@@ -71,6 +71,7 @@ public:
   int resize(size_t const y, size_t const x);
   int reposition(size_t const y, size_t const x);
   void clear();
+  void eraseWin();
   void refresh();
   void setKeypad(bool);
   void display(std::vector<int> const &breakConditions = {(int)'q',

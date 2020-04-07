@@ -291,7 +291,7 @@ private:
   int _DELETE = -1; // delete custom keymap
 
   /// internal methods
-  void displayListView(std::filesystem::path &);
+  void displayListView(std::filesystem::path const &);
 
   command_map _COMMAND_MAP{
       pair("bell", &Shell::bell),
@@ -309,7 +309,7 @@ private:
       pair("memory", &Shell::printMemoryHistory),
       pair("lsview", &Shell::listView),
       pair("cpos", &Shell::cpos),
-      pair("MOVE", &Shell::MOVE),
+      pair("move", &Shell::MOVE),
   };
 
   command_map _SHELL_CONFIG_MAP{

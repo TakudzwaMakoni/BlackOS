@@ -486,9 +486,6 @@ void Shell::logResult() {
 
 /// print the prompt to the screen
 void Shell::displayPrompt() {
-
-  // curs_set(_CURSOR);
-  // noecho();
   std::string currentDir = _CURRENT_DIR;
   std::string prompt = "Tr " + currentDir + "> ";
   _PROMPT_LEN = prompt.length();
@@ -842,6 +839,7 @@ void Shell::resetArgs() {
 
 /// read in user arguments
 int Shell::readArgs() {
+  noecho();
   std::string line;
   std::string userLine;
 
@@ -941,7 +939,7 @@ int Shell::readArgs() {
   return 0;
 }
 
-void Shell::displayListView(std::filesystem::path &dir) {
+void Shell::displayListView(std::filesystem::path const &dir) {
 
   _LSVIEW_SIZE_Y = _TERM_SIZE_Y;
   _LSVIEW_SIZE_X = _TERM_SIZE_X / 4;
@@ -967,7 +965,7 @@ void Shell::displayListView(std::filesystem::path &dir) {
   path.loadParent(dir);
   auto const children = path.children();
   int childrenSize = children.size();
-  _LSVIEW->clear();
+  _LSVIEW->eraseWin();
   _LSVIEW->refresh();
   _LSVIEW->print("contents:", A_UNDERLINE);
   _LSVIEW->newLines(2);
@@ -1086,6 +1084,7 @@ void Shell::runCommand() {
       // parent
       waitpid(pid, NULL, 0);
       tcsetattr(STDIN_FILENO, TCSANOW, &_OLDT); /*reapply the old settings */
+      _DISPLAY->newLine();
     }
   }
 } // namespace Trinkets
@@ -1104,7 +1103,7 @@ int Shell::listView() {
 
   if (!_LIST_VIEW_ENABLED) {
     if (_LSVIEW->windowSet()) {
-      _LSVIEW->clear();
+      _LSVIEW->eraseWin();
       _LSVIEW->refresh();
       _LSVIEW->setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
     }

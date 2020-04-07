@@ -608,6 +608,8 @@ size_t Menu::numFieldsThisPage() const { return _f; }
 
 size_t Menu::highlighted() const { return _highlighted; }
 
+void Menu::eraseWin() { werase(_win); }
+
 void Menu::display(std::vector<int> const &breakConditions,
                    std::vector<size_t> const &ignoreBlocks) {
   setKeypad(true); // enaable keypad
