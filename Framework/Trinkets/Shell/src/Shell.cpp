@@ -48,7 +48,6 @@ std::vector<char *> nullTerminatedArgV(std::vector<std::string> const &v) {
 /// executes the visual bell in screen
 int Shell::bell() {
 
-  start_color();
   _DISPLAY->bgfg(COLOR_BLACK, _BACKGROUND);
   _DISPLAY->refresh();
   usleep(50000);
@@ -70,6 +69,21 @@ int Shell::bell() {
   _DISPLAY->bgfg(_FOREGROUND, _BACKGROUND);
   _DISPLAY->refresh();
 
+  return 0;
+}
+
+int Shell::configListView() {
+  // TODO: tell which line has error in config file
+  if (_ARGC != 3) {
+    _DISPLAY->print("not enough arguments!\n");
+    return 1;
+  }
+  std::string value = _ARGV[2];
+  if (value == "TRUE" || value == "1") {
+    _CURRENT_DIR = _HOME;
+    listView(1);
+  } else if (value != "FALSE" || value != "0")
+    _DISPLAY->print(value + "is not recognised.");
   return 0;
 }
 
@@ -116,7 +130,6 @@ int Shell::configThemeInvader() {
   printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
   fflush(stdout);
 
-  start_color();
   _DISPLAY->bgfg(_FOREGROUND, _BACKGROUND);
   _USING_COLOR_FLAG = 1;
   _DISPLAY->refresh();
@@ -145,7 +158,6 @@ int Shell::configThemeIre() {
   printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
   fflush(stdout);
 
-  start_color();
   _DISPLAY->bgfg(_FOREGROUND, _BACKGROUND);
   _USING_COLOR_FLAG = 1;
   _DISPLAY->refresh();
@@ -174,7 +186,6 @@ int Shell::configThemeClassic() {
   printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
   fflush(stdout);
 
-  start_color();
   _DISPLAY->bgfg(_FOREGROUND, _BACKGROUND);
   _USING_COLOR_FLAG = 1;
   _DISPLAY->refresh();
@@ -203,7 +214,6 @@ int Shell::configThemeThinkPad() {
   printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
   fflush(stdout);
 
-  start_color();
   _DISPLAY->bgfg(_FOREGROUND, _BACKGROUND);
   _USING_COLOR_FLAG = 1;
   _DISPLAY->refresh();
@@ -232,7 +242,6 @@ int Shell::configThemeAntiClassic() {
   printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
   fflush(stdout);
 
-  start_color();
   _DISPLAY->bgfg(_FOREGROUND, _BACKGROUND);
   _USING_COLOR_FLAG = 1;
   _DISPLAY->refresh();
@@ -261,7 +270,6 @@ int Shell::configThemeNeptune() {
   printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
   fflush(stdout);
 
-  start_color();
   _DISPLAY->bgfg(_FOREGROUND, _BACKGROUND);
   _USING_COLOR_FLAG = 1;
   _DISPLAY->refresh();
@@ -315,7 +323,6 @@ int Shell::configThemeUgly() {
   printf("\e]12;%s\a", _CURSOR_COLOUR.c_str());
   fflush(stdout);
 
-  start_color();
   _DISPLAY->bgfg(_FOREGROUND, _BACKGROUND);
   _USING_COLOR_FLAG = 1;
   _DISPLAY->refresh();
@@ -327,7 +334,7 @@ int Shell::configThemeUgly() {
 int Shell::rainbow() {
   auto start = std::chrono::system_clock::now();
   auto end = std::chrono::system_clock::now();
-  start_color();
+
   while (
       (std::chrono::duration_cast<std::chrono::seconds>(end - start).count() !=
        1)) {
@@ -367,21 +374,12 @@ void Shell::appendTofile(std::filesystem::path const &path,
 /// load the shell to screen
 void Shell::loadShell() {
   _DISPLAY->setWin(BlackOS::DisplayKernel::WIN_SET_CODE::INIT_PARENT);
+  _DISPLAY->setKeypad(1);
+  _DISPLAY->setScroll(1);
   // load default colour scheme
-  noraw();
+  // noraw();
   cbreak();
   noecho();
-
-  if (_COLOUR_SUPPORT) {
-    // 2 reserved for error
-    init_pair(2, COLOR_RED, COLOR_WHITE);
-    // 3 reserved for info
-    init_pair(3, COLOR_BLUE, COLOR_BLACK);
-
-    _STYLE_ERROR = COLOR_PAIR(2);
-    _STYLE_INFO = COLOR_PAIR(3);
-    _STYLE_IMPORTANT = A_STANDOUT;
-  }
 
   _DISPLAY->resize(_DISPLAY_SIZE_Y, _DISPLAY_SIZE_X);
   _DISPLAY->reposition(0, 0);
@@ -413,6 +411,17 @@ void Shell::loadShell() {
   if (_COLOUR_SUPPORT == FALSE) {
     _DISPLAY->print("warning: this terminal does not support colour\n");
     _DISPLAY->newLine();
+  } else {
+    start_color();
+    use_default_colors();
+    // 2 reserved for error
+    init_pair(2, COLOR_RED, COLOR_WHITE);
+    // 3 reserved for info
+    init_pair(3, COLOR_BLUE, COLOR_BLACK);
+
+    _STYLE_ERROR = COLOR_PAIR(2);
+    _STYLE_INFO = COLOR_PAIR(3);
+    _STYLE_IMPORTANT = A_STANDOUT;
   }
 
   // initialise shell with config settings and shell variables described in
@@ -907,7 +916,8 @@ int Shell::readArgs() {
           _DISPLAY->refresh();
         } else if (historyCounter <= 0) {
           historyCounter = 0;
-          _DISPLAY->erase(_CURSOR_Y, _PROMPT_LEN, _CURSOR_Y, _TERM_SIZE_X - 1);
+          _DISPLAY->erase(_CURSOR_Y, _PROMPT_LEN + 2, _CURSOR_Y,
+                          _DISPLAY_SIZE_X - 1);
           _DISPLAY->insert(userLine, _CURSOR_Y, _PROMPT_LEN);
 
           line = userLine;
@@ -916,9 +926,8 @@ int Shell::readArgs() {
       }
     } else {
       _DISPLAY->cursorPosition(_CURSOR_Y, _CURSOR_X);
-      if (_CURSOR_X < _DISPLAY_SIZE_X) {
+      if (_CURSOR_X < _DISPLAY_SIZE_X - 1) {
         _DISPLAY->addChar(ch);
-        _DISPLAY->refresh();
         line += ch;
         userLine = line;
       }
@@ -962,12 +971,15 @@ void Shell::displayListView(std::filesystem::path const &dir) {
     _LSVIEW->borderStyle();
 
   PathController path;
+  path.showHidden(_LIST_VIEW_HIDDEN_ENABLED);
   path.loadParent(dir);
   auto const children = path.children();
+
   int childrenSize = children.size();
   _LSVIEW->eraseWin();
   _LSVIEW->refresh();
-  _LSVIEW->print("contents:", A_UNDERLINE);
+  _LSVIEW->print("contents in ");
+  _LSVIEW->print(dir, A_BOLD);
   _LSVIEW->newLines(2);
 
   int height = _LSVIEW_SIZE_Y - 4;
@@ -975,6 +987,7 @@ void Shell::displayListView(std::filesystem::path const &dir) {
     int remaining = childrenSize - height;
     for (int i = 0; i < height; i++) {
       auto const &child = children[i];
+      std::string entity = child.filename();
       attr_t style;
       auto const type = path.pathType(child);
       if (type == "directory")
@@ -1003,7 +1016,6 @@ void Shell::displayListView(std::filesystem::path const &dir) {
       _LSVIEW->newLine();
     }
   }
-
   _LSVIEW->refresh();
 }
 
@@ -1041,53 +1053,90 @@ int Shell::execute() {
     (this->*(x->second))(); // call using pointer
     return 0;
   } else {
-    tcgetattr(STDIN_FILENO, &_OLDT); /*store old settings */
-    _NEWT = _OLDT;                   /* copy old settings to new settings */
-    _NEWT.c_oflag |= (ONLCR);
-    _NEWT.c_lflag &= ~(ICANON | ECHO); /* make one change to old
-                     settings in new settings */
-    tcsetattr(STDIN_FILENO, TCSANOW,
-              &_NEWT); /*apply the new settings immediatly */
-    // system("stty sane");
     return 1;
   }
 }
 
+bool Shell::commandNotPrintable() {
+  std::vector<std::string>::const_iterator x;
+  x = std::find(_PRINTABLES.begin(), _PRINTABLES.end(), _ARGV[0]);
+  return x == _PRINTABLES.end();
+}
+
 void Shell::runCommand() {
-  int result;
-  pid_t pid;
+
   if (execute() != 0) {
 
-    // Fork our process
-    pid = fork();
+    tcgetattr(STDIN_FILENO, &_OLDT); /*store old settings */
+   // _NEWT = _OLDT;                   /* copy old settings to new settings */
+   // _NEWT.c_oflag |= (ONLCR | ECHO);
+   // _NEWT.c_lflag &= ~(ICANON); /* make one change to old
+   //                  settings in new settings */
+   //                                    //  tcsetattr(STDIN_FILENO, TCSANOW,
+   //            &_NEWT); /*apply the new settings immediatly */
+    system("stty sane");
 
-    std::vector<char *> argv = nullTerminatedArgV(_ARGV);
-    char **command = argv.data();
+    // fallback to bash/sh
+    if (commandNotPrintable()) {
 
-    // error
-    if (pid < 0)
-      perror("Error (pid < 0)");
+      int result;
+      pid_t pid = fork();
 
-    // child process
-    else if (pid == 0) {
+      std::vector<char *> argv = nullTerminatedArgV(_ARGV);
+      char **command = argv.data();
 
-      std::cout << "\n";
-      char cmd[100];
-      strcpy(cmd, "/usr/bin/");
-      strcat(cmd, command[0]);
-      int result = execvp(cmd, command);
-      perror("Fallback Shell");
+      // error
+      if (pid < 0)
+        perror("Error (pid < 0)");
 
-      exit(RESULT::END_OF_PROCESS); // duplicate child process is created.
+      // child process
+      else if (pid == 0) {
 
-    } else if (pid > 0) {
-      // parent
-      waitpid(pid, NULL, 0);
-      tcsetattr(STDIN_FILENO, TCSANOW, &_OLDT); /*reapply the old settings */
+        std::cout << "\n";
+        char cmd[100];
+        strcpy(cmd, "/usr/bin/");
+        strcat(cmd, command[0]);
+        int result = execvp(cmd, command);
+        perror("Fallback Shell");
+
+        exit(RESULT::END_OF_PROCESS);
+
+      } else if (pid > 0) {
+        waitpid(pid, NULL, 0);
+        // do parental things
+        _DISPLAY->newLine();
+        bell();
+      }
+
+    } else {
       _DISPLAY->newLine();
+      // run a process and create a streambuf that reads its stdout and stderr
+      redi::ipstream proc(_ARGV,
+                          redi::pstreams::pstdout | redi::pstreams::pstderr);
+      std::string line;
+      // read child's stdout
+      while (std::getline(proc.out(), line)) {
+        // the output is captured line by line here
+        // so that i can do what i want with it
+        _DISPLAY->print(line.c_str());
+        _DISPLAY->newLine();
+      }
+
+      // if reading stdout stopped at EOF then reset the state:
+      if (proc.eof() && proc.fail()) {
+        proc.clear();
+      }
+      // read child's stderr
+      while (std::getline(proc.err(), line)) {
+        // error message is captured line by line here
+        // so that i can do what i want with it.
+        _DISPLAY->print(line.c_str());
+        _DISPLAY->newLine();
+      }
     }
+    tcsetattr(STDIN_FILENO, TCSANOW, &_OLDT);
   }
-} // namespace Trinkets
+}
 
 int Shell::cpos() {
   _DISPLAY->cursorPosition(_CURSOR_Y, _CURSOR_X);
@@ -1097,6 +1146,7 @@ int Shell::cpos() {
   return 0;
 }
 
+// listView switch
 int Shell::listView() {
   // switch on/off ListView on display
   _LIST_VIEW_ENABLED = !_LIST_VIEW_ENABLED;
@@ -1107,7 +1157,37 @@ int Shell::listView() {
       _LSVIEW->refresh();
       _LSVIEW->setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
     }
-    _IGNORE_BLOCKS = {};
+
+    _DISPLAY_SIZE_X = _TERM_SIZE_X + _LSVIEW_SIZE_X;
+    if (_SHOW_BORDER) {
+      _DISPLAY->borderStyle(' ');
+      _DISPLAY->resize(_DISPLAY_SIZE_Y, _DISPLAY_SIZE_X);
+      _DISPLAY->borderStyle();
+    } else {
+      _DISPLAY->resize(_DISPLAY_SIZE_Y, _DISPLAY_SIZE_X);
+    }
+    _DISPLAY->print("lsview subwindow disabled");
+    _DISPLAY->newLine();
+  } else {
+    displayListView(_CURRENT_DIR);
+    _DISPLAY->print("lsview subwindow enabled");
+    _DISPLAY->newLine();
+  }
+  _DISPLAY->refresh();
+  return 0;
+}
+
+// explicitly enable/disable listView
+int Shell::listView(bool x) {
+  // switch on/off ListView on display
+  _LIST_VIEW_ENABLED = x;
+
+  if (!_LIST_VIEW_ENABLED) {
+    if (_LSVIEW->windowSet()) {
+      _LSVIEW->eraseWin();
+      _LSVIEW->refresh();
+      _LSVIEW->setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+    }
 
     _DISPLAY_SIZE_X = _TERM_SIZE_X + _LSVIEW_SIZE_X;
     if (_SHOW_BORDER) {
@@ -1179,10 +1259,8 @@ Shell::Shell() {
   _LSVIEW = generateUniqueWindow();
 
   // SIGINT may end process without exiting Shell
-  std::string test = "test";
-  auto signalHandler = [](int const i) {
-    //_DISPLAY->print("\ncaptured signal: %d\n", i);
-  };
+  // std::string test = "test";
+  auto signalHandler = [](int const i) {};
 
   _SIGNAL_INT_HANDLER.sa_handler = signalHandler;
   sigemptyset(&_SIGNAL_INT_HANDLER.sa_mask);

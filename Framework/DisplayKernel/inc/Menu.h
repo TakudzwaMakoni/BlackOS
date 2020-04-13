@@ -74,6 +74,10 @@ public:
   void eraseWin();
   void refresh();
   void setKeypad(bool);
+  void print(std::string const &str, attr_t style = A_NORMAL);
+  void print(std::string const &format, std::string const &str,
+             attr_t style = A_NORMAL);
+  void moveCursor(int, int);
   void display(std::vector<int> const &breakConditions = {(int)'q',
                                                           10 /*ENTER key*/,
                                                           27 /*ESC key*/},

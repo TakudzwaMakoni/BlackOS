@@ -42,6 +42,8 @@ int Shell::navigateDir() {
   else
     y = _CURSOR_Y + 1;
 
+  int menuPos = y;
+  int currentDirPos = y - 1;
   // uncomment if using externally specified window position
 
   if (_ARGC == 1) {
@@ -127,11 +129,12 @@ int Shell::navigateDir() {
   std::string hiddenAttribute = "showing hidden paths: ";
 
   // create menu object
-  BlackOS::DisplayKernel::Menu NavigationMenu(_DISPLAY_SIZE_Y - y,
-                                              _DISPLAY_SIZE_X, y, 0);
+  BlackOS::DisplayKernel::Menu NavigationMenu(_DISPLAY_SIZE_Y - menuPos,
+                                              _DISPLAY_SIZE_X, menuPos, 0);
 
   // create new window object
-  BlackOS::DisplayKernel::Window CurrentDirWindow(1, _DISPLAY_SIZE_X, y, 0);
+  BlackOS::DisplayKernel::Window CurrentDirWindow(
+      1, _DISPLAY_SIZE_X - currentDirPos, currentDirPos, 0);
 
   // create path navigator object;
   PathController pathController;
@@ -179,11 +182,11 @@ int Shell::navigateDir() {
 
     // include 1 additional space.
     menuWidth = title.length() + 1;
-    menuHeight = _DISPLAY_SIZE_X - y - 2;
+    menuHeight = _DISPLAY_SIZE_Y - menuPos;
     pagination = menuHeight - 3;
 
     NavigationMenu.resize(menuHeight, menuWidth);
-    NavigationMenu.reposition(y + 2 /*maintain cursor _CURSOR_Y position*/,
+    NavigationMenu.reposition(menuPos /*maintain cursor _CURSOR_Y position*/,
                               0 /*left of screen*/);
 
     if (fieldSz == 0) {
@@ -194,7 +197,7 @@ int Shell::navigateDir() {
         message = "no entries to show (excl. hidden paths).";
       }
       NavigationMenu.eraseWin(); // clear previous output
-      NavigationMenu.insert(message.c_str(), 0, 0);
+      NavigationMenu.print(message.c_str());
       NavigationMenu.refresh(); // present message to screen
       NavigationMenu.pause();
       // go back up a level and skip iteration.
@@ -204,13 +207,15 @@ int Shell::navigateDir() {
     }
 
     // load all menu attributes first
+    // NavigationMenu.loadTitle(title, A_BOLD);
+    NavigationMenu.hideBorder();
     NavigationMenu.loadTitle(title, A_BOLD);
+    NavigationMenu.showTitle();
     NavigationMenu.initFields(fields);
     NavigationMenu.loadFieldAlignment(-1, 1);
     NavigationMenu.paginate(pagination, pagination <= fieldSz);
 
-    NavigationMenu.hideBorder();
-    NavigationMenu.showTitle();
+    // NavigationMenu.showTitle();
 
     std::string showingHidden = withHidden ? "t" : "f";
     std::string hiddenInfo = hiddenAttribute + showingHidden;
@@ -220,16 +225,17 @@ int Shell::navigateDir() {
     std::string currentDirMessage = "looking in: ";
     currentDir = " " + currentDir;
 
-    CurrentDirWindow.resize(1,
-                            currentDirMessage.length() + currentDir.length());
-    CurrentDirWindow.reposition(y, 0);
-    CurrentDirWindow.insert(currentDirMessage, 0, 0, A_UNDERLINE);
+    CurrentDirWindow.resize(1, _DISPLAY_SIZE_X);
+    CurrentDirWindow.reposition(currentDirPos, 0);
+    CurrentDirWindow.moveCursor(0, 0);
+    CurrentDirWindow.print(currentDirMessage, A_BOLD);
     CurrentDirWindow.print(currentDir);
     CurrentDirWindow.refresh();
 
     std::vector<size_t> ignoreBlocks = {attributePosition, 0, attributePosition,
                                         hiddenInfo.length()};
-    NavigationMenu.insert(hiddenInfo, attributePosition, 0);
+    NavigationMenu.moveCursor(attributePosition, 0);
+    NavigationMenu.print(hiddenInfo);
     NavigationMenu.refresh();
 
     // NavigationMenu.display(breakConditions, ignoreBlocks);
@@ -438,18 +444,22 @@ int Shell::navigateDir() {
       if (chosenPathType == "directory") {
         _ARGV = {"cd", chosenPath};
         _ARGC = 2;
-        changeDir();
+
         NavigationMenu.eraseWin();
         CurrentDirWindow.eraseWin();
+        NavigationMenu.refresh();
+        CurrentDirWindow.refresh();
         NavigationMenu.setWin(BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
         CurrentDirWindow.setWin(
             BlackOS::DisplayKernel::WIN_SET_CODE::KILL_CHILD);
+        changeDir();
         break;
       } else if (chosenPathType == "file") {
         int result = openWithTextEditor(chosenPath);
+        curs_set(_CURSOR); // TODO: find where to put this
         NavigationMenu.eraseWin();
         if (result == -1) {
-          NavigationMenu.insert("no EDITOR environment variable is set.", 0, 0);
+          NavigationMenu.print("no EDITOR environment variable is set.");
           NavigationMenu.refresh();
           NavigationMenu.pause();
         }

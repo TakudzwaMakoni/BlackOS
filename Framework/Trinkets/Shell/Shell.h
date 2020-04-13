@@ -22,6 +22,7 @@
  * @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+#include "../../External/inc/pstream.h"
 #include "../helpers/PathController.h"
 #include "Screen.h"
 #include "Window.h"
@@ -153,6 +154,8 @@ public:
   void splashScreen(std::vector<std::string> const &argv);
   ///
   void printToScreen(std::string const &, bool newlineAtBeginning = true);
+  ///
+  bool commandNotPrintable();
 
   /// Native commands
 
@@ -176,6 +179,8 @@ public:
   int shortcut();
   ///
   int listView();
+  ///
+  int listView(bool);
 
   /// configurations
 
@@ -211,6 +216,8 @@ public:
   int cpos();
   ///
   int MOVE();
+  ///
+  int configListView();
 
   ~Shell();
 
@@ -255,7 +262,6 @@ private:
   bool _SHOW_BORDER = 0;
 
   // default system colours / styles
-
   int _STYLE_ERROR;
   int _STYLE_INFO;
   int _STYLE_IMPORTANT = A_STANDOUT;
@@ -274,6 +280,7 @@ private:
 
   // screen attributes
   bool _LIST_VIEW_ENABLED = 0;
+  bool _LIST_VIEW_HIDDEN_ENABLED = 0;
   bool _TTY_FLAG_FALLBACK = 0;
   bool _USING_COLOR_FLAG = 0;
   std::filesystem::path _CURRENT_DIR; // or should we only get this on call?
@@ -319,6 +326,7 @@ private:
       pair("DELETE", &Shell::configDeleteKey),
       pair("FG", &Shell::configForegroundColour),
       pair("THEME", &Shell::configTheme),
+      pair("LSVIEW", &Shell::configListView),
   };
 
   command_map _THEME_MAP{
@@ -330,6 +338,15 @@ private:
       pair("thinkpad", &Shell::configThemeThinkPad),
       pair("system", &Shell::configThemeSystem),
       pair("ugly", &Shell::configThemeUgly),
+  };
+  std::vector<std::string> _PRINTABLES{
+      "make",
+      "ps",
+      "ss",
+      "nproc",
+      "lspci",
+      "dir",
+      "acpi",
   };
 };
 

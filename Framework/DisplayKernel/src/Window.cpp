@@ -111,24 +111,21 @@ wchar_t Window::getCharFromUser() const { return wgetch(_win); }
 
 void Window::insert(std::string const &str, size_t const y, size_t const x,
                     attr_t style) {
-  wattron(_win, style);
-  mvwprintw(_win, y, x, str.c_str());
-  wattroff(_win, style);
+  moveCursor(y, x);
+  print(str.c_str(), style);
 }
 
 void Window::insert(char const *ch, size_t const y, size_t const x,
                     attr_t style) {
-  wattron(_win, style);
-  mvwprintw(_win, y, x, ch);
-  wattroff(_win, style);
+  moveCursor(y, x);
+  print(ch, style);
 }
 
 void Window::insert(char const ch, size_t const y, size_t const x,
                     attr_t style) {
   char const *chstr = &ch;
-  wattron(_win, style);
-  mvwprintw(_win, y, x, chstr);
-  wattroff(_win, style);
+  moveCursor(y, x);
+  print(chstr, style);
 }
 
 /// MUTATOR RETROACTIVE
@@ -289,24 +286,24 @@ void Window::newLine(bool newlineAtBeginning) {
   int x;
   int y;
   getyx(_win, y, x);
-  if (newlineAtBeginning) {
-    x = 0;
+
+  print("\n");
+  if (!newlineAtBeginning) {
+    wmove(_win, y, x);
   }
-  wmove(_win, y + 1, x);
   wrefresh(_win);
 }
 
 void Window::newLines(int n, bool newlineAtBeginning) {
-
   int x;
   int y;
   getyx(_win, y, x);
-  if (newlineAtBeginning) {
-    x = 0;
-  }
 
   for (int i = 1; i <= n; i++)
-    wmove(_win, y + i, x);
+    print("\n");
+  if (!newlineAtBeginning) {
+    wmove(_win, y, x);
+  }
   wrefresh(_win);
 }
 
@@ -553,13 +550,15 @@ void Window::eraseExcept(std::vector<size_t> const &elements) {
 
 void Window::refresh() { wrefresh(_win); }
 
-/// MF ACTIVE
+void Window::setScroll(bool x) { scrollok(_win, x); }
+
+void Window::setKeypad(bool x) { keypad(_win, x); }
+
 void Window::setWin(WIN_SET_CODE const init) {
 
   if (init == WIN_SET_CODE::INIT_PARENT) {
     initscr();
     keypad(_win, TRUE);
-    scrollok(_win, TRUE);
 
     _win = newwin(0, 0, 0, 0);
     wresize(_win, _winSzY, _winSzX);

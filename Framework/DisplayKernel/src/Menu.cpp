@@ -121,23 +121,20 @@ wchar_t Menu::getCharFromUser() const { return wgetch(_win); }
 
 void Menu::insert(std::string const &str, size_t const y, size_t const x,
                   attr_t style) {
-  attron(style);
-  mvprintw(y, x, str.c_str());
-  attroff(style);
+  moveCursor(y, x);
+  print(str.c_str(), style);
 }
 
 void Menu::insert(char const *ch, size_t const y, size_t const x,
                   attr_t style) {
-  attron(style);
-  mvprintw(y, x, ch);
-  attroff(style);
+  moveCursor(y, x);
+  print(ch, style);
 }
 
 void Menu::insert(char const ch, size_t const y, size_t const x, attr_t style) {
   char const *chstr = &ch;
-  attron(style);
-  mvprintw(y, x, chstr);
-  attroff(style);
+  moveCursor(y, x);
+  print(chstr, style);
 }
 
 /// MUTATOR RETROACTIVE
@@ -427,7 +424,7 @@ void Menu::showTitle() {
 
   std::string header(paddingCorrection, ' ');
   header.insert(0, headerTitle);
-  insert(header, y, x, _titleStyle);
+  print(header, _titleStyle);
 };
 
 void Menu::_updateM() {
@@ -464,8 +461,20 @@ char Menu::getCharFromWin(size_t const y, size_t const x,
 /// MF ACTIVE
 void Menu::erase(size_t const y1, size_t const x1, size_t const y2,
                  size_t const x2) {
+  int y, x, Y, X;
+  getyx(_win, y, x);
+  getmaxyx(_win, Y, X);
 
-  _checkRange(y1, x1, y2, x2);
+  if (y1 == 0)
+    y += _showTitle + _showBorder;
+  if (x1 == 0)
+    x += _showBorder;
+
+  if (y2 == Y)
+    Y -= _showBorder;
+  if (x2 == X)
+    X -= _showBorder;
+
   size_t width = x2 - x1 + 1;
   std::string fill(width, ' ');
   for (size_t i = y1; i <= y2; ++i) {
@@ -498,7 +507,19 @@ void Menu::fill(char const ch, bool const titleBar) {
 void Menu::eraseExcept(size_t const y1, size_t const x1, size_t const y2,
                        size_t const x2) {
 
-  _checkRange(y1, x1, y2, x2);
+  int y, x, Y, X;
+  getyx(_win, y, x);
+  getmaxyx(_win, Y, X);
+
+  if (y1 == 0)
+    y += _showTitle + _showBorder;
+  if (x1 == 0)
+    x += _showBorder;
+
+  if (y2 == Y)
+    Y -= _showBorder;
+  if (x2 == X)
+    X -= _showBorder;
 
   size_t start = _showTitle + _showBorder;
   size_t end = _winSzY - (2 * _showBorder) - _showTitle;
@@ -584,6 +605,58 @@ int Menu::reposition(size_t const y, size_t const x) {
   _winPosX = x;
   mvwin(_win, _winPosY, _winPosX);
   return 1;
+}
+
+void Menu::print(std::string const &str, attr_t style) {
+  int y, x, Y, X;
+  getyx(_win, y, x);
+  getmaxyx(_win, Y, X);
+
+  if (y == 0)
+    y += _showTitle + _showBorder;
+  if (x == 0)
+    x += _showBorder;
+
+  if (y == Y)
+    Y -= _showBorder;
+  if (x == X)
+    X -= _showBorder;
+
+  wmove(_win, y, x);
+  wattron(_win, style);
+  wprintw(_win, str.c_str());
+  wattroff(_win, style);
+}
+
+void Menu::print(std::string const &format, std::string const &str,
+                 attr_t style) {
+  int y, x;
+  getyx(_win, y, x);
+
+  if (y == 0)
+    y += _showTitle + _showBorder;
+  if (x == 0)
+    x += _showBorder;
+
+  wmove(_win, y, x);
+  wattron(_win, style);
+  wprintw(_win, format.c_str(), str.c_str());
+  wattroff(_win, style);
+}
+
+void Menu::moveCursor(int y, int x) {
+  int Y, X;
+  getmaxyx(_win, Y, X);
+  if (y == 0)
+    y += _showTitle + _showBorder;
+  if (x == 0)
+    x += _showBorder;
+
+  if (y == Y)
+    Y -= _showBorder;
+  if (x == X)
+    X -= _showBorder;
+  wmove(_win, y, x);
 }
 
 void Menu::setKeypad(bool x) { keypad(_win, x); }

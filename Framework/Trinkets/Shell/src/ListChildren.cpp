@@ -105,7 +105,7 @@ int Shell::listChildren() {
   _DISPLAY->newLine();
 
   for (std::string const &field : fields) {
-    _DISPLAY->print(field.c_str());
+    _DISPLAY->print((field).c_str());
     _DISPLAY->newLine();
   }
   _DISPLAY->newLine();

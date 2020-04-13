@@ -84,6 +84,8 @@ public:
   int reposition(size_t const y, size_t const x);
   void cursorPosition(int &, int &) const;
   void bgfg(int const fg, int const bg); // TODO: rename
+  void setScroll(bool);
+  void setKeypad(bool);
 
   void newLine(bool newlineAtBeginning = true);
   void newLines(int n, bool newlineAtBeginning = true);

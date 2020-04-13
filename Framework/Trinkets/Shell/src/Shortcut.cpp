@@ -55,10 +55,9 @@ int Shell::shortcut() {
   // create menu object
   BlackOS::DisplayKernel::Menu ShortcutMenu(_TERM_SIZE_Y - y, _TERM_SIZE_Y, y,
                                             0);
-
   // load shortcuts
-  int maxNameLen = 0;
-  int maxDirLen = 0;
+  size_t maxNameLen = 0;
+  size_t maxDirLen = 0;
 
   std::ifstream infile(_SHORTCUTS_FILE);
   std::string shortcutName, directory;
@@ -110,21 +109,21 @@ int Shell::shortcut() {
     return 0;
   }
 
-  menuWidth = maxDirLen + maxNameLen + 1;
-  menuHeight = _TERM_SIZE_Y - y - 2;
+  menuWidth = _TERM_SIZE_X;
+  menuHeight = _DISPLAY_SIZE_Y - y - 2;
   pagination = menuHeight - 1;
 
-  ShortcutMenu.loadTitle("title", A_BOLD);
-  ShortcutMenu.initFields(fields);
   ShortcutMenu.loadFieldAlignment(-1, 1);
   ShortcutMenu.paginate(pagination, pagination <= fieldSz);
-
-  ShortcutMenu.hideBorder();
-  ShortcutMenu.showTitle();
 
   ShortcutMenu.resize(menuHeight, menuWidth);
   ShortcutMenu.reposition(y /*maintain cursor y position*/,
                           0 /*left of screen*/);
+
+  ShortcutMenu.loadTitle(title, A_BOLD);
+  ShortcutMenu.initFields(fields);
+  ShortcutMenu.showTitle();
+  ShortcutMenu.hideBorder();
 
   std::vector<int> breakConditions = {(int)'d', (int)'q', 10 /*ENTER*/,
                                       27 /*ESC*/};

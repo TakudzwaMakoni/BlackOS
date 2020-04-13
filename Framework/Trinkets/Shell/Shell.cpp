@@ -23,8 +23,6 @@
 
 using namespace BlackOS::Trinkets;
 
-// thanks to Sarah Vessels for Pipe/Redirect:
-// https://www.3till7.net/2008/11/29/c-shell-with-forks-and-pipes/index.html
 int main() {
 
   // use stdscreen
